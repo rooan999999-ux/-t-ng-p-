@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Cách sống đúng của Thanh niên Việt Nam</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      line-height: 1.6;
+    }
+    header {
+      background: #c62828;
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    section {
+      max-width: 900px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h2 { color: #c62828; }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #222;
+      color: white;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>TƯ TƯỞNG CÁCH SỐNG CỦA THANH NIÊN VIỆT NAM</h1>
+  <p>Sống có lý tưởng – Có trách nhiệm – Có cống hiến</p>
+</header>
+
+<section>
+  <h2>1. Lý tưởng sống</h2>
+  <p>
+    Thanh niên cần xác định lý tưởng sống đúng đắn,
+    sống vì gia đình, cộng đồng và đất nước.
+  </p>
+</section>
+
+<section>
+  <h2>2. Học tập và rèn luyện</h2>
+  <p>
+    Không ngừng học hỏi, rèn luyện đạo đức,
+    nâng cao tri thức và kỹ năng sống.
+  </p>
+</section>
+
+<section>
+  <h2>3. Lao động và cống hiến</h2>
+  <p>
+    Lao động là vinh quang.
+    Thanh niên phải chăm chỉ, sáng tạo và có trách nhiệm.
+  </p>
+</section>
+
+<section>
+  <h2>4. Trách nhiệm với cộng đồng</h2>
+  <p>
+    Sống trung thực, đoàn kết, tuân thủ pháp luật,
+    sẵn sàng giúp đỡ người khác.
+  </p>
+</section>
+
+<footer>
+  © 2026 – Trang web về cách sống đúng của thanh niên Việt Nam
+</footer>
+
+</body>
+</html>
