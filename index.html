@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Web Học Lập Trình</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+}
+header {
+    background: #020617;
+    padding: 15px;
+    font-size: 20px;
+}
+.container {
+    display: flex;
+}
+.menu {
+    width: 230px;
+    background: #020617;
+    height: 100vh;
+    padding: 10px;
+}
+.menu button {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 10px;
+    background: #1e293b;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.menu button:hover {
+    background: #38bdf8;
+    color: black;
+}
+.content {
+    padding: 20px;
+    flex: 1;
+}
+.box {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+pre {
+    background: black;
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+}
+</style>
+</head>
+
+<body>
+
+<header>👨‍💻 Web Học Lập Trình (Python • C++ • Java)</header>
+
+<div class="container">
+    <div class="menu">
+        <button onclick="show('py_basic')">Python cơ bản</button>
+        <button onclick="show('py_adv')">Python nâng cao</button>
+        <button onclick="show('cpp')">C++</button>
+        <button onclick="show('java')">Java</button>
+        <button onclick="show('web')">Web hoạt động</button>
+        <button onclick="show('error')">Lỗi web</button>
+    </div>
+
+    <div class="content" id="content">
+        <div class="box">
+            <h2>Chào mừng 👋</h2>
+            <p>Chọn mục bên trái để bắt đầu học lập trình.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function show(type) {
+    let html = "";
+
+    if (type === "py_basic") {
+        html = `
+        <div class="box">
+            <h2>🐍 Python cơ bản</h2>
+            <pre>print("Hello Python")
+x = 10
+if x > 5:
+    print("x lớn hơn 5")</pre>
+            <p>Học biến, điều kiện, in ra màn hình.</p>
+        </div>`;
+    }
+
+    if (type === "py_adv") {
+        html = `
+        <div class="box">
+            <h2>🐍 Python nâng cao</h2>
+            <pre>def tinh_tong(a, b):
+    return a + b
+
+print(tinh_tong(3, 5))</pre>
+            <p>Hàm, logic, tư duy lập trình.</p>
+        </div>`;
+    }
+
+    if (type === "cpp") {
+        html = `
+        <div class="box">
+            <h2>💻 C++</h2>
+            <pre>#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello C++";
+    return 0;
+}</pre>
+            <p>C++ quản lý bộ nhớ, tốc độ cao.</p>
+        </div>`;
+    }
+
+    if (type === "java") {
+        html = `
+        <div class="box">
+            <h2>☕ Java</h2>
+            <pre>public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello Java");
+    }
+}</pre>
+            <p>Java chạy trên JVM, đa nền tảng.</p>
+        </div>`;
+    }
+
+    if (type === "web") {
+        html = `
+        <div class="box">
+            <h2>🌐 Web hoạt động thế nào?</h2>
+            <p>HTML tạo nội dung, CSS tạo giao diện, JavaScript xử lý tương tác.</p>
+        </div>`;
+    }
+
+    if (type === "error") {
+        html = `
+        <div class="box">
+            <h2>🐞 Lỗi web thường gặp</h2>
+            <ul>
+                <li>Web trắng → lỗi JavaScript</li>
+                <li>CSS không ăn → cache trình duyệt</li>
+                <li>Link sai → lỗi đường dẫn</li>
+            </ul>
+        </div>`;
+    }
+
+    document.getElementById("content").innerHTML = html;
+}
+</script>
+
+</body>
+</html>
