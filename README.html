@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Bài 28: Phạm Vi Biến - Nhóm 2 | Thuyết trình tương tác</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060f);
+            font-family: 'Inter', sans-serif;
+            color: #edf2ff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Canvas nền động */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Container chính - dạng slider */
+        .presentation-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            perspective: 1500px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 88%;
+            max-width: 1400px;
+            height: 85vh;
+            background: rgba(15, 25, 45, 0.75);
+            backdrop-filter: blur(18px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            padding: 2.5rem 3.5rem;
+            overflow-y: auto;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+            transform: translateX(50px) scale(0.95);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+            z-index: 20;
+        }
+
+        /* Scrollbar đẹp */
+        .slide::-webkit-scrollbar { width: 8px; }
+        .slide::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 8px; margin: 1rem; }
+        .slide::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 8px; }
+        .slide::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.8); }
+
+        /* Typography */
+        h1 {
+            font-size: 3.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #c084fc, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-left: 5px solid #a855f7;
+            padding-left: 1.2rem;
+            margin-bottom: 1.8rem;
+            color: #f8fafc;
+        }
+
+        h2 i {
+            color: #c084fc;
+            font-size: 2rem;
+        }
+
+        .desc-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #cbd5e6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        /* Elements */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1.5rem;
+            padding: 1.8rem;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255,255,255,0.06);
+            transform: translateY(-5px);
+            border-color: rgba(168,85,247,0.4);
+            box-shadow: 0 10px 20px -10px rgba(168,85,247,0.2);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            width: fit-content;
+        }
+        .badge-local { background: #10b98120; color: #34d399; border: 1px solid #34d39940; }
+        .badge-global { background: #f43f5e20; color: #fb7185; border: 1px solid #fb718540; }
+        .badge-info { background: #0ea5e920; color: #7dd3fc; border: 1px solid #38bdf840; }
+        .badge-warning { background: #f59e0b20; color: #fbbf24; border: 1px solid #fcd34d40; }
+
+        /* Code Block */
+        .code-block {
+            background: #0b0e17;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            border: 1px solid #2d3a5e;
+            box-shadow: 0 15px 25px -10px rgba(0,0,0,0.5);
+        }
+        .code-header {
+            background: #131824;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border-bottom: 1px solid #2d3a5e;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .code-header .dot { width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; }
+        .code-header .dot.yellow { background: #ffbd2e; }
+        .code-header .dot.green { background: #27c93f; }
+        .code-content {
+            padding: 1.5rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #f8f8f2;
+        }
+        .keyword { color: #ff79c6; font-weight: 600; }
+        .func { color: #50fa7b; }
+        .string { color: #f1fa8c; }
+        .number { color: #bd93f9; }
+        .comment { color: #6272a4; font-style: italic; }
+        .operator { color: #ff79c6; }
+
+        /* Lists */
+        .list-styled {
+            list-style: none;
+        }
+        .list-styled li {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.2rem;
+            font-size: 1.15rem;
+            color: #e2e8f0;
+        }
+        .list-styled li i { color: #a855f7; margin-top: 0.25rem; font-size: 1.2rem; }
+
+        /* Animations */
+        .fragment {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .fragment.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Controls */
+        .nav-bar {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 80px;
+            padding: 0.6rem 2rem;
+            display: flex;
+            gap: 1.8rem;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .nav-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-btn:hover:not(:disabled) { background: rgba(168, 85, 247, 0.3); border-color: #c084fc; color: #fff; transform: scale(1.05); }
+        .nav-btn:active:not(:disabled) { transform: scale(0.95); }
+        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .progress {
+            width: 200px;
+            height: 6px;
+            background: #334155;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #3b82f6, #a855f7, #ec4899);
+            transition: width 0.4s ease;
+        }
+        .counter {
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            min-width: 60px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Script panel */
+        .script-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 380px;
+            max-height: 75vh;
+            background: rgba(11, 17, 32, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 1.2rem;
+            border: 1px solid #334155;
+            border-top: 4px solid #f59e0b;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            font-size: 1rem;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .script-panel.show { display: flex; animation: slideIn 0.3s forwards; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .script-header {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: grab;
+            font-weight: 600;
+            color: #fcd34d;
+        }
+        .script-header:active { cursor: grabbing; }
+        .script-body {
+            padding: 1.2rem;
+            overflow-y: auto;
+            max-height: calc(75vh - 60px);
+            color: #cbd5e6;
+        }
+        .script-line {
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border-radius: 8px;
+            transition: 0.3s;
+            border-left: 3px solid transparent;
+            background: rgba(255,255,255,0.02);
+        }
+        .script-line.active-line {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #f59e0b;
+            color: #fff;
+        }
+
+        /* Custom Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        th { background: rgba(30, 41, 59, 0.8); padding: 1.2rem; text-align: left; font-weight: 600; color: #a855f7; border-bottom: 2px solid #334155; }
+        td { padding: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(15, 23, 42, 0.4); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.05); }
+
+        .highlight-text { color: #a855f7; font-weight: bold; }
+
+        @media (max-width: 1000px) {
+            .slide { width: 95%; padding: 2rem; height: 88vh; }
+            h1 { font-size: 2.8rem; }
+            h2 { font-size: 1.8rem; }
+            .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 1rem; }
+            .script-panel { width: 90%; right: 5%; top: 10px; }
+            .nav-bar { width: 90%; justify-content: center; padding: 0.6rem; }
+            .progress { display: none; }
+        }
+    </style>
+</head>
+<body>
+<!-- Background Animation -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- Kịch bản thuyết trình (Dành cho MC) -->
+<div id="scriptPanel" class="script-panel">
+    <div class="script-header" id="scriptDragHandle">
+        <span><i class="fas fa-microphone-alt"></i> Lời thoại MC (Nhóm 2)</span>
+        <button onclick="toggleScript()" style="background:none; border:none; color:#f87171; cursor:pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="script-body" id="scriptContent">
+        <!-- Nội dung sẽ được render bằng JS -->
+    </div>
+</div>
+
+<!-- CONTAINER TRÌNH CHIẾU -->
+<div class="presentation-wrapper" id="presentationContainer">
+    
+    <!-- SLIDE 1: Giới thiệu -->
+    <div class="slide active" id="slide-1">
+        <div style="flex:1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <div class="badge badge-info fragment" style="margin-bottom: 1.5rem; font-size: 1.1rem;"><i class="fas fa-code"></i> Tin Học 10 - Lập Trình Python</div>
+            <h1 class="fragment">Bài 28: Phạm Vi Của Biến</h1>
+            <p class="desc-text fragment" style="max-width: 800px;">Khám phá cách Python quản lý không gian bộ nhớ, sự khác biệt giữa biến cục bộ, toàn cục và cách áp dụng vào giải quyết bài toán thực tế.</p>
+            
+            <div class="fragment glass-card" style="margin-top: 3rem; width: 100%; max-width: 900px; background: rgba(168, 85, 247, 0.05); border-color: rgba(168, 85, 247, 0.3);">
+                <h3 style="color:#c084fc; font-size: 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <i class="fas fa-users"></i> Thực hiện: Nhóm 2
+                </h3>
+                <div class="grid-3" style="gap:1.2rem; text-align:center; font-size: 1.1rem; font-weight: 500;">
+                    <div><i class="fas fa-user-astronaut" style="color: #60a5fa;"></i> An</div>
+                    <div><i class="fas fa-user-ninja" style="color: #34d399;"></i> Khơ He</div>
+                    <div><i class="fas fa-user-tie" style="color: #fb7185;"></i> Núi</div>
+                    <div><i class="fas fa-user-graduate" style="color: #fcd34d;"></i> Ước</div>
+                    <div><i class="fas fa-user-md" style="color: #a855f7;"></i> Phương Nhi</div>
+                    <div><i class="fas fa-user-cog" style="color: #fb923c;"></i> Yuen Ni</div>
+                    <div style="grid-column: 1 / -1; text-align: center;"><i class="fas fa-user-shield" style="color: #f87171;"></i> Ân</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 2: Hoạt động 1 - Khái niệm -->
+    <div class="slide" id="slide-2">
+        <h2><i class="fas fa-book-reader"></i> 1. Hoạt động 1: Đọc ví dụ SGK Trang 37</h2>
+        <p class="desc-text fragment">Thông qua Ví dụ 1 SGK, chúng ta nhận thấy trong Python có hai không gian tồn tại của biến:</p>
+        
+        <div class="grid-2">
+            <div class="glass-card fragment" style="border-top: 4px solid #34d399;">
+                <div class="badge badge-local mb-2">A. Biến khai báo TRONG hàm</div>
+                <ul class="list-styled" style="margin-top: 1rem;">
+                    <li><i class="fas fa-check"></i> Vị trí: Đặt bên trong khối lệnh <code>def</code>.</li>
+                    <li><i class="fas fa-check"></i> Còn gọi là: <strong style="color:#34d399">Biến cục bộ (Local Variable)</strong>.</li>
+                    <li><i class="fas fa-check"></i> Ví dụ: Biến tham số, biến tính toán trung gian tạo ra trong hàm.</li>
+                </ul>
+            </div>
+            
+            <div class="glass-card fragment" style="border-top: 4px solid #fb7185;">
+                <div class="badge badge-global mb-2">B. Biến khai báo NGOÀI hàm</div>
+                <ul class="list-styled" style="margin-top: 1rem;">
+                    <li><i class="fas fa-check"></i> Vị trí: Đặt bên ngoài mọi khối lệnh <code>def</code> (thường ở đầu chương trình).</li>
+                    <li><i class="fas fa-check"></i> Còn gọi là: <strong style="color:#fb7185">Biến toàn cục (Global Variable)</strong>.</li>
+                    <li><i class="fas fa-check"></i> Ví dụ: Các hằng số, các cấu hình chung của toàn bộ file code.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 3: Hoạt động 1 - So sánh -->
+    <div class="slide" id="slide-3">
+        <h2><i class="fas fa-balance-scale-right"></i> Sự khác biệt về Vị trí & Ý nghĩa</h2>
+        
+        <div class="glass-card fragment" style="margin-bottom: 1.5rem;">
+            <h3 style="color: #60a5fa; margin-bottom: 0.5rem;"><i class="fas fa-map-marker-alt"></i> 1. Về vị trí (Tầm vực hoạt động)</h3>
+            <p class="desc-text" style="margin-bottom: 0;">- <strong>Biến trong hàm:</strong> Chỉ "nhìn thấy" và sử dụng được <span class="highlight-text">từ lúc khai báo cho đến khi kết thúc hàm</span> đó. Gọi nó từ bên ngoài sẽ báo lỗi <code>NameError</code>.</p>
+            <p class="desc-text">- <strong>Biến ngoài hàm:</strong> Hoạt động xuyên suốt, có thể được gọi ở <span class="highlight-text">bất cứ đâu</span> (cả ngoài lẫn trong các hàm khác).</p>
+        </div>
+
+        <div class="glass-card fragment">
+            <h3 style="color: #fcd34d; margin-bottom: 0.5rem;"><i class="fas fa-lightbulb"></i> 2. Về ý nghĩa (Quản lý bộ nhớ)</h3>
+            <p class="desc-text" style="margin-bottom: 0;">- <strong>Biến trong hàm:</strong> Mang tính <em>đóng gói</em>. Nó được sinh ra khi hàm chạy và <strong>tự động bị xóa sạch khỏi RAM</strong> khi hàm kết thúc. Giúp tiết kiệm bộ nhớ và tránh xung đột tên.</p>
+            <p class="desc-text">- <strong>Biến ngoài hàm:</strong> Mang tính <em>chia sẻ dữ liệu</em>. Nó tồn tại trong suốt quá trình chạy chương trình. Phù hợp làm dữ liệu dùng chung (như Tỷ giá, Điểm chuẩn, Hệ số...).</p>
+        </div>
+    </div>
+
+    <!-- SLIDE 4: Ví dụ 1 - Biến trong hàm -->
+    <div class="slide" id="slide-4">
+        <h2><i class="fas fa-box-open"></i> 2. Ví dụ 1: Biến khai báo TRONG hàm (Local)</h2>
+        <p class="desc-text fragment">Xét bài toán tính diện tích hình chữ nhật.</p>
+        
+        <div class="grid-2">
+            <div class="code-block fragment">
+                <div class="code-header">
+                    <div class="dot"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <span style="margin-left:8px;">tinh_dien_tich.py</span>
+                </div>
+                <div class="code-content">
+                    <span class="keyword">def</span> <span class="func">DienTich_HCN</span>(dai, rong):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 'dien_tich' là biến trong hàm (Cục bộ)</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;dien_tich = dai * rong <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="func">print</span>(<span class="string">"Diện tích là:"</span>, dien_tich)<br>
+                    <br>
+                    <span class="comment"># Gọi hàm thực thi</span><br>
+                    DienTich_HCN(<span class="number">10</span>, <span class="number">5</span>) <br>
+                    <br>
+                    <span class="comment"># Lỗi nếu cố gọi biến cục bộ ở ngoài!</span><br>
+                    <span class="func">print</span>(dien_tich) <span class="comment"># ❌ Báo lỗi NameError</span>
+                </div>
+            </div>
+            
+            <div class="flex-col fragment">
+                <div class="glass-card" style="height: 100%;">
+                    <h3 style="color:#34d399; margin-bottom: 1rem;"><i class="fas fa-search"></i> Phân tích</h3>
+                    <ul class="list-styled">
+                        <li>Biến <code>dien_tich</code> được tạo ra bên trong hàm <code>DienTich_HCN</code>.</li>
+                        <li>Nó làm nhiệm vụ lưu trữ kết quả tạm thời.</li>
+                        <li>Ngay khi in kết quả xong và thoát hàm, <code>dien_tich</code> <strong>bị hủy</strong>. Cố tình in ra ở ngoài sẽ gây lỗi vì máy tính không còn nhớ nó là gì.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 5: Ví dụ 2 - Biến ngoài hàm -->
+    <div class="slide" id="slide-5">
+        <h2><i class="fas fa-globe-asia"></i> 2. Ví dụ 2: Biến khai báo NGOÀI hàm (Global)</h2>
+        <p class="desc-text fragment">Một hằng số Pi được dùng chung cho nhiều tính toán.</p>
+        
+        <div class="grid-2">
+            <div class="code-block fragment">
+                <div class="code-header">
+                    <div class="dot"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <span style="margin-left:8px;">hinh_tron.py</span>
+                </div>
+                <div class="code-content">
+                    <span class="comment"># 'PI' là biến ngoài hàm (Toàn cục)</span><br>
+                    PI = <span class="number">3.14159</span><br>
+                    <br>
+                    <span class="keyword">def</span> <span class="func">ChuVi</span>(r):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="number">2</span> * PI * r  <span class="comment"># Hàm đọc được PI</span><br>
+                    <br>
+                    <span class="keyword">def</span> <span class="func">DienTich</span>(r):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> PI * r * r <span class="comment"># Hàm này cũng đọc được PI</span><br>
+                    <br>
+                    <span class="func">print</span>(ChuVi(<span class="number">5</span>))<br>
+                    <span class="func">print</span>(DienTich(<span class="number">5</span>))
+                </div>
+            </div>
+            
+            <div class="flex-col fragment">
+                <div class="glass-card" style="height: 100%;">
+                    <h3 style="color:#fb7185; margin-bottom: 1rem;"><i class="fas fa-search"></i> Phân tích</h3>
+                    <ul class="list-styled">
+                        <li>Biến <code>PI</code> nằm ngoài mọi hàm.</li>
+                        <li>Nó đóng vai trò là "dữ liệu công cộng".</li>
+                        <li>Cả 2 hàm <code>ChuVi</code> và <code>DienTich</code> đều có thể "nhìn thấy" và lấy giá trị của <code>PI</code> để tính toán mà không cần phải tự tạo lại.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 6: Thực hành (Nhiệm vụ 1) -->
+    <div class="slide" id="slide-6">
+        <h2><i class="fas fa-laptop-code"></i> 3a. Giải thích Thực hành (Nhiệm vụ 1)</h2>
+        <p class="desc-text fragment">Nhiệm vụ yêu cầu: Viết chương trình có sử dụng biến và hàm để thấy rõ tính chất phạm vi. Bài toán: Tính điểm trung bình môn.</p>
+
+        <div class="grid-2">
+            <div class="code-block fragment">
+                <div class="code-content" style="padding: 1.2rem; font-size: 0.95rem;">
+                    he_so_toan = <span class="number">2</span> <span class="comment"># Biến ngoài (Global)</span><br>
+                    <br>
+                    <span class="keyword">def</span> <span class="func">TinhDiemTB</span>(toan, van, anh):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># tong_diem là biến trong (Local)</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;tong_diem = (toan * he_so_toan) + van + anh<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;dtb = tong_diem / <span class="number">4</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> dtb<br>
+                    <br>
+                    diem = TinhDiemTB(<span class="number">8.0</span>, <span class="number">7.5</span>, <span class="number">9.0</span>)<br>
+                    <span class="func">print</span>(<span class="string">"Điểm TB:"</span>, diem)
+                </div>
+            </div>
+            <div class="glass-card fragment">
+                <h3 style="color: #a855f7; margin-bottom: 0.8rem;">Giải thích code:</h3>
+                <p class="desc-text" style="font-size: 1.05rem;">
+                    1. Chúng ta đặt <code>he_so_toan = 2</code> làm biến toàn cục vì luật chung của trường Toán nhân đôi.<br><br>
+                    2. Trong hàm <code>TinhDiemTB</code>, các biến <code>toan, van, anh</code> (tham số) và <code>tong_diem, dtb</code> là biến cục bộ. Chúng chỉ xuất hiện để phục vụ tính toán cho 1 học sinh cụ thể.<br><br>
+                    3. Hàm tính toán mượt mà do kết hợp <strong>đọc dữ liệu chung (Global)</strong> và <strong>xử lý dữ liệu riêng (Local)</strong>.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 7: Bài toán Sáng tạo (Điểm 10) -->
+    <div class="slide" id="slide-7">
+        <h2><i class="fas fa-fire"></i> 3b. Mở rộng sáng tạo: Hệ thống tính Lực Chiến RPG</h2>
+        <div class="badge badge-warning fragment" style="margin-bottom: 1rem;"><i class="fas fa-star"></i> Yêu cầu sáng tạo điểm 10</div>
+        <p class="desc-text fragment">Nâng cấp từ bài thực hành 1, nhóm thiết kế một chương trình tính Lực chiến (Combat Power) cho nhân vật Game. Sử dụng biến <strong>Global</strong> làm buff (chỉ số cường hóa server) và <strong>Local</strong> cho trang bị nhân vật.</p>
+        
+        <div class="grid-2">
+            <div class="code-block fragment" style="border: 1px solid #f59e0b;">
+                <div class="code-header" style="background:#451a03; color:#fcd34d;">
+                    <i class="fas fa-gamepad"></i> game_logic.py
+                </div>
+                <div class="code-content" style="font-size: 0.9rem;">
+                    <span class="comment"># Global: Buff Server cuối tuần</span><br>
+                    SERVER_BUFF = <span class="number">1.5</span> <br>
+                    <br>
+                    <span class="keyword">def</span> <span class="func">TinhLucChien</span>(vu_khi, giap):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># Local: Chỉ số riêng của người chơi</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;luc_cong = vu_khi * <span class="number">10</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;luc_thu = giap * <span class="number">5</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;tong_luc = (luc_cong + luc_thu) * SERVER_BUFF<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> tong_luc<br>
+                    <br>
+                    player_A = TinhLucChien(<span class="number">50</span>, <span class="number">20</span>)<br>
+                    <span class="func">print</span>(<span class="string">"Lực chiến Player A:"</span>, player_A) <span class="comment"># 900.0</span>
+                </div>
+            </div>
+            <div class="glass-card fragment">
+                <h3 style="color:#fcd34d;"><i class="fas fa-bolt"></i> Điểm sáng tạo:</h3>
+                <ul class="list-styled" style="font-size: 1rem; margin-top: 1rem;">
+                    <li>Áp dụng vào thực tế ngành công nghiệp Game.</li>
+                    <li>Sử dụng hằng số <code>SERVER_BUFF</code> (viết hoa) chuẩn quy tắc code chuyên nghiệp.</li>
+                    <li>Cho thấy sức mạnh của biến toàn cục: Chỉ cần đổi <code>SERVER_BUFF = 2.0</code> (sự kiện X2), lực chiến hàng triệu người chơi gọi hàm này sẽ tự động tăng theo mà không cần sửa code bên trong hàm!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE 8: Tổng kết -->
+    <div class="slide" id="slide-8">
+        <h2><i class="fas fa-clipboard-check"></i> Tổng Kết Kiến Thức</h2>
+        <div class="fragment">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tiêu chí so sánh</th>
+                        <th>Biến Cục Bộ (Local)</th>
+                        <th>Biến Toàn Cục (Global)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Nơi khai báo</strong></td>
+                        <td>Bên trong định nghĩa hàm.</td>
+                        <td>Bên ngoài tất cả các hàm.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tầm nhìn (Scope)</strong></td>
+                        <td>Chỉ sử dụng được bên trong hàm đó.</td>
+                        <td>Sử dụng được ở bất kỳ đâu trong file code.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Thời gian tồn tại</strong></td>
+                        <td>Tạo ra khi gọi hàm, xóa khi kết thúc.</td>
+                        <td>Tồn tại từ khi khai báo đến khi đóng chương trình.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ứng dụng chính</strong></td>
+                        <td>Biến đếm, tính toán trung gian, dữ liệu tạm.</td>
+                        <td>Hằng số chung, cấu hình hệ thống, dữ liệu nền.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="glass-card fragment" style="margin-top: 2rem; text-align: center; background: rgba(168,85,247,0.1); border-color: #a855f7;">
+            <p style="font-size: 1.2rem; font-weight: 500; color: #e2e8f0;">
+                <i class="fas fa-lightbulb" style="color:#fcd34d"></i> <strong>Quy tắc vàng:</strong> Hạn chế lạm dụng biến toàn cục. Hãy ưu tiên sử dụng biến cục bộ và tham số để hàm mang tính "đóng gói" và ít gặp lỗi nhất!
+            </p>
+        </div>
+    </div>
+
+    <!-- SLIDE 9: Q&A / Ending -->
+    <div class="slide" id="slide-9">
+        <div style="height:100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <i class="fas fa-graduation-cap fragment" style="font-size: 5rem; color: #a855f7; margin-bottom: 2rem;"></i>
+            <h1 class="fragment" style="font-size:4.5rem; margin-bottom: 1rem;">THANK YOU!</h1>
+            <p class="desc-text fragment" style="font-size: 1.5rem; margin-bottom: 2rem;">Cảm ơn Cô và các bạn đã lắng nghe phần trình bày của Nhóm 2.</p>
+            
+            <div class="glass-card fragment" style="background: rgba(255,255,255,0.05); padding: 2rem 4rem; cursor: pointer; border: 2px dashed #64748b;">
+                <h3 style="color:#60a5fa; font-size: 1.8rem; margin-bottom: 0.5rem;"><i class="fas fa-question-circle"></i> Q&A Section</h3>
+                <p>Nhóm xin mời cô và các bạn đặt câu hỏi!</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- THANH ĐIỀU KHIỂN (Navigation) -->
+<div class="nav-bar">
+    <button class="nav-btn" onclick="toggleScript()" title="Mở kịch bản MC" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b;"><i class="fas fa-scroll"></i></button>
+    <button class="nav-btn" id="prevBtn" onclick="prevStep()"><i class="fas fa-chevron-left"></i></button>
+    
+    <div class="progress">
+        <div class="progress-bar" id="progressBarFill"></div>
+    </div>
+    
+    <div class="counter" id="slideCounter">1/9</div>
+    
+    <button class="nav-btn" id="nextBtn" onclick="nextStep()"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+<script>
+    // ---------- HỆ THỐNG KỊCH BẢN (SCRIPT CHO MC) ----------
+    const mcScripts = [
+        {
+            // Slide 1
+            fragments: [
+                "Chào cô và các bạn, đại diện Nhóm 2, hôm nay mình xin trình bày về Bài 28: Phạm vi của biến trong Python.",
+                "Nhóm mình gồm 7 thành viên: An, Khơ He, Núi, Ước, Phương Nhi, Yuen Ni và Ân đã cùng nhau chuẩn bị nội dung này.",
+                "Xin mời cô và các bạn cùng hướng lên màn hình."
+            ]
+        },
+        {
+            // Slide 2
+            fragments: [
+                "Đầu tiên, chúng ta cùng giải quyết Hoạt động 1, sách giáo khoa trang 37.",
+                "Qua ví dụ, ta thấy biến được phân chia làm 2 loại không gian:",
+                "Loại 1: Khai báo TRONG hàm. Hay còn gọi là biến cục bộ. (Ví dụ như các tham số)",
+                "Loại 2: Khai báo NGOÀI hàm. Hay còn gọi là biến toàn cục. Thường đặt ở đầu file code."
+            ]
+        },
+        {
+            // Slide 3
+            fragments: [
+                "Vậy hai loại này khác nhau ở đâu? Hãy xét về 2 khía cạnh: Vị trí và Ý nghĩa.",
+                "Về vị trí, biến cục bộ như một người nội bộ, chỉ được biết đến và sử dụng trong hàm của nó. Biến toàn cục thì như loa phường, ai cũng có thể truy cập.",
+                "Về ý nghĩa và bộ nhớ, biến cục bộ rất tiết kiệm, dùng xong là máy tính tự xóa. Còn biến toàn cục sẽ 'sống' mãi đến khi tắt chương trình."
+            ]
+        },
+        {
+            // Slide 4
+            fragments: [
+                "Để làm rõ, nhóm đưa ra Ví dụ 1 về biến TRONG hàm.",
+                "Mọi người xem hàm tính diện tích hình chữ nhật sau.",
+                "Ở đây, biến 'dien_tich' là biến cục bộ.",
+                "Nếu ta cố tình in biến 'dien_tich' ở dòng cuối cùng (ngoài hàm), chương trình sẽ ngay lập tức báo lỗi NameError vì nó đã bị hủy."
+            ]
+        },
+        {
+            // Slide 5
+            fragments: [
+                "Đến với Ví dụ 2 về biến NGOÀI hàm.",
+                "Ta có biến PI nằm trên cùng.",
+                "Và ta có 2 hàm tính chu vi, diện tích hình tròn ở dưới.",
+                "Điểm hay ở đây là: cả 2 hàm đều có thể xài chung biến PI này mà không cần báo lỗi, vì PI là 'đồ dùng chung' của toàn bộ file code."
+            ]
+        },
+        {
+            // Slide 6
+            fragments: [
+                "Tiếp theo, nhóm sẽ giải thích bài Thực hành Nhiệm vụ 1. Yêu cầu tính điểm trung bình.",
+                "Mọi người xem đoạn code sau.",
+                "Code có sự kết hợp rất hay: he_so_toan là biến toàn cục, còn toan, van, anh, dtb là biến cục bộ. Điều này giúp hàm gọn gàng, tính cho 1 người nhưng vẫn tuân theo quy tắc chung của toàn trường."
+            ]
+        },
+        {
+            // Slide 7
+            fragments: [
+                "Đặc biệt, để khuyến khích sáng tạo (lấy điểm 10), nhóm em đã chuyển thể bài tính điểm thành Hệ thống tính lực chiến Game RPG cực kỳ hấp dẫn.",
+                "Thay vì hệ số điểm, tụi em dùng SERVER_BUFF là biến toàn cục. Đại diện cho sự kiện nhân đôi kinh nghiệm server.",
+                "Và các biến chỉ số Vũ khí, Giáp là biến cục bộ của từng người chơi.",
+                "Sự sáng tạo nằm ở chỗ: Khi sự kiện diễn ra, GM Game chỉ cần sửa duy nhất biến SERVER_BUFF, lực chiến của hàng vạn người chơi sẽ tự động thay đổi theo. Đây chính là sức mạnh thực tế của biến Toàn cục!"
+            ]
+        },
+        {
+            // Slide 8
+            fragments: [
+                "Để chốt lại bài học, mọi người cùng xem bảng so sánh tổng quát sau đây.",
+                "Bảng tóm tắt rất rõ ràng về Nơi khai báo, tầm nhìn, và ứng dụng chính.",
+                "Tuy nhiên, nhóm có 1 quy tắc vàng dành cho các bạn lập trình viên: Đừng lạm dụng biến toàn cục! Hãy ưu tiên truyền tham số và dùng biến cục bộ để code an toàn, không bị lỗi đè dữ liệu."
+            ]
+        },
+        {
+            // Slide 9
+            fragments: [
+                "",
+                "Và đó là toàn bộ nội dung tìm hiểu của Nhóm 2.",
+                "Cảm ơn cô và các bạn đã chú ý theo dõi.",
+                "Tiếp theo là phần Q&A, không biết có nhóm nào muốn đặt câu hỏi để nhóm 2 giải đáp không ạ?"
+            ]
+        }
+    ];
+
+    // ---------- QUẢN LÝ SLIDE & HIỆU ỨNG ----------
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    let currentIndex = 0;
+    let currentFragmentStep = -1;
+
+    function initPresentation() {
+        updateSlides();
+    }
+
+    function updateSlides() {
+        slides.forEach((slide, idx) => {
+            slide.classList.remove('active');
+            if (idx === currentIndex) slide.classList.add('active');
+        });
+        updateProgressAndCounter();
+        resetFragmentsForCurrentSlide();
+    }
+
+    function updateProgressAndCounter() {
+        const percent = ((currentIndex + 1) / slides.length) * 100;
+        document.getElementById('progressBarFill').style.width = `${percent}%`;
+        document.getElementById('slideCounter').innerText = `${currentIndex + 1}/${slides.length}`;
+        
+        // Disable buttons at boundaries
+        document.getElementById('prevBtn').disabled = (currentIndex === 0 && currentFragmentStep === -1);
+        const isLastSlide = (currentIndex === slides.length - 1);
+        const activeSlideFrags = slides[currentIndex].querySelectorAll('.fragment');
+        const allFragsVisible = currentFragmentStep >= activeSlideFrags.length - 1;
+        document.getElementById('nextBtn').disabled = (isLastSlide && allFragsVisible);
+    }
+
+    function resetFragmentsForCurrentSlide() {
+        const currentSlide = slides[currentIndex];
+        const fragments = currentSlide.querySelectorAll('.fragment');
+        fragments.forEach((frag, i) => {
+            if (i <= currentFragmentStep) frag.classList.add('visible');
+            else frag.classList.remove('visible');
+        });
+        renderScriptPanel();
+    }
+
+    function nextStep() {
+        const currentSlide = slides[currentIndex];
+        const fragments = currentSlide.querySelectorAll('.fragment');
+        
+        if (currentFragmentStep < fragments.length - 1) {
+            currentFragmentStep++;
+            fragments[currentFragmentStep].classList.add('visible');
+            updateProgressAndCounter();
+            renderScriptPanel();
+        } else if (currentIndex < slides.length - 1) {
+            currentIndex++;
+            currentFragmentStep = -1;
+            updateSlides();
+        }
+    }
+
+    function prevStep() {
+        if (currentFragmentStep >= 0) {
+            const currentSlide = slides[currentIndex];
+            const fragments = currentSlide.querySelectorAll('.fragment');
+            fragments[currentFragmentStep].classList.remove('visible');
+            currentFragmentStep--;
+            updateProgressAndCounter();
+            renderScriptPanel();
+        } else if (currentIndex > 0) {
+            currentIndex--;
+            const prevSlideFrags = slides[currentIndex].querySelectorAll('.fragment');
+            currentFragmentStep = prevSlideFrags.length - 1;
+            updateSlides();
+            const frags = slides[currentIndex].querySelectorAll('.fragment');
+            frags.forEach((f, idx) => {
+                if (idx <= currentFragmentStep) f.classList.add('visible');
+                else f.classList.remove('visible');
+            });
+            renderScriptPanel();
+        }
+    }
+
+    // ---------- UI KỊCH BẢN MC ----------
+    const scriptPanel = document.getElementById('scriptPanel');
+    const scriptContent = document.getElementById('scriptContent');
+    let scriptVisible = false;
+
+    function toggleScript() {
+        scriptVisible = !scriptVisible;
+        if (scriptVisible) {
+            scriptPanel.classList.add('show');
+            renderScriptPanel();
+        } else {
+            scriptPanel.classList.remove('show');
+        }
+    }
+
+    function renderScriptPanel() {
+        if (!scriptVisible) return;
+        const currentSlideScript = mcScripts[currentIndex];
+        if (!currentSlideScript) return;
+
+        let html = '';
+        currentSlideScript.fragments.forEach((text, idx) => {
+            if(text.trim() === '') return;
+            const stepClass = (idx === currentFragmentStep || (currentFragmentStep === -1 && idx === 0)) ? 'active-line' : '';
+            const icon = stepClass ? '<i class="fas fa-caret-right" style="color:#f59e0b; margin-right:8px;"></i>' : '';
+            html += `<div class="script-line ${stepClass}">${icon}${text}</div>`;
+        });
+        scriptContent.innerHTML = html;
+        
+        // Auto scroll to active line
+        const activeEl = scriptContent.querySelector('.active-line');
+        if (activeEl) {
+            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    // Kéo thả Script Panel
+    let isDragging = false, startX, startY, initialX, initialY;
+    const dragHandle = document.getElementById('scriptDragHandle');
+
+    dragHandle.addEventListener('mousedown', dragStart);
+    function dragStart(e) {
+        initialX = scriptPanel.offsetLeft;
+        initialY = scriptPanel.offsetTop;
+        startX = e.clientX;
+        startY = e.clientY;
+        isDragging = true;
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+    }
+    function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        const currentX = e.clientX - startX;
+        const currentY = e.clientY - startY;
+        scriptPanel.style.left = (initialX + currentX) + "px";
+        scriptPanel.style.top = (initialY + currentY) + "px";
+        scriptPanel.style.right = "auto"; 
+    }
+    function dragEnd() {
+        isDragging = false;
+        document.removeEventListener('mousemove', drag);
+        document.removeEventListener('mouseup', dragEnd);
+    }
+
+    // Điều khiển bằng bàn phím
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            nextStep();
+        } else if (e.key === 'ArrowLeft') {
+            prevStep();
+        }
+    });
+
+    // ---------- BACKGROUND CANVAS ANIMATION ----------
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = Math.random() * 0.5 - 0.25;
+            this.speedY = Math.random() * 0.5 - 0.25;
+            this.color = Math.random() > 0.5 ? '#a855f7' : '#60a5fa';
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x > canvas.width) this.x = 0;
+            if (this.x < 0) this.x = canvas.width;
+            if (this.y > canvas.height) this.y = 0;
+            if (this.y < 0) this.y = canvas.height;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.globalAlpha = 0.5;
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < 100; i++) particles.push(new Particle());
+
+    function animateCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            
+            for (let j = i; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < 100) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = particles[i].color;
+                    ctx.globalAlpha = 0.1 * (1 - distance/100);
+                    ctx.lineWidth = 0.5;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        requestAnimationFrame(animateCanvas);
+    }
+    animateCanvas();
+
+    // Khởi chạy UI
+    window.onload = () => {
+        initPresentation();
+    };
+
+</script>
+</body>
+</html>
