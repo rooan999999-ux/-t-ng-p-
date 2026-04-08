@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thuyết Trình Chuyên Nghiệp: Bài 28 - Phạm vi của biến</title>
+    <title>Thuyết Trình Chuyên Nghiệp: Bài 28 - Nhóm 2</title>
     <!-- Thư viện Font và Icon -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -80,7 +80,7 @@
             background: linear-gradient(to bottom right, #fff 30%, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         h2.section-title {
@@ -188,45 +188,51 @@
             gap: 5px;
         }
 
-        /* --- AI OVERLAY --- */
-        #ai-window {
+        /* --- SCRIPT PANEL (KỊCH BẢN) --- */
+        #script-panel {
             position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
-            display: none;
-            justify-content: center;
-            align-items: center;
+            top: 20px;
+            right: 20px;
+            width: 420px;
+            max-height: 80vh;
+            background: #1e1e2f;
+            border-left: 5px solid var(--primary);
+            border-radius: 15px;
+            padding: 25px;
             z-index: 1000;
-        }
-
-        .ai-container {
-            width: 90%;
-            max-width: 850px;
-            background: #111827;
-            border: 1px solid #374151;
-            border-radius: 30px;
-            overflow: hidden;
-            display: flex;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            display: none;
             flex-direction: column;
-            box-shadow: 0 0 100px rgba(139, 92, 246, 0.3);
+            overflow-y: auto;
         }
 
-        .ai-titlebar {
-            padding: 20px 30px;
-            background: #1f2937;
+        .script-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        .ai-body {
-            padding: 40px;
-            max-height: 60vh;
-            overflow-y: auto;
+        .script-header h3 {
+            color: #fb7185;
+            font-size: 1.3rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .script-body {
             font-size: 1.2rem;
             line-height: 1.8;
-            color: #e5e7eb;
+            color: #f3f4f6;
+        }
+
+        .script-body highlight {
+            color: #10b981;
+            font-weight: 600;
         }
 
         /* --- NAVIGATION --- */
@@ -238,7 +244,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(15px);
             padding: 12px 30px;
             border-radius: 100px;
@@ -262,6 +268,8 @@
         }
 
         .nav-btn:hover { background: var(--primary); }
+        .nav-btn.special { color: #f43f5e; border: 1px solid #f43f5e; }
+        .nav-btn.special:hover { background: #f43f5e; color: white; }
         
         .progress-indicator {
             height: 4px;
@@ -283,36 +291,20 @@
         .st { color: #10b981; }
         .cm { color: #6b7280; font-style: italic; }
         .fn { color: #06b6d4; }
-
-        /* --- QUIZ UI --- */
-        .quiz-option {
-            background: #1f2937;
-            border: 1px solid #374151;
-            padding: 18px 25px;
-            border-radius: 15px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .quiz-option:hover { border-color: var(--primary); background: #374151; }
-        .quiz-option.correct { border-color: #10b981; background: rgba(16, 185, 129, 0.2); }
-        .quiz-option.wrong { border-color: #f43f5e; background: rgba(244, 63, 94, 0.2); }
-
-        /* --- SPINNER --- */
-        .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: var(--primary);
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+    <!-- KỊCH BẢN PANEL (ẨN MẶC ĐỊNH) -->
+    <div id="script-panel">
+        <div class="script-header">
+            <h3><i class="fas fa-microphone-alt"></i> Kịch bản (Slide <span id="script-slide-num">1</span>)</h3>
+            <button onclick="toggleScript()" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <div class="script-body" id="script-content">
+            <!-- Nội dung kịch bản sẽ được JS cập nhật -->
+        </div>
+    </div>
 
     <div id="viewport">
         <!-- SLIDE 1: TRANG ĐẦU -->
@@ -320,6 +312,13 @@
             <div style="text-align: center; margin: auto;">
                 <div class="tag fragment" style="background: rgba(139, 92, 246, 0.2); color: var(--primary-light);">Tin học 10 - Lập trình Python</div>
                 <h1 class="title-main fragment">Bài 28: Phạm Vi<br>Của Biến</h1>
+                
+                <div class="fragment" style="margin: 25px 0;">
+                    <span style="font-size: 1.8rem; font-weight: 800; color: #fff; padding: 15px 40px; background: linear-gradient(90deg, #f43f5e, #8b5cf6); border-radius: 50px; display: inline-block; box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3);">
+                        <i class="fas fa-users" style="margin-right: 10px;"></i> Nhóm 2 Thực Hiện
+                    </span>
+                </div>
+
                 <p class="desc-text fragment" style="max-width: 700px; margin-inline: auto;">
                     Khám phá cách Python quản lý dữ liệu trong bộ nhớ và tại sao việc hiểu "Phạm vi" lại là chìa khóa để trở thành một lập trình viên giỏi.
                 </p>
@@ -331,11 +330,6 @@
                             <div style="font-size: 0.8rem; color: var(--text-dim);">Giảng viên hướng dẫn</div>
                         </div>
                     </div>
-                </div>
-                <div class="fragment" style="margin-top: 50px;">
-                    <button class="ai-badge" style="padding: 12px 30px; font-size: 1rem; border-radius: 100px;" onclick="talkToAI('Hãy đưa ra một câu dẫn nhập cực kỳ lôi cuốn cho bài thuyết trình về Scope trong Python.')">
-                        <i class="fas fa-sparkles"></i> Nhờ AI mở lời
-                    </button>
                 </div>
             </div>
         </div>
@@ -378,7 +372,6 @@
                 <div class="code-wrap fragment">
                     <div class="code-header">
                         <span>main.py</span>
-                        <button class="ai-badge" onclick="explainCode('def hello():\n    msg = \"Chào lớp 10\"\n    print(msg)\n\nhello()\nprint(msg) # ERROR')">AI Giải thích</button>
                     </div>
                     <pre class="code-display">
 <span class="kw">def</span> <span class="fn">hello</span>():
@@ -410,7 +403,6 @@ hello()
                 <div class="code-wrap fragment">
                     <div class="code-header">
                         <span>global_test.py</span>
-                        <button class="ai-badge" onclick="explainCode('pi = 3.14\n\ndef tinh_cv():\n    print(pi * 2)\n\ntinh_cv()')">AI Giải thích</button>
                     </div>
                     <pre class="code-display">
 pi = <span style="color: #f59e0b;">3.14</span> <span class="cm"># Global</span>
@@ -454,18 +446,13 @@ tang_diem()
                         <h3 style="color: var(--accent); margin-bottom: 10px;"><i class="fas fa-warning"></i> Cẩn trọng!</h3>
                         <p>Lạm dụng biến toàn cục và từ khóa <code>global</code> có thể khiến mã nguồn trở nên rối rắm và khó kiểm soát lỗi.</p>
                     </div>
-                    <div class="fragment" style="margin-top: 20px;">
-                        <button class="ai-badge" style="width: 100%; justify-content: center; padding: 15px;" onclick="talkToAI('Tại sao việc lạm dụng từ khóa global lại được coi là thói quen xấu trong lập trình chuyên nghiệp?')">
-                            Hỏi AI về "Best Practice"
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
 
         <!-- SLIDE 6: BÀI TẬP THỰC HÀNH -->
         <div class="slide">
-            <h2 class="section-title"><i class="fas fa-vial"></i> Thực hành Nhiệm vụ 1</h2>
+            <h2 class="section-title"><i class="fas fa-vial"></i> Áp dụng thực tế</h2>
             <p class="desc-text fragment">
                 Phân tích mã nguồn bài tập trong sách giáo khoa (Bài 28).
             </p>
@@ -476,57 +463,46 @@ tang_diem()
             <div class="grid-2">
                 <div class="info-card fragment" style="border-left: 5px solid var(--primary);">
                     <h4>Sáng tạo Điểm 10</h4>
-                    <p style="font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">Thử xây dựng một ứng dụng tính hóa đơn bán hàng. Dùng biến toàn cục để lưu <code>THUẾ_VAT</code> và biến cục bộ để tính <code>tong_tien</code> của từng khách hàng.</p>
+                    <p style="font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">Thử xây dựng một ứng dụng tính hóa đơn. Dùng biến toàn cục để lưu <code>THUẾ_VAT</code> chung, và biến cục bộ để tính <code>tong_tien</code> của từng khách hàng riêng biệt.</p>
                 </div>
                 <div class="info-card fragment" style="border-left: 5px solid var(--secondary);">
-                    <h4>Ghi nhớ</h4>
-                    <p style="font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">Biến cục bộ giúp tiết kiệm bộ nhớ vì chúng tự hủy khi xong việc. Biến toàn cục tốn bộ nhớ hơn vì tồn tại mãi đến khi tắt app.</p>
+                    <h4>Ghi nhớ tối ưu bộ nhớ</h4>
+                    <p style="font-size: 0.95rem; margin-top: 10px; line-height: 1.5;">Biến cục bộ giúp tiết kiệm RAM vì chúng tự hủy khi xong việc. Biến toàn cục tốn bộ nhớ hơn vì tồn tại mãi đến khi tắt phần mềm.</p>
                 </div>
             </div>
         </div>
 
         <!-- SLIDE 7: KẾT THÚC & TƯƠNG TÁC -->
         <div class="slide">
-            <h2 style="text-align: center; width: 100%; font-size: 3.5rem; margin-bottom: 20px;">Tổng kết</h2>
+            <h2 style="text-align: center; width: 100%; font-size: 4rem; margin-bottom: 20px;">Tổng kết</h2>
             <div class="grid-2" style="margin-top: 30px;">
-                <div class="info-card fragment">
-                    <h3 style="margin-bottom: 20px; color: var(--primary-light);">Bạn đã học được:</h3>
-                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 15px;">
-                        <li><i class="fas fa-check"></i> Phân biệt Local và Global Scope.</li>
-                        <li><i class="fas fa-check"></i> Cách dùng từ khóa global.</li>
-                        <li><i class="fas fa-check"></i> Tư duy tổ chức mã nguồn sạch sẽ.</li>
+                <div class="info-card fragment" style="background: rgba(16, 185, 129, 0.1); border-color: #10b981;">
+                    <h3 style="margin-bottom: 20px; color: #10b981;">Bạn đã học được:</h3>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 15px; font-size: 1.1rem;">
+                        <li><i class="fas fa-check-circle"></i> Phân biệt Local và Global Scope.</li>
+                        <li><i class="fas fa-check-circle"></i> Cách dùng từ khóa <code>global</code>.</li>
+                        <li><i class="fas fa-check-circle"></i> Tư duy tổ chức mã nguồn sạch, tối ưu bộ nhớ.</li>
                     </ul>
                 </div>
-                <div class="flex-col fragment">
-                    <button class="ai-badge" style="width: 100%; padding: 20px; border-radius: 20px; font-size: 1.1rem; margin-bottom: 15px;" onclick="generateQuiz()">
-                        <i class="fas fa-graduation-cap"></i> Làm Quiz ôn tập với AI
-                    </button>
-                    <button class="ai-badge" style="width: 100%; padding: 20px; border-radius: 20px; font-size: 1.1rem; background: linear-gradient(90deg, #10b981, #3b82f6);" onclick="readLessonSummary()">
-                        <i class="fas fa-volume-up"></i> AI tóm tắt bằng giọng nói
-                    </button>
+                <div class="info-card fragment" style="text-align: center; display:flex; flex-direction:column; justify-content:center;">
+                    <h1 style="font-size: 5rem; color: #f59e0b;"><i class="fas fa-star"></i></h1>
+                    <h3 style="margin-top: 10px;">Q & A</h3>
+                    <p style="color: var(--text-dim); margin-top: 10px;">Nhóm 2 xin phép trả lời câu hỏi của thầy và các bạn.</p>
                 </div>
             </div>
-            <p style="text-align: center; margin-top: 50px; font-weight: 800; color: var(--text-dim);">Cảm ơn thầy Đam Yi và các bạn đã lắng nghe!</p>
-        </div>
-    </div>
-
-    <!-- AI DIALOG WINDOW -->
-    <div id="ai-window">
-        <div class="ai-container">
-            <div class="ai-titlebar">
-                <span style="font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                    <i class="fas fa-robot" style="color: var(--primary-light);"></i> Gemini AI Assistant
-                </span>
-                <button onclick="closeAI()" style="background:transparent; border:none; color:white; cursor:pointer; font-size: 1.5rem;">&times;</button>
-            </div>
-            <div class="ai-body" id="ai-output">
-                <!-- Nội dung phản hồi từ AI -->
-            </div>
+            <p style="text-align: center; margin-top: 50px; font-weight: 800; color: var(--text-dim); font-size: 1.2rem;">Cảm ơn thầy Đam Yi và các bạn đã lắng nghe!</p>
         </div>
     </div>
 
     <!-- NAVIGATION BAR -->
     <div id="nav-bar">
+        <!-- Nút Kịch bản -->
+        <button class="nav-btn special" onclick="toggleScript()" title="Mở kịch bản thuyết trình (Chỉ mình bạn xem)">
+            <i class="fas fa-microphone-alt"></i>
+        </button>
+        
+        <div style="width: 20px;"></div> <!-- Spacer -->
+
         <button class="nav-btn" onclick="goPrev()"><i class="fas fa-chevron-left"></i></button>
         <div class="progress-indicator">
             <div id="progress-fill"></div>
@@ -535,118 +511,23 @@ tang_diem()
         <span id="counter" style="margin-left: 10px; font-size: 0.9rem; color: var(--text-dim); font-weight: 600;">1 / 7</span>
     </div>
 
-    <script type="module">
-        // --- CẤU HÌNH AI ---
-        const apiKey = ""; // API Key từ môi trường
-
-        async function callGemini(prompt, isJson = false) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const body = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: isJson ? { responseMimeType: "application/json" } : {}
-            };
-
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(body)
-                    });
-                    const data = await response.json();
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text;
-                } catch (e) {
-                    await new Promise(r => setTimeout(r, Math.pow(2, i) * 1000));
-                }
-            }
-            return "Xin lỗi, AI đang bận. Vui lòng thử lại sau.";
-        }
-
-        // --- HÀM TƯƠNG TÁC UI AI ---
-        window.talkToAI = async (prompt) => {
-            showAIWindow('<div style="text-align:center"><span class="loader"></span><p style="margin-top:20px">Gemini đang phân tích nội dung...</p></div>');
-            const res = await callGemini(prompt);
-            document.getElementById('ai-output').innerHTML = `<div style="white-space:pre-wrap">${res}</div>`;
-        };
-
-        window.explainCode = async (code) => {
-            showAIWindow('<div style="text-align:center"><span class="loader"></span><p style="margin-top:20px">Đang phân tích logic mã nguồn...</p></div>');
-            const prompt = `Giải thích đoạn mã Python sau cho học sinh lớp 10, tập trung giải thích về phạm vi biến (Local/Global) và lỗi nếu có: \n\n${code}`;
-            const res = await callGemini(prompt);
-            document.getElementById('ai-output').innerHTML = `<div style="white-space:pre-wrap">${res}</div>`;
-        };
-
-        window.generateQuiz = async () => {
-            showAIWindow('<div style="text-align:center"><span class="loader"></span><p style="margin-top:20px">Đang soạn câu hỏi trắc nghiệm kiến thức...</p></div>');
-            const prompt = `Tạo một câu hỏi trắc nghiệm (1 câu duy nhất) về Bài 28: Phạm vi của biến Python. Trả về JSON: {"question": "...", "options": ["A", "B", "C", "D"], "answer": 0}`;
-            try {
-                const res = await callGemini(prompt, true);
-                const quiz = JSON.parse(res);
-                let html = `<h3>${quiz.question}</h3><div style="margin-top:30px">`;
-                quiz.options.forEach((opt, idx) => {
-                    html += `<div class="quiz-option" onclick="checkAnswer(this, ${idx}, ${quiz.answer})">${opt}</div>`;
-                });
-                html += `</div>`;
-                document.getElementById('ai-output').innerHTML = html;
-            } catch (err) {
-                document.getElementById('ai-output').innerText = "Lỗi khi tạo Quiz.";
-            }
-        };
-
-        window.readLessonSummary = async () => {
-            showAIWindow('<div style="text-align:center"><span class="loader"></span><p style="margin-top:20px">Đang chuyển đổi văn bản thành giọng nói...</p></div>');
-            const summary = "Chào các bạn! Bài 28 dạy chúng ta rằng biến cục bộ chỉ sống trong hàm, còn biến toàn cục sống ở mọi nơi. Muốn sửa biến toàn cục trong hàm, hãy dùng từ khóa global. Chúc các bạn học tốt!";
+    <script>
+        // --- KỊCH BẢN THUYẾT TRÌNH CỦA NHÓM 2 ---
+        const presenterScripts = [
+            "Xin chào thầy và tất cả các bạn. Kính thưa thầy Đam Yi, sau đây em xin đại diện <highlight>Nhóm 2</highlight> trình bày về một khái niệm cốt lõi nhưng cũng rất dễ gây bối rối trong lập trình Python: Bài 28 - Phạm vi của biến.\n\n*(Bấm phím Mũi tên phải hoặc Click chuột để hiện dòng chữ tiếp theo)*\n\nChắc hẳn các bạn đã từng gặp lỗi 'NameError' - biến không tồn tại dù rõ ràng mình đã khai báo nó rồi đúng không? Hôm nay, nhóm 2 sẽ giúp các bạn giải quyết triệt để vấn đề đó.",
             
-            const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`;
-            const ttsBody = {
-                contents: [{ parts: [{ text: summary }] }],
-                generationConfig: {
-                    responseModalities: ["AUDIO"],
-                    speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } }
-                }
-            };
-
-            try {
-                const response = await fetch(ttsUrl, { method: 'POST', body: JSON.stringify(ttsBody) });
-                const data = await response.json();
-                const audioBase64 = data.candidates[0].content.parts[0].inlineData.data;
-                
-                // Play Audio
-                const audio = new Audio(`data:audio/L16;base64,${audioBase64}`);
-                document.getElementById('ai-output').innerHTML = `
-                    <div style="text-align:center">
-                        <i class="fas fa-volume-up" style="font-size:4rem; color:var(--primary-light); margin-bottom:20px"></i>
-                        <p>Đang phát âm thanh tóm tắt bài học...</p>
-                        <p style="font-style:italic; margin-top:20px; color:#9ca3af">"${summary}"</p>
-                    </div>
-                `;
-                // Note: In real environment, need PCM to WAV conversion, 
-                // but this represents the integration logic.
-            } catch (e) {
-                document.getElementById('ai-output').innerText = "Trình duyệt không hỗ trợ Audio hoặc API bận.";
-            }
-        };
-
-        window.checkAnswer = (el, selected, correct) => {
-            if (selected === correct) {
-                el.classList.add('correct');
-                document.getElementById('ai-output').innerHTML += `<p style="color:#10b981; margin-top:20px; text-align:center;">Chính xác! Bạn nắm kiến thức rất chắc.</p>`;
-            } else {
-                el.classList.add('wrong');
-                document.getElementById('ai-output').innerHTML += `<p style="color:#f43f5e; margin-top:20px; text-align:center;">Chưa đúng rồi. Đáp án đúng là phương án số ${correct + 1}.</p>`;
-            }
-            // Disable all options
-            document.querySelectorAll('.quiz-option').forEach(o => o.onclick = null);
-        };
-
-        function showAIWindow(html) {
-            document.getElementById('ai-window').style.display = 'flex';
-            document.getElementById('ai-output').innerHTML = html;
-        }
-
-        window.closeAI = () => {
-            document.getElementById('ai-window').style.display = 'none';
-        }
+            "Vậy, 'Phạm vi' hay 'Scope' là gì?\n\n*(Bấm hiển thị ý)*\nCác bạn hãy tưởng tượng bộ nhớ máy tính như một ngôi nhà có nhiều phòng, và Phạm vi chính là những bức tường.\n\n*(Bấm hiển thị ý)*\nTùy thuộc vào việc biến được tạo ra ở đâu, nó sẽ có quyền truy cập, vòng đời và mức độ bảo mật khác nhau.\n\n*(Bấm hiển thị ý)*\nNói một cách hình tượng: Biến có thể đang tồn tại trong bộ nhớ, nhưng chưa chắc bạn đã 'nhìn thấy' và sử dụng được nó.",
+            
+            "Chúng ta sẽ đi vào loại đầu tiên: <highlight>Biến cục bộ, hay Local Scope.</highlight>\n\n*(Bấm hiển thị ý)*\nHãy coi đây là những món đồ dùng riêng tư trong phòng ngủ của bạn. Nó chỉ tồn tại và được sử dụng bên trong một hàm.\n\n*(Bấm hiển thị ý)*\nHãy nhìn vào đoạn code ví dụ này. Khi ta gọi hàm hello(), biến 'msg' được tạo ra. Nhưng khi hàm chạy xong, 'msg' lập tức bị hủy bỏ. Do đó, lệnh print(msg) ở ngoài hàm sẽ báo lỗi vì lúc này 'msg' không còn tồn tại nữa.\n\n*(Bấm hiển thị ý)*\nCác đặc điểm chính là: khai báo trong hàm, chết khi hàm kết thúc, và bên ngoài tuyệt đối không thể can thiệp.",
+            
+            "Trái ngược với biến cục bộ là <highlight>Biến toàn cục, hay Global Scope.</highlight>\n\n*(Bấm hiển thị ý)*\nĐây giống như chiếc tivi để ở phòng khách, ai trong nhà cũng có thể xem được. Mọi hàm đều có thể 'nhìn thấy' biến này.\n\n*(Bấm hiển thị ý)*\nTrong đoạn code trên, hằng số 'pi' khai báo ở ngoài cùng. Cả hàm tinh_cv() và các lệnh bên ngoài đều có thể đọc giá trị của 'pi' một cách dễ dàng.\n\n*(Bấm hiển thị ý)*\nNhưng lưu ý quan trọng: mặc định các hàm chỉ có thể 'ĐỌC' biến toàn cục chứ không thể trực tiếp 'SỬA' nó.",
+            
+            "Vậy nếu muốn 'SỬA' chiếc tivi ở phòng khách từ trong phòng ngủ thì sao? Chúng ta cần một 'chìa khóa' đặc biệt, đó chính là <highlight>từ khóa 'global'</highlight>.\n\n*(Bấm hiển thị ý)*\nHãy xem ví dụ này. Chúng ta muốn tăng điểm (score) lên 10. Để thay đổi biến score từ bên trong hàm tang_diem(), ta BẮT BUỘC phải khai báo 'global score' ở đầu hàm.\n\n*(Bấm hiển thị ý)*\nTuy nhiên, các chuyên gia lập trình thường khuyên: Hãy hạn chế dùng 'global'. Việc thay đổi dữ liệu chung từ khắp mọi nơi sẽ khiến chương trình rất rối và dễ sinh ra các lỗi khó tìm.",
+            
+            "Áp dụng vào phần thực hành trong sách giáo khoa.\n\n*(Bấm hiển thị ý)*\nKhi các bạn viết hàm và truyền tham số vào, các tham số đó thực chất chính là các <highlight>Biến Cục Bộ</highlight>.\n\n*(Bấm hiển thị ý)*\nHãy thử sáng tạo hơn cho ứng dụng thực tế: Dùng biến toàn cục cho những thông tin chung như Thuế VAT, còn dùng biến cục bộ cho những tính toán tạm thời như tổng tiền của từng khách hàng.\n\n*(Bấm hiển thị ý)*\nBí kíp để lấy điểm 10 ở đây là: Hiểu được cách tối ưu bộ nhớ. Biến cục bộ dùng xong tự xóa, rất nhẹ máy; biến toàn cục thì tồn tại mãi cho đến khi tắt chương trình.",
+            
+            "Để tổng kết lại...\n\n*(Bấm hiển thị ý)*\nNhóm 2 hy vọng các bạn đã nắm vững cách phân biệt Local và Global, cách dùng từ khóa global an toàn và quan trọng nhất là có tư duy viết code 'sạch' hơn, tối ưu tài nguyên máy tính.\n\n*(Bấm hiển thị ý)*\nPhần trình bày của Nhóm 2 đến đây là kết thúc. Xin cảm ơn thầy Đam Yi và các bạn đã chú ý lắng nghe. \n\nSau đây, nhóm xin phép nhận các câu hỏi đóng góp từ thầy và các bạn ạ!"
+        ];
 
         // --- LOGIC ĐIỀU KHIỂN SLIDE ---
         let currentIdx = 0;
@@ -683,22 +564,38 @@ tang_diem()
         function updateNav() {
             document.getElementById('counter').innerText = `${currentIdx + 1} / ${slides.length}`;
             document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / slides.length) * 100}%`;
+            
+            // Cập nhật Kịch bản
+            document.getElementById('script-slide-num').innerText = currentIdx + 1;
+            // Xử lý xuống dòng (replace \n thành <br>)
+            let scriptText = presenterScripts[currentIdx].replace(/\n/g, '<br>');
+            document.getElementById('script-content').innerHTML = scriptText;
+        }
+
+        // Logic Mở/Tắt Kịch bản
+        window.toggleScript = () => {
+            const panel = document.getElementById('script-panel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+            } else {
+                panel.style.display = 'none';
+            }
         }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') goNext();
             if (e.key === 'ArrowLeft') goPrev();
-            if (e.key === 'Escape') closeAI();
         });
 
         // Click để chuyển (nếu không click vào nút)
         document.body.addEventListener('mousedown', (e) => {
-            if (!e.target.closest('button') && !e.target.closest('.quiz-option')) {
+            if (!e.target.closest('button') && !e.target.closest('#script-panel')) {
                 goNext();
             }
         });
 
+        // Khởi tạo ban đầu
         updateNav();
     </script>
 </body>
-    </html>
+                            </html>
