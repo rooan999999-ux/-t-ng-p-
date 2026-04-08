@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thuyết Trình Chuyên Nghiệp: Bài 28 - Nhóm 2</title>
+    
+    <!-- Thư viện Font & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           1. CSS VARIABLES & THEMING
+        ========================================= */
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: rgba(30, 41, 59, 0.7);
+            --bg-surface-hover: rgba(30, 41, 59, 0.9);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #0ea5e9;
+            --accent: #f43f5e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #cbd5e1;
+            --text-dim: #94a3b8;
+            --border-glass: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 255, 255, 0.2);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --z-bg: 0;
+            --z-slide: 10;
+            --z-overlay: 100;
+            --z-modal: 1000;
+        }
+
+        /* =========================================
+           2. RESET & BASE STYLES
+        ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow: hidden; /* Prevent scrolling, act like a PPT */
+            height: 100vh;
+            width: 100vw;
+            line-height: 1.6;
+        }
+
+        canvas#particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: var(--z-bg);
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        /* =========================================
+           3. SLIDE LAYOUT & TRANSITIONS
+        ========================================= */
+        #presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: var(--z-slide);
+            perspective: 1200px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 90%;
+            max-width: 1280px;
+            height: 85vh;
+            padding: 3rem 4rem;
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateZ(-200px) rotateY(10deg);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateZ(0) rotateY(0deg);
+            pointer-events: auto;
+            z-index: 20;
+        }
+
+        .slide.prev {
+            transform: translateZ(-200px) rotateY(-10deg) translateX(-10%);
+            opacity: 0;
+        }
+
+        .slide.next {
+            transform: translateZ(-200px) rotateY(10deg) translateX(10%);
+            opacity: 0;
+        }
+
+        /* =========================================
+           4. TYPOGRAPHY & UTILITIES
+        ========================================= */
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .text-gradient-secondary {
+            background: linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1.main-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        h2.slide-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid rgba(255,255,255,0.05);
+            padding-bottom: 1rem;
+        }
+
+        h2.slide-title i {
+            color: var(--primary);
+            filter: drop-shadow(0 0 10px var(--primary-glow));
+        }
+
+        .desc-text {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* Flex & Grid Systems */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: 100%;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        /* =========================================
+           5. UI COMPONENTS (Cards, Badges)
+        ========================================= */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border-highlight);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        }
+
+        .glass-card:hover::before {
+            opacity: 1;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            border-radius: 99px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: fit-content;
+        }
+
+        .badge-local { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .badge-global { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(251, 113, 133, 0.3); }
+        .badge-info { background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+        .list-styled {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .list-styled li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 1.15rem;
+        }
+
+        .list-styled li i {
+            margin-top: 0.3rem;
+            color: var(--primary);
+        }
+
+        /* =========================================
+           6. CODE BLOCK & SYNTAX HIGHLIGHTING
+        ========================================= */
+        .code-window {
+            background: #0f111a;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            height: 100%;
+        }
+
+        .code-header {
+            background: #1a1d27;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .mac-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .mac-dot.red { background: #ff5f56; }
+        .mac-dot.yellow { background: #ffbd2e; }
+        .mac-dot.green { background: #27c93f; }
+
+        .file-name {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            flex-grow: 1;
+            tab-size: 4;
+        }
+
+        /* Python Syntax Highlight Colors (Dracula Theme inspired) */
+        .kw { color: #ff79c6; font-weight: bold; } /* Keyword */
+        .fn { color: #50fa7b; } /* Function name */
+        .st { color: #f1fa8c; } /* String */
+        .nm { color: #bd93f9; } /* Number */
+        .cm { color: #6272a4; font-style: italic; } /* Comment */
+        .op { color: #ff79c6; } /* Operator */
+        .bl { color: #8be9fd; font-style: italic; } /* Built-in */
+
+        /* =========================================
+           7. FRAGMENT ANIMATIONS (Step-by-step)
+        ========================================= */
+        .fragment {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .fragment.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Special fragment effects */
+        .fragment.fade-in { transform: none; }
+        .fragment.scale-up { transform: scale(0.9); }
+        .fragment.scale-up.visible { transform: scale(1); }
+
+        /* =========================================
+           8. NAVIGATION & PROGRESS BAR
+        ========================================= */
+        #controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 2rem;
+            border-radius: 99px;
+            border: 1px solid var(--border-glass);
+            z-index: var(--z-overlay);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .ctrl-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.25rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .ctrl-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.1);
+            color: var(--primary);
+        }
+        
+        .ctrl-btn:disabled {
+            color: var(--text-dim);
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #progress-bar {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: linear-gradient(90deg, var(--secondary), var(--primary));
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 3px;
+        }
+
+        .slide-counter {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* =========================================
+           9. PRESENTER SCRIPT PANEL
+        ========================================= */
+        #script-panel {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 400px;
+            max-height: calc(100vh - 4rem);
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border-glass);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-md);
+            display: none;
+            flex-direction: column;
+            z-index: var(--z-modal);
+            box-shadow: -10px 10px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        #script-panel.show {
+            display: flex;
+            animation: slideInRight 0.3s ease forwards;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .script-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            cursor: move; /* Indicate draggable */
+        }
+
+        .script-header h3 {
+            font-size: 1.1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .script-content {
+            padding: 1.5rem;
+            overflow-y: auto;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-main);
+        }
+
+        .script-content .prompt {
+            color: var(--warning);
+            font-size: 0.9rem;
+            font-style: italic;
+            display: block;
+            margin: 1rem 0 0.5rem 0;
+            border-left: 2px solid var(--warning);
+            padding-left: 0.5rem;
+        }
+
+        .btn-script-toggle {
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .btn-script-toggle:hover {
+            background: rgba(245, 158, 11, 0.1) !important;
+            color: var(--warning) !important;
+        }
+
+        /* =========================================
+           10. INTERACTIVE QUIZ & DIAGRAMS
+        ========================================= */
+        .memory-box {
+            border: 2px dashed var(--border-highlight);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            position: relative;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .memory-box::before {
+            content: attr(data-label);
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--bg-surface);
+            padding: 0 10px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .var-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            margin: 5px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .var-tag .val { color: var(--secondary); font-weight: bold;}
+
+        /* Quiz UI */
+        .quiz-option {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-mono);
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--success);
+            color: #34d399;
+        }
+
+        .quiz-option.wrong {
+            background: rgba(244, 63, 94, 0.2);
+            border-color: var(--accent);
+            color: #fb7185;
+        }
+
+        .diagram-legb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .legb-box {
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            background: rgba(0,0,0,0.4);
+            position: relative;
+        }
+        .legb-b { border-color: #6b7280; width: 90%; }
+        .legb-g { border-color: #3b82f6; width: 75%; }
+        .legb-e { border-color: #f59e0b; width: 60%; }
+        .legb-l { border-color: #10b981; width: 45%; }
+        
+        .arrow-down {
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 1. BACKGROUND CANVAS -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- 2. SCRIPT PANEL (KỊCH BẢN CHO NGƯỜI THUYẾT TRÌNH) -->
+    <div id="script-panel">
+        <div class="script-header" id="script-drag-handle">
+            <h3><i class="fas fa-headset"></i> Kịch bản MC</h3>
+            <button onclick="toggleScript()" style="background:none; border:none; color:white; cursor:pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="script-content" id="script-text">
+            <!-- Nội dung tự động cập nhật qua JS -->
+        </div>
+    </div>
+
+    <!-- 3. PRESENTATION CONTAINER (CÁC SLIDE) -->
+    <div id="presentation-container">
+
+        <!-- ================= SLIDE 1: INTRO ================= -->
+        <div class="slide active">
+            <div class="flex-center" style="flex-direction: column; text-align: center;">
+                <div class="badge badge-info fragment fade-in" style="margin-bottom: 1.5rem;">Tin học 10 - Python Programming</div>
+                <h1 class="main-title fragment scale-up text-gradient">Bài 28: Phạm Vi Của Biến</h1>
+                <p class="desc-text fragment" style="max-width: 600px;">Khám phá cách không gian bộ nhớ hoạt động trong Python và nguyên lý che khuất dữ liệu.</p>
+                
+                <div class="fragment scale-up" style="margin-top: 3rem; background: rgba(0,0,0,0.3); padding: 2rem; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.05); width: 100%; max-width: 800px;">
+                    <h3 style="color: var(--primary); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Thực hiện: Nhóm 2</h3>
+                    <div class="grid-3" style="text-align: left;">
+                        <div class="flex-col" style="gap: 5px;">
+                            <div style="font-weight: bold; color: var(--text-main);">1. Nguyễn Văn A</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);"><i class="fas fa-laptop-code"></i> Nhóm trưởng / Code</div>
+                        </div>
+                        <div class="flex-col" style="gap: 5px;">
+                            <div style="font-weight: bold; color: var(--text-main);">2. Trần Thị B</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);"><i class="fas fa-pen-nib"></i> Nội dung / Slides</div>
+                        </div>
+                        <div class="flex-col" style="gap: 5px;">
+                            <div style="font-weight: bold; color: var(--text-main);">3. Lê Hoàng C</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);"><i class="fas fa-microphone"></i> Thuyết trình (MC)</div>
+                        </div>
+                        <div class="flex-col" style="gap: 5px; margin-top: 10px;">
+                            <div style="font-weight: bold; color: var(--text-main);">4. Phạm Văn D</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);"><i class="fas fa-search"></i> Thu thập tài liệu</div>
+                        </div>
+                        <div class="flex-col" style="gap: 5px; margin-top: 10px;">
+                            <div style="font-weight: bold; color: var(--text-main);">5. Vũ Tuấn E</div>
+                            <div style="font-size: 0.85rem; color: var(--text-dim);"><i class="fas fa-check-circle"></i> QA / Kiểm tra</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fragment fade-in" style="margin-top: 2rem; display: flex; align-items: center; gap: 1rem;">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=TeacherDamYi" alt="Teacher" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--secondary);">
+                    <div style="text-align: left;">
+                        <div style="font-size: 0.9rem; color: var(--text-dim);">Giáo viên hướng dẫn</div>
+                        <div style="font-weight: bold; color: var(--secondary);">Thầy Đam Yi</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 2: VẤN ĐỀ (TẠI SAO PHẢI HỌC?) ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-bug"></i> Vấn đề thường gặp</h2>
+            <div class="grid-2">
+                <div class="flex-col">
+                    <p class="desc-text fragment">Bạn đã bao giờ gặp tình trạng khai báo biến rồi nhưng Python lại báo lỗi <code style="color:var(--accent)">NameError: name is not defined</code>?</p>
+                    <div class="glass-card fragment">
+                        <h3 style="color: var(--warning); margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> Tình huống:</h3>
+                        <p>Bạn mua một cuốn sách cất trong phòng ngủ (Hàm A). Sau đó bạn ra phòng khách (Hàm B) và tìm cuốn sách đó... Tất nhiên là không thấy!</p>
+                    </div>
+                    <p class="desc-text fragment" style="margin-top: 1rem;">Đó chính là khái niệm về <b>Phạm vi (Scope)</b>. Python quản lý không gian tên rất chặt chẽ để tránh xung đột dữ liệu.</p>
+                </div>
+                <div class="flex-col fragment">
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="mac-dots">
+                                <div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div>
+                            </div>
+                            <div class="file-name">loi_pho_bien.py</div>
+                        </div>
+                        <div class="code-content">
+<pre>
+<span class="kw">def</span> <span class="fn">tao_du_lieu</span>():
+    diem_so = <span class="nm">10</span> <span class="cm"># Tạo biến</span>
+    <span class="bl">print</span>(<span class="st">"Đã tạo điểm!"</span>)
+
+tao_du_lieu()
+<span class="cm"># Cố gắng in biến ở ngoài hàm</span>
+<span class="bl">print</span>(diem_so)
+
+<span style="color: var(--accent); font-weight: bold;">Traceback (most recent call last):
+  File "main.py", line 6, in &lt;module&gt;
+NameError: name 'diem_so' is not defined</span>
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 3: TỔNG QUAN SCOPE ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-map"></i> Bản đồ Phạm vi trong Python</h2>
+            <p class="desc-text fragment">Python chủ yếu chia phạm vi biến thành 2 loại cơ bản (trong chương trình phổ thông):</p>
+            
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div class="glass-card fragment flex-col" style="border-top: 4px solid #34d399;">
+                    <div style="font-size: 3rem; color: #34d399;"><i class="fas fa-box"></i></div>
+                    <h3 style="font-size: 1.5rem;">Biến Cục Bộ (Local)</h3>
+                    <p class="desc-text" style="font-size: 1rem;">Sinh ra bên trong một hàm. Chỉ sống và được nhận diện nội bộ trong hàm đó. Hủy ngay khi hàm kết thúc.</p>
+                    <div class="badge badge-local">Bảo mật cao</div>
+                </div>
+                
+                <div class="glass-card fragment flex-col" style="border-top: 4px solid #fb7185;">
+                    <div style="font-size: 3rem; color: #fb7185;"><i class="fas fa-globe"></i></div>
+                    <h3 style="font-size: 1.5rem;">Biến Toàn Cục (Global)</h3>
+                    <p class="desc-text" style="font-size: 1rem;">Khai báo ở cấp cao nhất của file script (ngoài mọi hàm). Mọi nơi đều có thể nhìn thấy và "đọc" được nó.</p>
+                    <div class="badge badge-global">Dùng chung</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 4: BIẾN CỤC BỘ (CHUYÊN SÂU) ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-door-closed"></i> 1. Biến Cục Bộ (Local Scope)</h2>
+            <div class="badge badge-local fragment" style="margin-bottom: 1rem;">Cơ chế cấp phát Stack</div>
+            
+            <div class="grid-2">
+                <div class="flex-col">
+                    <p class="desc-text fragment">Bất kỳ biến nào được <b>gán giá trị</b> lần đầu tiên bên trong một hàm sẽ mặc định là biến cục bộ.</p>
+                    <ul class="list-styled fragment">
+                        <li><i class="fas fa-check"></i> <b>Tham số hàm</b> (vd: <code>def func(x):</code>) cũng là biến cục bộ.</li>
+                        <li><i class="fas fa-check"></i> Giúp tái sử dụng tên biến thoải mái ở các hàm khác nhau mà không sợ xung đột.</li>
+                        <li><i class="fas fa-check"></i> Tiết kiệm RAM: Bộ nhớ được dọn dẹp ngay khi hàm chạy xong (Garbage Collection).</li>
+                    </ul>
+                </div>
+                <div class="flex-col">
+                    <div class="code-window fragment">
+                        <div class="code-header"><div class="file-name">local_example.py</div></div>
+                        <div class="code-content">
+<pre>
+<span class="kw">def</span> <span class="fn">tinh_tong</span>(a, b):
+    <span class="cm"># a, b, ket_qua là các biến cục bộ</span>
+    ket_qua = a <span class="op">+</span> b 
+    <span class="kw">return</span> ket_qua
+
+x = tinh_tong(<span class="nm">5</span>, <span class="nm">3</span>)
+<span class="bl">print</span>(ket_qua) <span class="cm"># Lỗi: Không nhìn thấy 'ket_qua'</span>
+</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 5: MÔ PHỎNG BỘ NHỚ LOCAL ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-microchip"></i> Hoạt ảnh: Vòng đời biến cục bộ</h2>
+            <div class="flex-col flex-center fragment" style="height: 60%;">
+                
+                <div style="display: flex; gap: 4rem; width: 100%; justify-content: center;">
+                    <!-- Code -->
+                    <div class="code-window" style="width: 400px; height: auto;">
+                        <div class="code-content" style="font-size: 1rem;">
+<pre>
+<span class="bl" id="line1">def chao():</span>
+<span class="bl" id="line2">    ten = "Alice"</span>
+<span class="bl" id="line3">    print("Hi", ten)</span>
+
+<span class="bl" id="line4">chao()</span>
+<span class="bl" id="line5">print("Xong")</span>
+</pre>
+                        </div>
+                    </div>
+                    
+                    <!-- Memory RAM -->
+                    <div class="memory-box" data-label="Bộ nhớ RAM" style="width: 300px; height: 250px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
+                        
+                        <div id="ram-frame" class="fragment" style="background: rgba(52, 211, 153, 0.2); border: 1px solid #34d399; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px;">
+                            <div style="font-size: 0.8rem; color: #34d399; margin-bottom: 5px;">Hàm: chao() Frame</div>
+                            <div class="var-tag fragment"><i class="fas fa-tag"></i> ten = <span class="val">"Alice"</span></div>
+                        </div>
+
+                        <div class="fragment" style="text-align: center; margin-top: 20px; color: var(--accent); font-weight: bold;">
+                            <i class="fas fa-fire"></i> Hàm kết thúc. Xóa Frame!
+                        </div>
+                    </div>
+                </div>
+                <p class="desc-text fragment" style="margin-top: 2rem; text-align: center;">Khi hàm <code>chao()</code> chạy xong, toàn bộ "vùng không gian" chứa biến <code>ten</code> lập tức bị hủy bỏ để nhường chỗ cho chương trình khác.</p>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 6: BIẾN TOÀN CỤC ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-globe-asia"></i> 2. Biến Toàn Cục (Global Scope)</h2>
+            <div class="badge badge-global fragment" style="margin-bottom: 1rem;">Tồn tại suốt chương trình</div>
+            
+            <div class="grid-2">
+                <div class="code-window fragment">
+                    <div class="code-header"><div class="file-name">global_read.py</div></div>
+                    <div class="code-content">
+<pre>
+he_so_luong = <span class="nm">2.5</span>  <span class="cm"># Biến Toàn Cục</span>
+
+<span class="kw">def</span> <span class="fn">tinh_luong</span>(luong_co_ban):
+    <span class="cm"># Hàm có quyền ĐỌC biến toàn cục</span>
+    thuc_lanh = luong_co_ban <span class="op">*</span> he_so_luong
+    <span class="bl">print</span>(<span class="st">"Lương:"</span>, thuc_lanh)
+
+tinh_luong(<span class="nm">5000</span>)
+<span class="cm"># Output: Lương: 12500.0</span>
+</pre>
+                    </div>
+                </div>
+                <div class="flex-col">
+                    <p class="desc-text fragment">Biến toàn cục cực kỳ hữu ích để lưu trữ các <b>hằng số chung</b> hoặc các cấu hình mà nhiều hàm cần dùng chung (vd: số Pi, Thuế VAT, hệ số...).</p>
+                    <div class="glass-card fragment" style="border-left: 4px solid var(--secondary);">
+                        <h4 style="color: var(--secondary); margin-bottom: 10px;"><i class="fas fa-info-circle"></i> Quy tắc ĐỌC:</h4>
+                        <p>Nếu trong hàm bạn chỉ gọi tên biến để lấy giá trị ra tính toán (đọc), Python sẽ tự động chạy ra ngoài "phòng khách" tìm biến toàn cục đó cho bạn.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 7: HIỆN TƯỢNG SHADOWING ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-mask"></i> 3. Hiện tượng Shadowing (Che khuất)</h2>
+            <p class="desc-text fragment">Chuyện gì xảy ra nếu bạn cố tình <b>tạo một biến cục bộ trùng tên</b> với biến toàn cục?</p>
+            
+            <div class="grid-2" style="margin-top: 1rem;">
+                <div class="flex-col">
+                    <div class="code-window fragment">
+                        <div class="code-content">
+<pre>
+x = <span class="nm">100</span>  <span class="cm"># Global x</span>
+
+<span class="kw">def</span> <span class="fn">test</span>():
+    x = <span class="nm">50</span>  <span class="cm"># Local x (Trùng tên!)</span>
+    <span class="bl">print</span>(<span class="st">"Bên trong hàm x ="</span>, x)
+
+test()
+<span class="bl">print</span>(<span class="st">"Bên ngoài hàm x ="</span>, x)
+</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-col fragment">
+                    <div class="glass-card" style="background: rgba(245, 158, 11, 0.1); border-color: var(--warning);">
+                        <h3 style="color: var(--warning); margin-bottom: 10px;">Kết quả:</h3>
+                        <div style="font-family: var(--font-mono); font-size: 1.1rem; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px;">
+                            Bên trong hàm x = 50<br>
+                            Bên ngoài hàm x = 100
+                        </div>
+                        <p style="margin-top: 15px;"><b>Giải thích:</b> Dòng <code>x = 50</code> trong hàm không hề làm thay đổi biến toàn cục. Nó tạo ra một biến <code>x</code> cục bộ hoàn toàn mới.<br>Khi ở trong hàm, biến cục bộ sẽ "che khuất" (shadow) biến toàn cục cùng tên.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 8: TỪ KHÓA GLOBAL ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-key"></i> 4. Quyền năng "global"</h2>
+            <p class="desc-text fragment">Vậy nếu tôi <b>thực sự muốn thay đổi</b> giá trị của biến toàn cục từ bên trong hàm thì sao? Hãy dùng từ khóa <code>global</code>.</p>
+            
+            <div class="grid-2">
+                <div class="code-window fragment">
+                    <div class="code-content">
+<pre>
+diem = <span class="nm">0</span>
+
+<span class="kw">def</span> <span class="fn">cong_diem</span>():
+    <span class="cm"># Xin phép Python cho sửa biến toàn cục</span>
+    <span class="kw">global</span> diem 
+    
+    diem = diem <span class="op">+</span> <span class="nm">10</span>
+    <span class="bl">print</span>(<span class="st">"Đã cộng điểm!"</span>)
+
+cong_diem()
+<span class="bl">print</span>(<span class="st">"Điểm hiện tại:"</span>, diem) <span class="cm"># In ra 10</span>
+</pre>
+                    </div>
+                </div>
+                <div class="flex-col">
+                    <div class="glass-card fragment" style="border-left: 4px solid var(--accent);">
+                        <h3 style="color: var(--accent); margin-bottom: 10px;"><i class="fas fa-radiation"></i> Cảnh báo thực tế</h3>
+                        <p>Dù có thể làm được, nhưng việc lạm dụng <code>global</code> là một <b>thói quen lập trình rất xấu</b> (Bad Practice).</p>
+                        <br>
+                        <p>Lý do: Khi chương trình lớn lên hàng ngàn dòng code, nếu hàm nào cũng thò tay vào sửa biến toàn cục, bạn sẽ không thể kiểm soát nổi dữ liệu bị sai từ đâu (hiệu ứng cánh bướm).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 9: KIẾN THỨC NÂNG CAO - LEGB ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-layer-group"></i> 5. Kiến thức Mở rộng: Quy tắc LEGB</h2>
+            <p class="desc-text fragment">Làm sao Python biết phải tìm biến ở đâu khi có quá nhiều biến cùng tên? Python tuân theo thứ tự ưu tiên từ trong ra ngoài: <b>L -> E -> G -> B</b>.</p>
+            
+            <div class="grid-2">
+                <div class="fragment diagram-legb">
+                    <div class="legb-box legb-b">B - Built-in (Sẵn có của Python: print, len...)
+                        <div class="legb-box legb-g" style="margin: 10px auto;">G - Global (Toàn cục)
+                            <div class="legb-box legb-e" style="margin: 10px auto;">E - Enclosing (Hàm lồng nhau)
+                                <div class="legb-box legb-l" style="margin: 10px auto;">L - Local (Cục bộ)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-col fragment">
+                    <ul class="list-styled" style="font-size: 1.05rem;">
+                        <li><span style="color:#10b981; font-weight:bold;">L (Local):</span> Tìm trong hàm hiện tại trước tiên.</li>
+                        <li><i class="fas fa-arrow-down arrow-down"></i> Nếu không có, ra ngoài 1 lớp...</li>
+                        <li><span style="color:#f59e0b; font-weight:bold;">E (Enclosing):</span> Tìm trong hàm bao bọc nó (nếu có hàm lồng hàm).</li>
+                        <li><i class="fas fa-arrow-down arrow-down"></i> Nếu vẫn không có...</li>
+                        <li><span style="color:#3b82f6; font-weight:bold;">G (Global):</span> Tìm ở cấp độ toàn file.</li>
+                        <li><i class="fas fa-arrow-down arrow-down"></i> Nếu vẫn không có...</li>
+                        <li><span style="color:#6b7280; font-weight:bold;">B (Built-in):</span> Tìm trong các hàm mặc định của bản thân ngôn ngữ Python.</li>
+                        <li><i class="fas fa-times" style="color:var(--accent);"></i> Cuối cùng không có -> Báo lỗi NameError.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 10: BEST PRACTICES ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-medal"></i> 6. Lời khuyên viết code (Best Practices)</h2>
+            <div class="grid-2">
+                <div class="glass-card fragment">
+                    <h3 style="color: var(--success); margin-bottom: 15px;"><i class="fas fa-thumbs-up"></i> NÊN LÀM</h3>
+                    <ul class="list-styled">
+                        <li>Truyền dữ liệu vào hàm qua <b>tham số</b> thay vì dùng biến global.</li>
+                        <li>Trả kết quả ra ngoài bằng <code>return</code> thay vì sửa biến global.</li>
+                        <li>Dùng IN HOA cho biến global không đổi (Hằng số): <code>PI = 3.14</code>, <code>VAT = 0.1</code>.</li>
+                    </ul>
+                </div>
+                <div class="glass-card fragment">
+                    <h3 style="color: var(--accent); margin-bottom: 15px;"><i class="fas fa-thumbs-down"></i> TRÁNH LÀM</h3>
+                    <ul class="list-styled">
+                        <li>Tránh lạm dụng từ khóa <code>global</code>.</li>
+                        <li>Tránh đặt tên biến cục bộ trùng với các hàm có sẵn (vd: <code>list = [1,2]</code>, <code>sum = 5</code>) sẽ làm hỏng hàm Built-in của Python.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="fragment scale-up flex-center" style="margin-top: 2rem;">
+                <div style="background: rgba(14, 165, 233, 0.15); padding: 1.5rem 3rem; border-radius: 99px; border: 1px solid var(--secondary); font-size: 1.2rem; font-weight: 600;">
+                    Tư duy chuẩn: "Hàm giống như một hộp đen. Đầu vào rõ ràng, đầu ra rõ ràng."
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 11: MINI TEST ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-gamepad"></i> Mini Quiz: Thử tài suy luận</h2>
+            <p class="desc-text fragment">Đoạn mã sau sẽ in ra màn hình con số nào?</p>
+            
+            <div class="grid-2">
+                <div class="code-window fragment">
+                    <div class="code-content">
+<pre>
+a = <span class="nm">5</span>
+
+<span class="kw">def</span> <span class="fn">ham_a</span>():
+    a = <span class="nm">10</span>
+    <span class="kw">def</span> <span class="fn">ham_b</span>():
+        <span class="bl">print</span>(a)
+    ham_b()
+
+ham_a()
+</pre>
+                    </div>
+                </div>
+                <div class="flex-col fragment">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. 5</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">B. 10</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">C. Lỗi NameError</div>
+                    
+                    <div id="quiz-feedback" style="display:none; margin-top: 1rem; padding: 1rem; border-radius: 8px; font-weight: bold;">
+                        <!-- Feedback text -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SLIDE 12: TỔNG KẾT ================= -->
+        <div class="slide">
+            <h2 class="slide-title"><i class="fas fa-clipboard-check"></i> Tổng kết bài học</h2>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 2rem;" class="fragment">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.1); text-align: left;">
+                        <th style="padding: 15px; border: 1px solid var(--border-glass);">Tiêu chí</th>
+                        <th style="padding: 15px; border: 1px solid var(--border-glass); color: #34d399;">Biến Cục Bộ (Local)</th>
+                        <th style="padding: 15px; border: 1px solid var(--border-glass); color: #fb7185;">Biến Toàn Cục (Global)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass); font-weight: bold;">Nơi khai báo</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Bên trong hàm.</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Bên ngoài mọi hàm.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass); font-weight: bold;">Tầm nhìn</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Chỉ nội bộ trong hàm đó.</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Mọi nơi trong file code.</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass); font-weight: bold;">Tuổi thọ</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Ngắn (Xóa khi hàm kết thúc).</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Dài (Tồn tại tới khi tắt app).</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass); font-weight: bold;">Sửa đổi từ trong hàm</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Bình thường.</td>
+                        <td style="padding: 15px; border: 1px solid var(--border-glass);">Cần từ khóa <code>global</code>.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ================= SLIDE 13: END & Q/A ================= -->
+        <div class="slide">
+            <div class="flex-center flex-col text-center" style="height: 100%;">
+                <h1 class="main-title text-gradient fragment scale-up" style="font-size: 5rem;">Q & A</h1>
+                <p class="desc-text fragment">Nhóm 2 xin trân trọng cảm ơn Thầy và các bạn đã lắng nghe!</p>
+                
+                <div class="fragment scale-up" style="margin-top: 3rem;">
+                    <div style="font-size: 4rem; color: var(--warning); margin-bottom: 1rem;"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Mời Thầy và các bạn đặt câu hỏi.</h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. NAVIGATION CONTROLS -->
+    <div id="controls">
+        <button class="ctrl-btn btn-script-toggle" onclick="toggleScript()" title="Mở kịch bản MC (Phím tắt: S)">
+            <i class="fas fa-headset"></i>
+        </button>
+        <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 10px;"></div>
+        
+        <button class="ctrl-btn" id="btn-prev" onclick="prevStep()"><i class="fas fa-chevron-left"></i></button>
+        
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div class="slide-counter" id="slide-counter">1 / 13</div>
+        
+        <button class="ctrl-btn" id="btn-next" onclick="nextStep()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- =========================================
+         5. JAVASCRIPT LOGIC
+    ========================================= -->
+    <script>
+        /* --- DỮ LIỆU KỊCH BẢN (CHUYÊN SÂU TỪNG BƯỚC) --- */
+        // Mỗi object tương ứng 1 slide. Mảng fragments tương ứng lời nói khi bấm nút next hiện ra các ý con.
+        const scriptData = [
+            { // Slide 1: Intro
+                init: "Dạ em xin chào Thầy Đam Yi và tất cả các bạn lớp 10. Hôm nay, đại diện cho Nhóm 2, em xin trình bày về Bài 28: Phạm vi của biến trong lập trình Python.",
+                fragments: [
+                    "<span class='prompt'>[Chỉ vào danh sách nhóm]</span> Đây là các thành viên của Nhóm 2 đã cùng nhau nghiên cứu và xây dựng bài thuyết trình này.",
+                    "Chúng em xin gửi lời cảm ơn đặc biệt đến Thầy Đam Yi đã hướng dẫn nhóm hoàn thành đồ án này."
+                ]
+            },
+            { // Slide 2: Vấn đề
+                init: "Trước khi đi vào lý thuyết khô khan, chúng ta hãy xem xét một tình huống thực tế mà ai mới học lập trình cũng từng gặp phải.",
+                fragments: [
+                    "Các bạn đã bao giờ gõ code, gán giá trị cho một biến, nhưng khi in ra thì màn hình đỏ rực báo lỗi: 'NameError: name is not defined' chưa?",
+                    "<span class='prompt'>[Ví dụ trực quan]</span> Giống như việc bạn cất cuốn sách ở phòng ngủ, nhưng lại chạy ra phòng khách tìm. Đương nhiên là không thể thấy được.",
+                    "Đó là lý do chúng ta phải học về Phạm Vi (Scope) - cách Python chia không gian bộ nhớ thành các phòng khác nhau để quản lý dữ liệu."
+                ]
+            },
+            { // Slide 3: Tổng quan
+                init: "Trong phạm vi chương trình phổ thông, chúng ta sẽ tập trung vào 2 'căn phòng' chính trong bản đồ bộ nhớ của Python.",
+                fragments: [
+                    "Thứ nhất là <strong style='color:#34d399'>Biến Cục Bộ (Local)</strong>. Nó giống như không gian riêng tư bên trong một hàm.",
+                    "Thứ hai là <strong style='color:#fb7185'>Biến Toàn Cục (Global)</strong>. Nó là không gian công cộng, dùng chung cho cả chương trình."
+                ]
+            },
+            { // Slide 4: Cục bộ
+                init: "Chúng ta đi sâu vào loại đầu tiên: Biến cục bộ.",
+                fragments: [
+                    "Bất kỳ biến nào bạn 'đẻ' ra bên trong một hàm (bằng phép gán) thì nó là biến cục bộ của hàm đó.",
+                    "Đặc điểm nhận dạng: Tham số đầu vào cũng là cục bộ. Nó giúp ta đặt tên biến thoải mái mà không sợ trùng với hàm khác. Đặc biệt, nó rất tiết kiệm RAM vì dùng xong là Python dọn rác ngay.",
+                    "<span class='prompt'>[Chỉ vào đoạn code]</span> Như các bạn thấy ở ví dụ, biến 'ket_qua' sinh ra trong hàm tinh_tong(). Khi chạy xong hàm, lệnh print ở ngoài gọi 'ket_qua' sẽ bị báo lỗi vì biến đã biến mất."
+                ]
+            },
+            { // Slide 5: Hoạt ảnh
+                init: "Để trực quan hơn, các bạn hãy xem hoạt ảnh mô phỏng bộ nhớ RAM này.",
+                fragments: [
+                    "Khi hàm chao() được gọi, Python lập tức cấp phát một vùng nhớ nhỏ gọi là 'Frame'. Biến 'ten = Alice' được tạo ra ở đây.",
+                    "Nhưng ngay khi hàm thực hiện xong lệnh print cuối cùng... Bùm! <span class='prompt'>[Nhấn mạnh]</span> Vùng nhớ Frame này bị tiêu hủy. Biến 'ten' không còn tồn tại nữa. Đó là vòng đời của biến cục bộ."
+                ]
+            },
+            { // Slide 6: Toàn cục
+                init: "Trái ngược với cục bộ là Biến Toàn Cục (Global Scope).",
+                fragments: [
+                    "<span class='prompt'>[Chỉ vào code]</span> Biến 'he_so_luong' được khai báo tít ngoài cùng. Bên trong hàm 'tinh_luong', ta vẫn có thể đem nó ra nhân bình thường dù không truyền qua tham số.",
+                    "Nó thường dùng để lưu các hằng số không thay đổi. Nhưng hãy lưu ý kỹ: Mặc định hàm chỉ có quyền <strong style='color:#38bdf8'>ĐỌC</strong> biến toàn cục mà thôi."
+                ]
+            },
+            { // Slide 7: Shadowing
+                init: "Vậy điều gì xảy ra nếu ta 'vô tình' đặt tên biến trong hàm trùng với tên biến ngoài hàm?",
+                fragments: [
+                    "<span class='prompt'>[Phân tích code]</span> Ở ngoài có x=100. Trong hàm test() lại gán x=50. Liệu biến ở ngoài có bị đổi thành 50 không?",
+                    "Câu trả lời là KHÔNG. Kết quả in ra trong là 50, ngoài vẫn là 100. Đây gọi là hiện tượng <strong style='color:#f59e0b'>Che Khuất (Shadowing)</strong>. Hàm đã tự tạo một biến x cục bộ mới, và ưu tiên dùng đồ của nhà nó, 'che lấp' đi đồ bên ngoài."
+                ]
+            },
+            { // Slide 8: Keyword global
+                init: "Nếu ta thực sự muốn 'sửa' biến toàn cục từ trong hàm thì phải làm sao? Python cung cấp một 'chìa khóa' đặc biệt.",
+                fragments: [
+                    "Đó là từ khóa <strong style='color:#ff79c6'>global</strong>. Trong hàm cong_diem(), khi ta khai báo 'global diem', ta đang báo cho Python biết: 'Đừng tạo biến mới, hãy cho tôi quyền sửa cái biến diem ở ngoài kia'. Kết quả diem tăng lên 10.",
+                    "<span class='prompt'>[Giọng nghiêm túc]</span> Tuy nhiên, các lập trình viên chuyên nghiệp hiếm khi dùng cách này. Nếu lạm dụng, code của bạn sẽ trở thành một mớ bòng bong vì ai cũng có thể thò tay sửa dữ liệu chung, sinh ra những lỗi cực kỳ khó debug."
+                ]
+            },
+            { // Slide 9: LEGB
+                init: "Đây là phần kiến thức mở rộng (Nâng cao) dành cho các bạn muốn lấy điểm 10. Khi bạn gọi tên một biến, làm sao Python biết đi tìm ở đâu?",
+                fragments: [
+                    "Python tuân theo quy tắc ưu tiên 4 tầng, viết tắt là L-E-G-B. Đầu tiên nó tìm ở Local (Cục bộ).",
+                    "Tìm không thấy, nó nhảy ra Enclosing (Hàm bọc ngoài nếu có hàm lồng hàm).",
+                    "Vẫn không có, nó tìm ra Global (Toàn file).",
+                    "Cuối cùng, nó tìm trong thư viện Built-in (các từ khóa có sẵn như print, len...). Nếu rà hết 4 tầng không có mới báo lỗi."
+                ]
+            },
+            { // Slide 10: Best practices
+                init: "Từ những nguyên lý trên, Nhóm 2 rút ra những kinh nghiệm thực chiến khi viết code.",
+                fragments: [
+                    "NÊN: Giao tiếp với hàm qua tham số (đầu vào) và return (đầu ra). Dùng viết hoa cho hằng số toàn cục.",
+                    "TRÁNH: Dùng global, và tối kỵ việc đặt tên biến là 'list', 'sum', 'str' vì nó sẽ 'shadow' làm hỏng các hàm có sẵn của Python.",
+                    "Tóm lại: Hãy coi hàm là một hộp đen kín đáo. Đầu vào và đầu ra phải rõ ràng."
+                ]
+            },
+            { // Slide 11: Quiz
+                init: "Để kiểm tra xem các bạn có nắm bài không, chúng ta đến với một câu hỏi nhỏ áp dụng quy tắc LEGB vừa học.",
+                fragments: [
+                    "Trong code có a=5 (Global). Hàm A có a=10 (Enclosing). Hàm B (Local) in ra a. Vậy theo thứ tự L-E-G-B, hàm B sẽ in ra số mấy?",
+                    "<span class='prompt'>[Tương tác]</span> Các bạn hãy chọn đáp án. <span class='prompt'>(Thuyết trình viên click thử để show kết quả đúng là 10)</span>."
+                ]
+            },
+            { // Slide 12: Tổng kết
+                init: "Cuối cùng, chúng ta hãy cùng nhìn lại bảng so sánh tổng quát này để khắc sâu kiến thức.",
+                fragments: [
+                    "Bảng này tổng hợp 4 tiêu chí cốt lõi: Nơi khai báo, tầm nhìn, tuổi thọ bộ nhớ và khả năng sửa đổi. Các bạn có thể chụp ảnh màn hình bảng này để ôn thi nhé."
+                ]
+            },
+            { // Slide 13: End
+                init: "Phần trình bày của Nhóm 2 đến đây là kết thúc.",
+                fragments: [
+                    "Một lần nữa, xin cảm ơn Thầy và các bạn đã chú ý lắng nghe. Bây giờ, nhóm xin phép được giải đáp các thắc mắc ạ."
+                ]
+            }
+        ];
+
+        /* --- QUẢN LÝ STATE SLIDE VÀ FRAGMENT --- */
+        let currentSlide = 0;
+        let currentFragment = 0; // -1 means no fragments active, 0 means first fragment, etc.
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        function initSlides() {
+            updateSlideClasses();
+            updateUI();
+            updateScriptPanel();
+        }
+
+        function updateSlideClasses() {
+            slides.forEach((slide, index) => {
+                slide.className = 'slide'; // Reset
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('prev');
+                } else {
+                    slide.classList.add('next');
+                }
+            });
+        }
+
+        function updateUI() {
+            // Update counter
+            document.getElementById('slide-counter').innerText = `${currentSlide + 1} / ${totalSlides}`;
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            // Update buttons
+            document.getElementById('btn-prev').disabled = (currentSlide === 0 && currentFragment === -1);
+            
+            // Check if we are at the very end (last slide, all fragments shown)
+            const activeSlideEl = slides[currentSlide];
+            const frags = activeSlideEl.querySelectorAll('.fragment');
+            const isAtEnd = (currentSlide === totalSlides - 1 && currentFragment >= frags.length - 1);
+            document.getElementById('btn-next').disabled = isAtEnd;
+        }
+
+        function updateScriptPanel() {
+            const data = scriptData[currentSlide];
+            if (!data) return;
+            
+            let html = `<p>${data.init}</p>`;
+            
+            // Highlight current speaking part
+            if (data.fragments && data.fragments.length > 0) {
+                html += `<ul style="list-style:none; margin-top: 15px; padding-left: 10px; border-left: 2px solid rgba(255,255,255,0.1);">`;
+                data.fragments.forEach((frag, idx) => {
+                    let color = (idx === currentFragment) ? 'var(--text-main)' : 'var(--text-dim)';
+                    let fw = (idx === currentFragment) ? 'bold' : 'normal';
+                    let bg = (idx === currentFragment) ? 'rgba(139, 92, 246, 0.2)' : 'transparent';
+                    
+                    html += `<li style="margin-bottom: 15px; color: ${color}; font-weight: ${fw}; background: ${bg}; padding: 10px; border-radius: 8px; transition: 0.3s;">
+                        <i class="fas fa-caret-right" style="color:var(--primary); margin-right: 5px;"></i> ${frag}
+                    </li>`;
+                });
+                html += `</ul>`;
+            }
+            
+            document.getElementById('script-text').innerHTML = html;
+        }
+
+        function nextStep() {
+            const activeSlideEl = slides[currentSlide];
+            const fragments = activeSlideEl.querySelectorAll('.fragment');
+            
+            // Nếu slide hiện tại còn fragment chưa hiển thị
+            if (currentFragment < fragments.length - 1) {
+                currentFragment++;
+                fragments[currentFragment].classList.add('visible');
+                updateUI();
+                updateScriptPanel();
+            } 
+            // Nếu đã hết fragment, sang slide mới
+            else if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                currentFragment = -1; // Reset fragments
+                updateSlideClasses();
+                updateUI();
+                updateScriptPanel();
+            }
+        }
+
+        function prevStep() {
+            const activeSlideEl = slides[currentSlide];
+            const fragments = activeSlideEl.querySelectorAll('.fragment');
+            
+            // Nếu có fragment đang hiển thị, ẩn nó đi
+            if (currentFragment >= 0) {
+                fragments[currentFragment].classList.remove('visible');
+                currentFragment--;
+                updateUI();
+                updateScriptPanel();
+            } 
+            // Về slide trước
+            else if (currentSlide > 0) {
+                currentSlide--;
+                // Fast-forward fragments of the previous slide so they are visible
+                const prevSlideEl = slides[currentSlide];
+                const prevFragments = prevSlideEl.querySelectorAll('.fragment');
+                prevFragments.forEach(f => f.classList.add('visible'));
+                currentFragment = prevFragments.length - 1;
+                
+                updateSlideClasses();
+                updateUI();
+                updateScriptPanel();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Spacebar' || e.key === ' ') {
+                nextStep();
+            } else if (e.key === 'ArrowLeft') {
+                prevStep();
+            } else if (e.key === 's' || e.key === 'S') {
+                toggleScript();
+            }
+        });
+
+        // Toggle Script Panel
+        let scriptVisible = false;
+        function toggleScript() {
+            const panel = document.getElementById('script-panel');
+            scriptVisible = !scriptVisible;
+            if (scriptVisible) {
+                panel.classList.add('show');
+            } else {
+                panel.classList.remove('show');
+            }
+        }
+
+        /* --- DRAGGABLE SCRIPT PANEL --- */
+        const scriptPanel = document.getElementById('script-panel');
+        const dragHandle = document.getElementById('script-drag-handle');
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        dragHandle.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            const rect = scriptPanel.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            scriptPanel.style.right = 'auto'; // Disable right anchoring
+            dragHandle.style.cursor = 'grabbing';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            scriptPanel.style.left = `${initialLeft + dx}px`;
+            scriptPanel.style.top = `${initialTop + dy}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            dragHandle.style.cursor = 'move';
+        });
+
+        /* --- QUIZ LOGIC --- */
+        function checkAnswer(el, isCorrect) {
+            // Reset all
+            const options = el.parentElement.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+                opt.style.pointerEvents = 'none'; // Disable clicks after choice
+            });
+            
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                el.classList.add('correct');
+                feedback.style.backgroundColor = 'rgba(16, 185, 129, 0.2)';
+                feedback.style.color = '#34d399';
+                feedback.innerHTML = '<i class="fas fa-check-circle"></i> Chính xác! Theo quy tắc LEGB, hàm_b() (L) không có biến a, nó tìm ra ngoài hàm_a() (E) thấy a=10 nên lấy luôn. Biến a=5 (G) ở xa hơn nên bị che khuất.';
+            } else {
+                el.classList.add('wrong');
+                feedback.style.backgroundColor = 'rgba(244, 63, 94, 0.2)';
+                feedback.style.color = '#fb7185';
+                feedback.innerHTML = '<i class="fas fa-times-circle"></i> Sai rồi. Hãy nhớ quy tắc LEGB: Local -> Enclosing -> Global. Python sẽ lấy giá trị gần nhất bao bọc nó.';
+                // Highlight correct
+                options[1].classList.add('correct');
+            }
+        }
+
+        /* --- PARTICLES BACKGROUND (CANVAS) --- */
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function resizeCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.5)';
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            let numParticles = Math.floor((width * height) / 15000);
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw connections
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    let dx = particles[i].x - particles[j].x;
+                    let dy = particles[i].y - particles[j].y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.2 * (1 - dist/120)})`;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        // Initialize App
+        resizeCanvas();
+        initParticles();
+        animateParticles();
+        initSlides();
+
+    </script>
+</body>
+    </html>
