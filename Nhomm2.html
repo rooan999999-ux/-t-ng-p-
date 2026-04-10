@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bài 28: Phạm vi của biến - Nhóm 2</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-glow: #00ffcc;
+            --secondary-glow: #ff00ff;
+            --text-main: #f8f9fa;
+            --accent: #ffd700;
+            --bg-dark: #0a0e17;
+            --glass-bg: rgba(20, 25, 40, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        body .reveal {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            color: var(--text-main);
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            font-weight: 800;
+            text-transform: none;
+            letter-spacing: -0.5px;
+        }
+        h1 { font-size: 3rem; text-shadow: 0 0 20px rgba(0, 255, 204, 0.5); }
+        h2 { 
+            font-size: 2.2rem; 
+            background: linear-gradient(45deg, #00ffcc, #3388ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid rgba(0, 255, 204, 0.3);
+            padding-bottom: 10px;
+        }
+        h3 { font-size: 1.6rem; color: var(--accent); }
+        p, li { font-size: 1.2rem; line-height: 1.5; text-align: left; }
+        ul { padding-left: 1.2em; }
+        li::marker { color: var(--primary-glow); content: '⯈ '; font-size: 1em; }
+        .glass-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: start; }
+        .terminal {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            margin: 20px 0;
+            text-align: left;
+        }
+        .terminal-header {
+            background: #2d2d2d;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #111;
+        }
+        .terminal-buttons { display: flex; gap: 8px; }
+        .btn-mac { width: 12px; height: 12px; border-radius: 50%; }
+        .btn-red { background: #ff5f56; }
+        .btn-yellow { background: #ffbd2e; }
+        .btn-green { background: #27c93f; }
+        .terminal-title { margin-left: 15px; color: #888; font-size: 0.8rem; font-family: 'Fira Code', monospace; }
+        .reveal pre { margin: 0; width: 100%; box-shadow: none; }
+        .reveal pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            padding: 15px;
+            line-height: 1.4;
+        }
+        code.inline {
+            background: rgba(0, 255, 204, 0.15);
+            color: #00ffcc;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+        }
+        .hl-red { color: #ff5f56; font-weight: bold; }
+        .hl-green { color: #27c93f; font-weight: bold; }
+        .hl-yellow { color: #ffbd2e; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(0, 255, 204, 0.1); color: #00ffcc; }
+        .watermark {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            z-index: 1000;
+        }
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+    <i class="fab fa-python floating-element" style="font-size: 15rem; top: 5%; right: 0%;"></i>
+    <div class="slides">
+        
+        <!-- SLIDE 1: Bìa -->
+        <section>
+            <div class="glass-box" style="padding: 40px; text-align: center;">
+                <h3 style="color: #00ffcc;">BÀI 28: PHẠM VI CỦA BIẾN</h3>
+                <h1 style="font-size: 2.8rem;">🔍 Biến trong hàm & ngoài hàm</h1>
+                <p style="font-size: 1.2rem;">Local scope – Global scope – Ứng dụng thực tế</p>
+                <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
+                    <p><i class="fas fa-users"></i> Nhóm 2 thực hiện</p>
+                    <p style="font-size: 0.9rem;">An, Ước, Phương Nhi, A Na, Nin, Yuen, Ly A, He, Núi, Khơ, Ni</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: Phân biệt biến trong/ngoài hàm -->
+        <section>
+            <h2><i class="fas fa-code-branch"></i> 1. Biến trong hàm vs ngoài hàm</h2>
+            <div class="grid-2">
+                <div class="glass-box">
+                    <h3 style="color:#27c93f;">📦 Biến trong hàm (Local)</h3>
+                    <ul>
+                        <li>Khai báo <strong>bên trong thân hàm</strong> (kể cả tham số)</li>
+                        <li>Chỉ tồn tại <span class="hl-green">khi hàm đang chạy</span></li>
+                        <li>Bị xóa khỏi bộ nhớ sau <code class="inline">return</code></li>
+                        <li>Bên ngoài hàm <span class="hl-red">không thể truy cập</span></li>
+                    </ul>
+                </div>
+                <div class="glass-box">
+                    <h3 style="color:#ffbd2e;">🌍 Biến ngoài hàm (Global)</h3>
+                    <ul>
+                        <li>Khai báo ở <strong>đầu file, ngoài mọi hàm</strong></li>
+                        <li>Tồn tại <span class="hl-yellow">xuyên suốt chương trình</span></li>
+                        <li>Mọi hàm đều có thể <strong>đọc</strong> được</li>
+                        <li>Muốn <strong>ghi đè</strong> trong hàm → dùng <code class="inline">global</code></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="glass-box fragment" style="margin-top: 20px;">
+                <p><i class="fas fa-lightbulb"></i> <strong>Ẩn dụ dễ nhớ:</strong> Biến local như <strong>đồ dùng cá nhân trong phòng họp kín</strong> – chỉ người trong phòng dùng. Biến global như <strong>đồ trong sảnh công ty</strong> – ai cũng thấy, nhưng muốn thay đổi phải có sự cho phép (từ khóa <code>global</code>).</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: Ví dụ 1 – Local không thể truy cập từ ngoài -->
+        <section>
+            <h2><i class="fas fa-ban"></i> Ví dụ 1: Local bị "cô lập"</h2>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                    <div class="terminal-title">local_demo.py</div>
+                </div>
+                <pre><code class="language-python">def tinh_tong(a, b):
+    ket_qua = a + b   # Biến local
+    return ket_qua
+
+tinh_tong(5, 3)
+# print(ket_qua)  # ❌ NameError: name 'ket_qua' is not defined</code></pre>
+            </div>
+            <div class="glass-box">
+                <p><strong>✅ Giải thích:</strong> <code>ket_qua</code> chỉ sống bên trong <code>tinh_tong</code>. Khi hàm kết thúc, biến bị thu hồi. Ra ngoài, Python không còn nhận diện được → báo lỗi.</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: Ví dụ 2 – Shadowing (che khuất) biến global -->
+        <section>
+            <h2><i class="fas fa-eye-slash"></i> Ví dụ 2: Che khuất biến toàn cục</h2>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                    <div class="terminal-title">shadowing.py</div>
+                </div>
+                <pre><code class="language-python">pi = 3.14159   # Biến toàn cục
+
+def thay_doi_pi():
+    pi = 3.14    # Tạo biến local mới, không ảnh hưởng global
+    print("Trong hàm:", pi)
+
+thay_doi_pi()          # In ra: 3.14
+print("Ngoài hàm:", pi) # In ra: 3.14159 (không đổi)</code></pre>
+            </div>
+            <div class="glass-box fragment">
+                <p><strong>🔍 Giải thích:</strong> Khi gán <code>pi = 3.14</code> bên trong hàm, Python hiểu là <strong>tạo biến local mới</strong> (hiện tượng <em>shadowing</em>). Biến toàn cục <code>pi</code> vẫn giữ nguyên giá trị.</p>
+                <p>👉 Muốn sửa biến global, cần khai báo <code class="inline">global pi</code> trước khi gán.</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: Thực hành Nhiệm vụ 1 – Lỗi UnboundLocalError -->
+        <section>
+            <h2><i class="fas fa-bug"></i> 3. Thực hành: Lỗi UnboundLocalError</h2>
+            <p>Đề bài: Biến toàn cục <code>count = 10</code>. Hàm <code>increase()</code> tăng count lên 1. Tại sao lỗi?</p>
+            <div class="terminal">
+                <pre><code class="language-python">count = 10
+
+def increase():
+    print(count)   # Dòng này gây lỗi
+    count = count + 1
+
+increase()</code></pre>
+            </div>
+            <div class="glass-box fragment">
+                <p><span class="hl-red">❌ Lỗi:</span> <code>UnboundLocalError: local variable 'count' referenced before assignment</code></p>
+                <p><strong>Nguyên nhân:</strong> Python thấy phép gán <code>count = ...</code> bên trong hàm → coi <code>count</code> là biến <strong>cục bộ</strong>. Nhưng dòng <code>print(count)</code> lại cố gắng in biến cục bộ chưa được khởi tạo.</p>
+                <p><strong>Cách sửa:</strong> Thêm <code class="inline">global count</code> ở đầu hàm.</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: Sửa lỗi đúng cách -->
+        <section>
+            <h2><i class="fas fa-tools"></i> Sửa lỗi với từ khóa <code class="inline">global</code></h2>
+            <div class="terminal">
+                <pre><code class="language-python">count = 10
+
+def increase():
+    global count   # Báo Python: dùng biến toàn cục
+    print(count)   # In ra 10
+    count = count + 1
+
+increase()
+print("Sau khi tăng:", count)  # In ra 11</code></pre>
+            </div>
+            <div class="glass-box">
+                <p><i class="fas fa-check-circle" style="color:#27c93f;"></i> Bây giờ chương trình chạy đúng. Biến toàn cục <code>count</code> được cập nhật thành 11.</p>
+                <p class="fragment">⚠️ <strong>Lưu ý:</strong> Chỉ dùng <code>global</code> khi thực sự cần thiết, tránh làm code khó bảo trì.</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: Bài toán sáng tạo – Quản lý điểm và đếm số lần gọi -->
+        <section>
+            <h2><i class="fas fa-lightbulb"></i> 4. Sáng tạo: Hệ thống quản lý điểm & đếm hành động</h2>
+            <p>Mở rộng từ bài thực hành: thêm tính năng <strong>đếm số lần thêm học sinh</strong> và <strong>tính điểm trung bình</strong>.</p>
+            <div class="terminal">
+                <pre><code class="language-python"># Biến toàn cục lưu trạng thái
+tong_so_lan_them = 0
+tong_diem = 0.0
+so_hoc_sinh = 0
+
+def them_hoc_sinh(ten, diem):
+    global tong_so_lan_them, tong_diem, so_hoc_sinh
+    tong_so_lan_them += 1   # tăng số lần gọi
+    if diem < 0 or diem > 10:
+        return f"❌ {ten}: điểm {diem} không hợp lệ"
+    tong_diem += diem
+    so_hoc_sinh += 1
+    return f"✅ Đã thêm {ten} | Điểm: {diem}"
+
+def diem_trung_binh():
+    return tong_diem / so_hoc_sinh if so_hoc_sinh > 0 else 0
+
+# Chạy thử
+print(them_hoc_sinh("An", 8.5))
+print(them_hoc_sinh("Bình", 9.0))
+print(them_hoc_sinh("Chi", -5))   # không hợp lệ
+print(f"Số HS: {so_hoc_sinh}, ĐTB: {diem_trung_binh():.2f}")
+print(f"Tổng số lần gọi hàm: {tong_so_lan_them}")</code></pre>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: Giải thích tính sáng tạo -->
+        <section>
+            <h2><i class="fas fa-chalkboard-teacher"></i> Giải thích bài sáng tạo</h2>
+            <div class="grid-2">
+                <div class="glass-box">
+                    <h3>Biến toàn cục</h3>
+                    <ul>
+                        <li><code>tong_so_lan_them</code>: đếm số lần hàm được gọi (kể cả lỗi)</li>
+                        <li><code>tong_diem</code>, <code>so_hoc_sinh</code>: lưu dữ liệu xuyên suốt</li>
+                    </ul>
+                    <p class="fragment">→ <span class="hl-yellow">Cần global</span> vì nhiều hàm cùng đọc/ghi.</p>
+                </div>
+                <div class="glass-box">
+                    <h3>Biến cục bộ</h3>
+                    <ul>
+                        <li>Tham số <code>ten, diem</code>: chỉ dùng trong hàm</li>
+                        <li>Không có biến local nào lưu trữ lâu dài</li>
+                    </ul>
+                    <p class="fragment">→ <span class="hl-green">Tiết kiệm bộ nhớ</span>, không ảnh hưởng ra ngoài.</p>
+                </div>
+            </div>
+            <div class="glass-box fragment" style="margin-top: 20px;">
+                <p><strong>🎯 Ý nghĩa thực tế:</strong> Hệ thống có thể mở rộng thành <strong>ứng dụng quản lý học sinh</strong>, ghi log số lần thao tác để kiểm tra hiệu suất hoặc phát hiện bug.</p>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: Tổng kết -->
+        <section>
+            <div class="glass-box" style="text-align: center;">
+                <i class="fas fa-check-double" style="font-size: 3rem; color: #00ffcc;"></i>
+                <h2>📌 Tổng kết</h2>
+                <ul style="display: inline-block; text-align: left;">
+                    <li><strong>Biến trong hàm (local)</strong> – chỉ dùng nội bộ, an toàn, tự động hủy.</li>
+                    <li><strong>Biến ngoài hàm (global)</strong> – chia sẻ toàn chương trình, cần <code class="inline">global</code> để sửa.</li>
+                    <li><strong>Lỗi thường gặp:</strong> <code>UnboundLocalError</code> khi vừa đọc vừa gán biến cùng tên.</li>
+                    <li><strong>Nguyên tắc vàng:</strong> Ưu tiên local, hạn chế global trừ khi cần lưu trạng thái xuyên suốt.</li>
+                </ul>
+                <p style="margin-top: 30px;">Cảm ơn thầy và các bạn đã lắng nghe! ❤️</p>
+            </div>
+        </section>
+    </div>
+    <div class="watermark">Nhóm 2 - Bài 28: Phạm vi của biến</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/zoom/zoom.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        transition: 'slide',
+        slideNumber: 'c/t',
+        plugins: [ RevealNotes, RevealZoom ]
+    });
+    document.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+</script>
+</body>
+</html>
