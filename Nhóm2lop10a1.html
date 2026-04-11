@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bài 28: Phạm vi của biến - Bản Premium</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800;900&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Reveal.js & Plugins CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================
+           CORE VARIABLES & THEME SETTINGS
+           ========================================= */
+        :root {
+            --primary: #00ffcc;
+            --primary-glow: rgba(0, 255, 204, 0.6);
+            --secondary: #ff00ff;
+            --secondary-glow: rgba(255, 0, 255, 0.6);
+            --accent: #ffd700;
+            --danger: #ff5f56;
+            --success: #27c93f;
+            --warning: #ffbd2e;
+            --text-main: #f8f9fa;
+            --text-muted: #a0aabf;
+            --bg-dark: #050810;
+            --glass-bg: rgba(15, 20, 35, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Be Vietnam Pro', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        /* =========================================
+           GLOBAL RESET & REVEAL OVERRIDES
+           ========================================= */
+        body {
+            background-color: var(--bg-dark);
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        body .reveal {
+            font-family: var(--font-main);
+            color: var(--text-main);
+        }
+
+        /* Canvas Background */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background: radial-gradient(circle at 50% 50%, #111a2c 0%, #050810 100%);
+        }
+
+        /* Glowing Orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulse 8s infinite alternate;
+        }
+        .orb-1 { width: 400px; height: 400px; background: var(--primary-glow); top: -10%; left: -10%; }
+        .orb-2 { width: 500px; height: 500px; background: var(--secondary-glow); bottom: -20%; right: -10%; animation-delay: -4s; }
+
+        @keyframes pulse {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.3; }
+            100% { transform: scale(1.2) translate(50px, 50px); opacity: 0.6; }
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-main);
+            font-weight: 800;
+            text-transform: none;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+        }
+
+        h1 { 
+            font-size: 3.5rem; 
+            text-shadow: 0 0 30px var(--primary-glow);
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 { 
+            font-size: 2.2rem; 
+            background: linear-gradient(45deg, var(--primary), #3388ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            border-bottom: 2px dashed rgba(0, 255, 204, 0.4);
+            padding-bottom: 10px;
+        }
+
+        h3 { font-size: 1.6rem; color: var(--accent); }
+        p, li { font-size: 1.2rem; line-height: 1.6; text-align: left; }
+        
+        ul { padding-left: 1.5em; }
+        li { margin-bottom: 10px; }
+        li::marker { color: var(--primary); content: '▹ '; font-weight: bold; }
+
+        /* =========================================
+           GLASSMORPHISM & UI COMPONENTS
+           ========================================= */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-left: 1px solid rgba(255,255,255,0.2);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 20px rgba(255,255,255,0.02);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,255,204,0.15), inset 0 0 20px rgba(255,255,255,0.05);
+            border-color: rgba(0, 255, 204, 0.3);
+        }
+
+        /* Layout Grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: stretch; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+
+        /* =========================================
+           MAC-STYLE TERMINAL (CODE BLOCKS)
+           ========================================= */
+        .terminal {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1);
+            margin: 20px 0;
+            text-align: left;
+            position: relative;
+        }
+
+        .terminal-header {
+            background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #111;
+        }
+
+        .terminal-buttons { display: flex; gap: 8px; }
+        .btn-mac { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 4px rgba(0,0,0,0.4); }
+        .btn-red { background: var(--danger); }
+        .btn-yellow { background: var(--warning); }
+        .btn-green { background: var(--success); }
+        
+        .terminal-title { 
+            margin: 0 auto; 
+            color: #999; 
+            font-size: 0.85rem; 
+            font-family: var(--font-code); 
+            transform: translateX(-20px); /* offset for buttons */
+        }
+
+        .reveal pre { margin: 0; width: 100%; box-shadow: none; }
+        .reveal pre code {
+            font-family: var(--font-code);
+            font-size: 1.05rem;
+            padding: 20px;
+            line-height: 1.5;
+            background: transparent;
+        }
+
+        /* Inline code */
+        code.inline {
+            background: rgba(0, 255, 204, 0.1);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: var(--font-code);
+            font-size: 0.85em;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+        }
+
+        /* =========================================
+           CUSTOM COMPONENTS (TABLE, MINDMAP, CARDS)
+           ========================================= */
+        
+        /* Premium Table */
+        .premium-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        
+        .premium-table th {
+            background: rgba(0, 255, 204, 0.15);
+            color: var(--primary);
+            padding: 15px;
+            text-align: center;
+            font-weight: 700;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .premium-table td {
+            padding: 15px;
+            text-align: center;
+            background: rgba(25, 30, 45, 0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.3s;
+        }
+
+        .premium-table tr:hover td {
+            background: rgba(0, 255, 204, 0.05);
+        }
+
+        .premium-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--warning);
+            border-right: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Mindmap Visuals */
+        .mindmap-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .mm-node {
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .mm-root {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            border: 2px solid #fff;
+            box-shadow: 0 0 20px rgba(42, 82, 152, 0.8);
+        }
+        
+        .mm-branches {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 40px;
+            position: relative;
+        }
+        
+        /* Connection Lines */
+        .mm-branches::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background: #fff;
+        }
+        .mm-branches::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25%;
+            width: 50%;
+            height: 2px;
+            background: #fff;
+        }
+        
+        .mm-branch { width: 50%; display: flex; flex-direction: column; align-items: center; position: relative;}
+        .mm-branch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 20px;
+            background: #fff;
+        }
+
+        .mm-local { background: rgba(39, 201, 63, 0.2); border: 2px solid var(--success); color: var(--success); margin-top: 20px;}
+        .mm-global { background: rgba(255, 189, 46, 0.2); border: 2px solid var(--warning); color: var(--warning); margin-top: 20px;}
+        
+        .mm-list {
+            margin-top: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: 12px;
+            width: 100%;
+            text-align: left;
+            font-size: 1.1rem;
+        }
+
+        /* Real-world Application Cards */
+        .app-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .app-card i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .app-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.1); }
+        .card-game i { color: #ff0055; text-shadow: 0 0 15px rgba(255,0,85,0.5); }
+        .card-web i { color: #00ddff; text-shadow: 0 0 15px rgba(0,221,255,0.5); }
+        .card-app i { color: #bb00ff; text-shadow: 0 0 15px rgba(187,0,255,0.5); }
+
+        /* Helpers */
+        .text-gradient {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+        .hl-red { color: var(--danger); font-weight: bold; }
+        .hl-green { color: var(--success); font-weight: bold; }
+        .hl-yellow { color: var(--warning); font-weight: bold; }
+        
+        /* Result Box for interactive slide */
+        .result-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 15px;
+            font-family: var(--font-code);
+        }
+
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.2);
+            z-index: 1000;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* Floating Animation for decorative elements */
+        .floating {
+            animation: float-anim 6s ease-in-out infinite;
+        }
+        @keyframes float-anim {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Dynamic Background Elements -->
+<canvas id="particle-canvas"></canvas>
+<div class="glow-orb orb-1"></div>
+<div class="glow-orb orb-2"></div>
+
+<div class="reveal">
+    <div class="slides">
+        
+        <!-- SLIDE 1: COVER -->
+        <section data-transition="zoom">
+            <div class="glass-panel" style="padding: 60px; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 20px;" class="floating">
+                    <i class="fab fa-python text-gradient"></i>
+                </div>
+                <h3 style="color: var(--primary); letter-spacing: 2px;">BÀI 28</h3>
+                <h1>PHẠM VI CỦA BIẾN</h1>
+                <p style="font-size: 1.4rem; color: var(--text-muted);">Biến trong hàm (Local) & Ngoài hàm (Global)</p>
+                
+                <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                    <p style="margin: 0; font-weight: 600;"><i class="fas fa-users" style="color: var(--warning);"></i> Nhóm 2 thực hiện</p>
+                    <p style="font-size: 0.9rem; color: #888; margin-top: 5px;">
+                        An, Ước, Phương Nhi, A Na, Nin, Yuen, Ly A, He, Núi, Khơ, Ni
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: MINDMAP (Tư duy) -->
+        <section data-transition="slide">
+            <h2><i class="fas fa-sitemap"></i> Sơ đồ tư duy</h2>
+            <div class="glass-panel" style="margin-top: 30px;">
+                <div class="mindmap-container">
+                    <div class="mm-node mm-root"><i class="fas fa-box-open"></i> PHẠM VI BIẾN</div>
+                    
+                    <div class="mm-branches">
+                        <!-- Nhánh Local -->
+                        <div class="mm-branch">
+                            <div class="mm-node mm-local"><i class="fas fa-door-closed"></i> Trong hàm (Local)</div>
+                            <div class="mm-list fragment fade-up">
+                                <ul>
+                                    <li>Khai báo <strong>bên trong</strong> hàm</li>
+                                    <li><strong>Chỉ dùng được</strong> trong hàm đó</li>
+                                    <li>Tự xóa sau khi hàm chạy xong</li>
+                                </ul>
+                                <div style="text-align: center; color: var(--success); font-weight: bold; margin-top: 10px;">
+                                    <i class="fas fa-lock"></i> Riêng tư
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nhánh Global -->
+                        <div class="mm-branch">
+                            <div class="mm-node mm-global"><i class="fas fa-globe-americas"></i> Ngoài hàm (Global)</div>
+                            <div class="mm-list fragment fade-up" data-fragment-index="1">
+                                <ul>
+                                    <li>Khai báo <strong>bên ngoài</strong> mọi hàm</li>
+                                    <li>Dùng được <strong>toàn chương trình</strong></li>
+                                    <li>Tồn tại xuyên suốt quá trình chạy</li>
+                                </ul>
+                                <div style="text-align: center; color: var(--warning); font-weight: bold; margin-top: 10px;">
+                                    <i class="fas fa-share-alt"></i> Dùng Chung
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fragment fade-in" data-fragment-index="2" style="margin-top: 30px; text-align: center; background: rgba(0,255,204,0.1); padding: 15px; border-radius: 10px;">
+                    <p style="margin:0;">🎯 <strong>Ghi nhớ nhanh:</strong> Local → Riêng tư | Global → Chung</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: BẢNG SO SÁNH -->
+        <section data-transition="convex">
+            <h2><i class="fas fa-balance-scale"></i> So sánh nhanh</h2>
+            <div class="glass-panel">
+                <table class="premium-table">
+                    <thead>
+                        <tr>
+                            <th>Tiêu chí</th>
+                            <th>Biến Local <i class="fas fa-box" style="color:var(--success)"></i></th>
+                            <th>Biến Global <i class="fas fa-globe" style="color:var(--warning)"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="fragment custom fade-in-then-semi-out">
+                            <td>Vị trí khai báo</td>
+                            <td>Bên trong hàm</td>
+                            <td>Bên ngoài hàm</td>
+                        </tr>
+                        <tr class="fragment custom fade-in-then-semi-out">
+                            <td>Phạm vi hoạt động</td>
+                            <td>Hạn chế (nội bộ)</td>
+                            <td>Toàn chương trình</td>
+                        </tr>
+                        <tr class="fragment custom fade-in-then-semi-out">
+                            <td>Thời gian sống</td>
+                            <td>Tạm thời</td>
+                            <td>Lâu dài</td>
+                        </tr>
+                        <tr class="fragment custom fade-in-then-semi-out">
+                            <td>Quyền truy cập</td>
+                            <td>Chỉ trong hàm đó</td>
+                            <td>Mọi nơi</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="fragment fade-up" style="margin-top: 20px; border-left: 4px solid var(--primary); padding-left: 15px;">
+                    <p style="margin:0;">👉 <strong>Kết luận:</strong> Nên ưu tiên dùng <strong>Local</strong> để tránh lỗi và dễ quản lý hơn. Chỉ dùng <strong>Global</strong> khi cần chia sẻ dữ liệu.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: TƯƠNG TÁC -->
+        <section data-transition="slide">
+            <h2><i class="fas fa-gamepad"></i> Câu hỏi tương tác</h2>
+            <p>Các bạn hãy đoán kết quả khi chạy đoạn code sau:</p>
+            
+            <div class="grid-2">
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                        <div class="terminal-title">quiz.py</div>
+                    </div>
+                    <pre><code class="language-python">count = 5
+
+def test():
+    count = 10
+    print("Trong hàm:", count)
+
+test()
+print("Ngoài hàm:", count)</code></pre>
+                </div>
+                
+                <div class="glass-panel" style="display: flex; flex-direction: column; justify-content: center;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">👉 Kết quả sẽ là gì?</h3>
+                    
+                    <!-- Đáp án bị ẩn -->
+                    <div class="fragment fade-up">
+                        <div class="result-box">
+                            <span class="hl-green">Trong hàm: 10</span><br>
+                            <span class="hl-yellow">Ngoài hàm: 5</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 1rem;">
+                            💡 <strong>Giải thích:</strong> Khi viết <code>count = 10</code> trong hàm, Python tạo ra một biến <strong>Local</strong> mới trùng tên, hoàn toàn không ảnh hưởng đến biến Global bên ngoài.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: LỖI THƯỜNG GẶP -->
+        <section data-transition="zoom">
+            <h2><i class="fas fa-bug"></i> Lỗi phổ biến: UnboundLocalError</h2>
+            <div class="glass-panel">
+                <p>Cố gắng thay đổi biến Global từ bên trong hàm nhưng quên khai báo:</p>
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                        <div class="terminal-title">error.py</div>
+                    </div>
+                    <pre><code class="language-python">score = 0
+
+def tang_diem():
+    score = score + 10  # 💥 Gây lỗi tại đây!
+    print(score)
+
+tang_diem()</code></pre>
+                </div>
+                <div class="fragment fade-up" style="background: rgba(255, 95, 86, 0.1); border: 1px solid var(--danger); padding: 15px; border-radius: 8px;">
+                    <p style="color: var(--danger); font-family: var(--font-code); margin: 0; font-size: 0.9rem;">UnboundLocalError: local variable 'score' referenced before assignment</p>
+                    <p style="margin: 10px 0 0 0; font-size: 1rem;">Python coi `score` là biến cục bộ (vì có phép gán =), nhưng nó chưa có giá trị ban đầu để cộng thêm 10.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: CÁCH SỬA -->
+        <section data-transition="slide">
+            <h2><i class="fas fa-wrench"></i> Giải pháp: Từ khóa <code>global</code></h2>
+            <div class="glass-panel">
+                <p>Để sửa lỗi, ta phải nói cho Python biết: <em>"Hãy dùng biến ở ngoài kia!"</em></p>
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                        <div class="terminal-title">fixed.py</div>
+                    </div>
+                    <pre><code class="language-python">score = 0
+
+def tang_diem():
+    global score        # ✅ Báo hiệu dùng biến Global
+    score = score + 10
+    print("Điểm hiện tại:", score)
+
+tang_diem()  # Output: Điểm hiện tại: 10
+tang_diem()  # Output: Điểm hiện tại: 20</code></pre>
+                </div>
+                <p class="fragment fade-up" style="font-size: 1rem; color: var(--text-muted); text-align: center;">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> Lưu ý: Chỉ dùng <code class="inline">global</code> khi thực sự cần thay đổi giá trị. Nếu chỉ <strong>đọc</strong> thì không cần.
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: ỨNG DỤNG THỰC TẾ -->
+        <section data-transition="convex">
+            <h2><i class="fas fa-rocket"></i> Ứng dụng thực tế</h2>
+            
+            <div class="grid-3" style="margin-top: 40px;">
+                <div class="app-card card-game fragment fade-up" data-fragment-index="1">
+                    <i class="fas fa-gamepad"></i>
+                    <h3>Trong Game</h3>
+                    <p style="font-size: 1rem;">Dùng biến Global để lưu <strong>Điểm số (Score)</strong>, <strong>Máu (HP)</strong> xuyên suốt các màn chơi.</p>
+                </div>
+                
+                <div class="app-card card-web fragment fade-up" data-fragment-index="2">
+                    <i class="fas fa-globe"></i>
+                    <h3>Trong Web</h3>
+                    <p style="font-size: 1rem;">Đếm <strong>tổng số lượt truy cập</strong> hoặc số người đang online trên toàn hệ thống.</p>
+                </div>
+                
+                <div class="app-card card-app fragment fade-up" data-fragment-index="3">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Trong App</h3>
+                    <p style="font-size: 1rem;">Lưu <strong>trạng thái đăng nhập</strong> của người dùng (Token/Session) để các màn hình khác nhận diện.</p>
+                </div>
+            </div>
+
+            <div class="glass-panel fragment fade-up" data-fragment-index="4" style="margin-top: 30px; padding: 20px;">
+                <p style="margin: 0; text-align: center;">
+                    👉 <strong>Global</strong>: Lưu dữ liệu trạng thái lâu dài.<br>
+                    👉 <strong>Local</strong>: Xử lý logic tạm thời bên trong các nút bấm, chức năng.
+                </p>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: CODE SÁNG TẠO -->
+        <section data-transition="slide">
+            <h2><i class="fas fa-code"></i> Hệ thống quản lý thực tế</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 10px;">Kết hợp cả Local (tham số) và Global (lưu trữ) một cách chuyên nghiệp.</p>
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-buttons"><div class="btn-mac btn-red"></div><div class="btn-mac btn-yellow"></div><div class="btn-mac btn-green"></div></div>
+                    <div class="terminal-title">school_system.py</div>
+                </div>
+                <pre><code class="language-python"># Biến Global: Lưu trữ trạng thái hệ thống
+tong_diem = 0.0
+so_hoc_sinh = 0
+
+def them_hoc_sinh(ten, diem): # ten, diem là biến Local
+    global tong_diem, so_hoc_sinh
+    
+    # Kiểm tra tính hợp lệ bằng biến Local
+    if diem < 0 or diem > 10:
+        return f"Lỗi: Điểm của {ten} không hợp lệ!"
+        
+    # Cập nhật dữ liệu hệ thống (Global)
+    tong_diem += diem
+    so_hoc_sinh += 1
+    return f"Đã thêm {ten}."
+
+print(them_hoc_sinh("An", 8.5))
+print(them_hoc_sinh("Bình", 9.5))
+print(f"Sĩ số: {so_hoc_sinh} | ĐTB: {tong_diem/so_hoc_sinh}")</code></pre>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: KẾT LUẬN -->
+        <section data-transition="zoom">
+            <div class="glass-panel" style="padding: 60px; text-align: center; position: relative;">
+                <i class="fas fa-check-circle" style="font-size: 4rem; color: var(--success); margin-bottom: 20px; text-shadow: 0 0 20px rgba(39, 201, 63, 0.5);"></i>
+                <h2>Thông điệp chính</h2>
+                
+                <ul style="display: inline-block; text-align: left; margin: 30px 0; font-size: 1.3rem;">
+                    <li>Hiểu rõ phạm vi biến giúp <strong>tránh lỗi code</strong> ngớ ngẩn.</li>
+                    <li>Biết dùng đúng chỗ giúp viết chương trình <strong>chuyên nghiệp hơn</strong>, dễ quản lý bộ nhớ.</li>
+                </ul>
+
+                <div style="background: rgba(0,255,204,0.1); border: 1px solid var(--primary); border-radius: 15px; padding: 25px; margin: 20px auto; max-width: 80%;">
+                    <h3 style="margin: 0; font-size: 2rem; color: #fff; text-shadow: 0 0 10px var(--primary);">
+                        "Biến đúng chỗ – Code mượt mà"
+                    </h3>
+                </div>
+
+                <p style="margin-top: 40px; font-weight: bold; font-size: 1.5rem;" class="text-gradient">
+                    🙏 Cảm ơn thầy và các bạn đã lắng nghe!
+                </p>
+            </div>
+        </section>
+
+    </div>
+    
+    <div class="watermark">Nhóm 2 | Bài 28: Phạm vi của biến | Python Programming</div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+
+<script>
+    // ==========================================
+    // REVEAL.JS INITIALIZATION
+    // ==========================================
+    Reveal.initialize({
+        hash: true,
+        transition: 'slide', 
+        backgroundTransition: 'fade',
+        slideNumber: 'c/t',
+        controls: true,
+        progress: true,
+        center: true,
+        plugins: [ RevealNotes ]
+    });
+
+    // ==========================================
+    // HIGHLIGHT.JS INITIALIZATION
+    // ==========================================
+    document.querySelectorAll('pre code').forEach((el) => {
+        hljs.highlightElement(el);
+    });
+
+    // ==========================================
+    // PARTICLE NETWORK BACKGROUND (CANVAS)
+    // ==========================================
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let particlesArray = [];
+    const colors = ['#00ffcc', '#ff00ff', '#4a90e2', '#ffffff'];
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = Math.random() * 1 - 0.5;
+            this.speedY = Math.random() * 1 - 0.5;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.size > 0.2) this.size -= 0.005; // shrinking effect occasionally
+            
+            // Bounce off edges
+            if(this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if(this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+        draw() {
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function initParticles() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.width * canvas.height) / 12000;
+        for (let i = 0; i < numberOfParticles; i++) {
+            particlesArray.push(new Particle());
+        }
+    }
+
+    function connectParticles() {
+        let opacityValue = 1;
+        for (let a = 0; a < particlesArray.length; a++) {
+            for (let b = a; b < particlesArray.length; b++) {
+                let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) 
+                             + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                if (distance < (canvas.width/10) * (canvas.height/10)) {
+                    opacityValue = 1 - (distance / 20000);
+                    ctx.strokeStyle = `rgba(0, 255, 204, ${opacityValue * 0.15})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                    ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+
+    function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+        }
+        connectParticles();
+    }
+
+    // Resize event
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initParticles();
+    });
+
+    // Start background animation
+    initParticles();
+    animateParticles();
+
+</script>
+</body>
+</html>
