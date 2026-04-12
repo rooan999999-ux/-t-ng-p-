@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Bài 28: Phạm vi của biến - Bản Nâng Cấp Khung Chữ Lớn</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css" id="theme">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/tokyo-night-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --neon-cyan: #00f0ff;
+            --neon-purple: #b026ff;
+            --neon-green: #00ff66;
+            --neon-yellow: #ffea00;
+            --neon-red: #ff3366;
+            --text-main: #ffffff;
+            --text-muted: #cbd5e0;
+            --bg-deep: #050b14;
+            --glass-bg: rgba(13, 20, 35, 0.85);
+            --glass-border: rgba(0, 240, 255, 0.3);
+            --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow-x: hidden;
+            background: #0a0f1a;
+        }
+
+        .reveal, .reveal .slides, .reveal section {
+            overflow-x: hidden !important;
+        }
+
+        /* === TYPOGRAPHY SIÊU LỚN === */
+        h1 { 
+            font-size: clamp(3rem, 12vw, 5.5rem) !important; 
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 45px !important;
+            letter-spacing: -0.02em;
+        }
+        h2 { 
+            font-size: clamp(2.5rem, 8vw, 4rem) !important; 
+            padding-bottom: 22px !important;
+            margin-bottom: 40px !important;
+            border-bottom-width: 5px;
+        }
+        h3 { 
+            font-size: clamp(2rem, 6vw, 2.8rem) !important; 
+            margin-bottom: 30px !important;
+        }
+        
+        /* VĂN BẢN, DANH SÁCH – LỚN HƠN RÕ RỆT */
+        p, li, .explanation-box p, .glass-panel p, .glass-panel li {
+            font-size: clamp(1.4rem, 5vw, 2rem) !important;
+            line-height: 1.7 !important;
+            margin-bottom: 1.4rem;
+        }
+        
+        /* Code inline & block cũng to hơn */
+        code.inline, pre code {
+            font-size: clamp(1.2rem, 4vw, 1.7rem) !important;
+        }
+        .reveal pre code {
+            padding: 28px !important;
+            line-height: 1.7 !important;
+        }
+        
+        /* Glass panel – rộng rãi, padding lớn */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 36px;
+            padding: 40px 38px;
+            box-shadow: var(--glass-shadow);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 20px;
+        }
+        
+        .explanation-box {
+            background: rgba(176, 38, 255, 0.15);
+            border-left: 10px solid var(--neon-purple);
+            padding: 32px 40px;
+            border-radius: 0 28px 28px 0;
+            margin: 35px 0;
+        }
+        .explanation-box h4 {
+            font-size: clamp(1.8rem, 5vw, 2.4rem) !important;
+            margin-bottom: 25px;
+        }
+        
+        /* Terminal – code dễ đọc */
+        .mac-terminal {
+            border-radius: 20px;
+            margin: 25px 0;
+        }
+        .terminal-header {
+            padding: 18px 24px;
+        }
+        .file-name {
+            font-size: 1.2rem;
+        }
+        
+        /* Grid co giãn tốt */
+        .grid-2, .grid-3 {
+            gap: 45px;
+        }
+        
+        /* Badge & highlight to hơn */
+        .badge {
+            font-size: 1.1rem !important;
+            padding: 8px 24px;
+            margin-bottom: 28px;
+        }
+        
+        /* Step number to, rõ */
+        .step-number {
+            width: 54px;
+            height: 54px;
+            font-size: 2rem;
+            margin-right: 20px;
+        }
+        
+        /* Kết quả output trong slide */
+        pre[style*="background: #000"] {
+            font-size: 1.3rem !important;
+            padding: 22px !important;
+        }
+        
+        /* Responsive: trên mobile vẫn to nhưng không vỡ */
+        @media (max-width: 680px) {
+            .glass-panel {
+                padding: 28px 22px;
+            }
+            .grid-2, .grid-3 {
+                gap: 30px;
+            }
+            .reveal .slides section {
+                padding: 0.5rem !important;
+            }
+            p, li {
+                text-align: left !important;
+            }
+        }
+        
+        /* Chống tràn tuyệt đối */
+        pre, code, .mac-terminal {
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .focus-text {
+            font-size: clamp(1.8rem, 7vw, 2.8rem) !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="reveal">
+    <div class="slides">
+
+        <!-- TRANG BÌA -->
+        <section>
+            <div class="glass-panel" style="padding: 80px 40px; text-align: center;">
+                <i class="fab fa-python" style="font-size: 6rem; color: var(--neon-cyan);"></i>
+                <h3 style="text-align: center; font-size: 2.2rem !important;">TIN HỌC 11 - BÀI 28</h3>
+                <h1>PHẠM VI CỦA BIẾN</h1>
+                <p style="font-size: 2rem !important; color: var(--neon-yellow);">Hiểu bản chất Local & Global trong Python</p>
+                <div style="margin-top: 70px;">
+                    <p style="font-size: 1.8rem !important;"><i class="fas fa-users-cog"></i> Nhóm 2 Thực Hiện</p>
+                    <p style="font-size: 1.4rem !important;">An • Ước • Phương Nhi • A Na • uin • Yuen<br>Ly A • He • Núi • Khơ • Ni</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ĐẶT VẤN ĐỀ -->
+        <section>
+            <h2><i class="fas fa-question-circle"></i> Tại sao phải quan tâm "Phạm vi"?</h2>
+            <div class="grid-2">
+                <div class="glass-panel">
+                    <h3>Nếu mọi thứ là Global?</h3>
+                    <p>Hãy tưởng tượng một thành phố không có cửa nhà, ai cũng có thể lấy hoặc sửa đồ của người khác. Sự hỗn loạn sẽ xảy ra!</p>
+                    <ul>
+                        <li>Xung đột tên biến khi code dài.</li>
+                        <li>Dữ liệu dễ bị sửa đổi ngoài ý muốn.</li>
+                        <li>Tốn bộ nhớ vô ích vì biến tồn tại mãi mãi.</li>
+                    </ul>
+                </div>
+                <div class="glass-panel">
+                    <h3>Giải pháp của Python</h3>
+                    <p>Chia không gian sống của biến thành các cấp bậc (Scopes):</p>
+                    <ul>
+                        <li><strong class="hl-green">Local (Cục bộ):</strong> Khu vực riêng tư, an toàn.</li>
+                        <li><strong class="hl-green">Global (Toàn cục):</strong> Khu vực công cộng, dữ liệu chia sẻ.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="explanation-box">
+                <h4><i class="fas fa-microphone-alt"></i> Giải thích chuyên sâu</h4>
+                <p>Khi mới học, chúng ta hay khai báo biến ngoài hàm cho tiện. Nhưng với dự án lớn, điều đó gây thảm họa. Phạm vi giúp <em>đóng gói</em> và <em>cách ly</em> dữ liệu, máy tính biết khi nào tạo vùng nhớ và khi nào giải phóng.</p>
+            </div>
+        </section>
+
+        <!-- LOCAL VARIABLE -->
+        <section>
+            <h2><i class="fas fa-box-open"></i> 1. Biến cục bộ (Local Variable)</h2>
+            <div class="glass-panel">
+                <span class="badge badge-local">Định nghĩa & Đặc điểm</span>
+                <p>Là biến được sinh ra <strong>bên trong</strong> một hàm. Nó là "tài sản riêng" của hàm đó.</p>
+                <div class="grid-2">
+                    <div>
+                        <ul>
+                            <li><i class="fas fa-clock"></i> <strong>Tuổi thọ:</strong> Chỉ tồn tại khi hàm bắt đầu chạy.</li>
+                            <li><i class="fas fa-trash-alt"></i> <strong>Cái chết:</strong> Bị xóa ngay khi hàm kết thúc.</li>
+                            <li><i class="fas fa-shield-alt"></i> <strong>Bảo mật:</strong> Code bên ngoài không thể chạm vào.</li>
+                        </ul>
+                    </div>
+                    <div class="mac-terminal">
+                        <div class="terminal-header">
+                            <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                            <div class="file-name">local_memory.py</div>
+                        </div>
+                        <pre><code class="language-python">def tinh_luong(ngay_cong):
+    thuong = 500000  # Local variable
+    return (ngay_cong * 200000) + thuong
+
+print(tinh_luong(22))
+# print(thuong)  # NameError: biến local không tồn tại ngoài hàm</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="explanation-box">
+                <h4><i class="fas fa-brain"></i> Call Stack & Frame</h4>
+                <p>Khi gọi hàm, Python tạo một "khung ngăn xếp". Biến <code class="inline">thuong</code> được cất trong khung đó. Hàm kết thúc → khung bị hủy → giải phóng RAM ngay lập tức.</p>
+            </div>
+        </section>
+
+        <!-- GLOBAL VARIABLE -->
+        <section>
+            <h2><i class="fas fa-globe-americas"></i> 2. Biến toàn cục (Global Variable)</h2>
+            <div class="glass-panel">
+                <span class="badge badge-global">Định nghĩa & Đặc điểm</span>
+                <p>Khai báo ở <strong>ngoài cùng</strong> của file code. Là "tài sản chung".</p>
+                <div class="grid-2">
+                    <div>
+                        <ul>
+                            <li><i class="fas fa-infinity"></i> <strong>Tuổi thọ:</strong> Tồn tại đến khi tắt chương trình.</li>
+                            <li><i class="fas fa-eye"></i> <strong>Đọc dữ liệu:</strong> Mọi hàm đều nhìn thấy và đọc được.</li>
+                            <li><i class="fas fa-edit"></i> <strong>Ghi dữ liệu:</strong> Cần từ khóa <code class="inline">global</code> nếu muốn sửa.</li>
+                        </ul>
+                    </div>
+                    <div class="mac-terminal">
+                        <div class="terminal-header">
+                            <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                            <div class="file-name">global_read.py</div>
+                        </div>
+                        <pre><code class="language-python">he_so_pi = 3.14159  # Biến Global
+
+def tinh_chu_vi(ban_kinh):
+    return 2 * he_so_pi * ban_kinh
+
+def tinh_dien_tich(ban_kinh):
+    return he_so_pi * (ban_kinh ** 2)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SHADOWING -->
+        <section>
+            <h2><i class="fas fa-mask"></i> 3. Hiện tượng Shadowing (Che khuất)</h2>
+            <div class="grid-2">
+                <div class="mac-terminal">
+                    <div class="terminal-header">
+                        <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                        <div class="file-name">shadowing.py</div>
+                    </div>
+                    <pre><code class="language-python">message = "Hello Global"
+
+def say_something():
+    message = "Hi Local"
+    print("Trong hàm:", message)
+
+say_something()
+print("Ngoài hàm:", message)</code></pre>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color: var(--neon-red);">Kết quả:</h3>
+                    <pre style="background: #000; padding: 20px; border-radius: 16px;">
+Trong hàm: Hi Local
+Ngoài hàm: Hello Global</pre>
+                    <p><i class="fas fa-exclamation-triangle"></i> Biến Global không hề bị thay đổi!</p>
+                </div>
+            </div>
+            <div class="explanation-box">
+                <h4><i class="fas fa-search-plus"></i> Phân tích</h4>
+                <p>Python khi thấy phép gán <code class="inline">=</code> bên trong hàm sẽ mặc định tạo biến Local mới. Biến Local "che khuất" biến Global cùng tên.</p>
+            </div>
+        </section>
+
+        <!-- LEGB RULE -->
+        <section>
+            <h2><i class="fas fa-sitemap"></i> 4. Quy tắc tìm kiếm biến: L.E.G.B</h2>
+            <div class="grid-2">
+                <div>
+                    <div class="glass-panel"><h4><span class="step-number">L</span> Local</h4><p>Tìm trong nội bộ hàm đang chạy trước tiên.</p></div>
+                    <div class="glass-panel"><h4><span class="step-number">E</span> Enclosing</h4><p>Tìm ở hàm bao ngoài (nếu có hàm lồng nhau).</p></div>
+                    <div class="glass-panel"><h4><span class="step-number">G</span> Global</h4><p>Tìm ở cấp độ file code.</p></div>
+                    <div class="glass-panel"><h4><span class="step-number">B</span> Built-in</h4><p>Tìm trong thư viện gốc của Python.</p></div>
+                </div>
+                <div class="explanation-box" style="margin-top: 0;">
+                    <h4><i class="fas fa-microphone-alt"></i> Hình dung</h4>
+                    <p>Giống như tìm chìa khóa: trong túi quần → trong phòng → phòng khách chung → ra siêu thị mua mới. Python tìm từ trong ra ngoài.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- UNBOUNDLOCALERROR -->
+        <section>
+            <h2><i class="fas fa-bug"></i> 5. Cái bẫy "UnboundLocalError"</h2>
+            <div class="grid-2">
+                <div class="mac-terminal">
+                    <div class="terminal-header">
+                        <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                        <div class="file-name">bug_demo.py</div>
+                    </div>
+                    <pre><code class="language-python">count = 10
+
+def increase():
+    print(count)        # Dòng 4
+    count = count + 1   # Dòng 5
+
+increase()</code></pre>
+                </div>
+                <div class="glass-panel">
+                    <h3 class="hl-red"><i class="fas fa-times-circle"></i> LỖI</h3>
+                    <pre style="background: #2d0000; padding: 20px;">UnboundLocalError: local variable 'count' referenced before assignment</pre>
+                </div>
+            </div>
+            <div class="explanation-box">
+                <h4><i class="fas fa-stethoscope"></i> Giải thích</h4>
+                <p>Python thấy phép gán <code class="inline">count = ...</code> nên xác định <code class="inline">count</code> là biến Local. Khi chạy <code class="inline">print(count)</code>, nó tìm biến Local nhưng chưa được gán → lỗi.</p>
+            </div>
+        </section>
+
+        <!-- CỨU CÁNH GLOBAL -->
+        <section>
+            <h2><i class="fas fa-tools"></i> 6. Từ khóa <code class="inline">global</code></h2>
+            <div class="grid-2">
+                <div class="mac-terminal">
+                    <div class="terminal-header">
+                        <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                        <div class="file-name">fix_bug.py</div>
+                    </div>
+                    <pre><code class="language-python">count = 10
+
+def increase():
+    global count
+    print("Cũ:", count)
+    count = count + 1
+    print("Mới:", count)
+
+increase()
+print("Ngoài hàm:", count)</code></pre>
+                </div>
+                <div class="glass-panel">
+                    <h3 style="color: var(--neon-green);">Kết quả:</h3>
+                    <pre style="background: #001a0e;">
+Cũ: 10
+Mới: 11
+Ngoài hàm: 11</pre>
+                </div>
+            </div>
+            <div class="explanation-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Lời khuyên</h4>
+                <p>Hạn chế dùng <code class="inline">global</code> để tránh rối code. Thay vào đó hãy truyền tham số và dùng <code class="inline">return</code>.</p>
+            </div>
+        </section>
+
+        <!-- BÀI TẬP SÁNG TẠO -->
+        <section>
+            <h2><i class="fas fa-laptop-code"></i> 7. Bài Tập Sáng Tạo: Quản Lý Điểm</h2>
+            <div class="mac-terminal">
+                <div class="terminal-header">
+                    <div class="mac-btns"><div class="mac-btn close"></div><div class="mac-btn min"></div><div class="mac-btn max"></div></div>
+                    <div class="file-name">quan_ly_hoc_sinh.py</div>
+                </div>
+                <pre><code class="language-python">tong_hoc_sinh = 0
+tong_diem = 0.0
+log_actions = 0
+
+def them_diem(ten, diem):
+    global tong_hoc_sinh, tong_diem, log_actions
+    log_actions += 1
+    if diem < 0 or diem > 10:
+        return f"❌ Lỗi: Điểm {diem} của {ten} vô lý!"
+    tong_hoc_sinh += 1
+    tong_diem += diem
+    return f"✅ Đã thêm {ten} ({diem} điểm)"
+
+def tinh_trung_binh():
+    return tong_diem / tong_hoc_sinh if tong_hoc_sinh else 0
+
+print(them_diem("Nguyễn Văn A", 8.5))
+print(them_diem("Lê Thị B", 9.0))
+print(them_diem("Hacker C", -5))
+print(f"👉 Thống kê: {tong_hoc_sinh} HS. Điểm TB: {tinh_trung_binh():.2f}. Lượt thao tác: {log_actions}")</code></pre>
+            </div>
+        </section>
+
+        <!-- TỔNG KẾT -->
+        <section>
+            <div class="glass-panel" style="text-align: center;">
+                <i class="fas fa-check-double" style="font-size: 5rem; color: var(--neon-cyan);"></i>
+                <h2>TỔNG KẾT BÀI HỌC</h2>
+                <div class="grid-2" style="margin-top: 40px;">
+                    <div style="background: rgba(0,255,102,0.12); border-radius: 28px; padding: 30px;">
+                        <h3 style="color: var(--neon-green);">Local</h3>
+                        <ul>
+                            <li>Sống và chết trong hàm.</li>
+                            <li>Đảm bảo an toàn, độc lập.</li>
+                            <li><strong>Ưu tiên sử dụng tối đa.</strong></li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(255,234,0,0.12); border-radius: 28px; padding: 30px;">
+                        <h3 style="color: var(--neon-yellow);">Global</h3>
+                        <ul>
+                            <li>Tồn tại suốt chương trình.</li>
+                            <li>Dùng <code class="inline">global</code> để sửa giá trị.</li>
+                            <li><strong>Hạn chế lạm dụng.</strong></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="explanation-box" style="margin-top: 35px;">
+                    <h4><i class="fas fa-lightbulb"></i> Best Practice</h4>
+                    <p>Theo PEP-8, hằng số toàn cục nên <strong>VIẾT_HOA</strong> (VD: <code class="inline">MAX_USERS = 100</code>), biến Local viết thường. Giúp đồng đội dễ nhận biết phạm vi.</p>
+                </div>
+                <h3 class="focus-text" style="margin-top: 50px;">CẢM ƠN THẦY VÀ CÁC BẠN ĐÃ LẮNG NGHE!</h3>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        transition: 'convex',
+        transitionSpeed: 'slow',
+        slideNumber: 'c/t',
+        center: true,
+        width: 1280,
+        height: 900,
+        margin: 0.08,
+        plugins: [ RevealNotes ],
+    });
+    document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+</script>
+</body>
+</html>
