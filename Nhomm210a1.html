@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thuyết Trình Tin Học 10 - Nhóm 2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+            color: #f8fafc;
+            overflow: hidden;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+            transform: scale(0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .code-block {
+            background: #1e1e1e;
+            border-left: 4px solid #3b82f6;
+            color: #d4d4d4;
+        }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .function { color: #dcdcaa; }
+        .comment { color: #6a9955; }
+        .error-text { color: #f43f5e; }
+        
+        /* Custom scrollbar for text-heavy slides */
+        .content-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col">
+
+    <!-- Progress Bar -->
+    <div class="fixed top-0 left-0 w-full h-1 bg-slate-800 z-50">
+        <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-300 w-0"></div>
+    </div>
+
+    <!-- Slides Container -->
+    <div id="slider" class="relative w-full h-full flex-grow">
+
+        <!-- Slide 1: Intro -->
+        <div class="slide active">
+            <div class="glass-panel w-full max-w-5xl rounded-3xl p-12 text-center relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-20">
+                    <i class="fab fa-python text-9xl"></i>
+                </div>
+                <h2 class="text-blue-400 font-bold tracking-widest uppercase mb-4 text-sm md:text-base">Môn: Tin học 10 - Kết Nối Tri Thức</h2>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-8 leading-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-teal-300">
+                    NHẬN BIẾT & XỬ LÝ LỖI <br> TRONG PYTHON
+                </h1>
+                
+                <div class="mt-12 text-left bg-slate-800/50 rounded-2xl p-6 inline-block w-full">
+                    <h3 class="text-2xl font-bold mb-4 text-center border-b border-slate-600 pb-2"><i class="fas fa-users mr-2 text-teal-400"></i>Thực hiện: Nhóm 2</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-lg mt-4 font-medium text-blue-100">
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 1. An</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 2. Ước</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 3. Phương Nhi</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 4. A Na</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 5. ni</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 6. uin</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 7. yuen</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 8. Núi</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 9. he</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 10. khơ</div>
+                        <div class="flex items-center"><i class="fas fa-user-astronaut mr-2 text-slate-400"></i> 11. Li A</div>
+                    </div>
+                </div>
+                <p class="mt-8 text-slate-400 animate-pulse">Sử dụng phím mũi tên ⮜ ⮞ hoặc nút bấm để chuyển Slide</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Mục lục -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-5xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-8 text-teal-300 border-l-8 border-teal-500 pl-4">NỘI DUNG CHÍNH</h2>
+                <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-8 content-scroll overflow-y-auto">
+                    <div class="bg-white/5 p-8 rounded-2xl hover:bg-white/10 transition duration-300 border border-white/10">
+                        <div class="text-5xl text-blue-400 mb-4"><i class="fas fa-bug"></i></div>
+                        <h3 class="text-3xl font-bold mb-4 text-white">Phần 1: Nhận biết lỗi chương trình</h3>
+                        <ul class="space-y-3 text-xl text-slate-300 list-disc list-inside leading-relaxed">
+                            <li>Khái niệm về lỗi trong lập trình.</li>
+                            <li>Các lỗi thường gặp (Theo SGK trang 142).</li>
+                            <li>Lỗi cú pháp (Syntax Error) là gì? Hiểu và phân tích.</li>
+                            <li>Lỗi ngữ nghĩa (Logic Error) là gì? Hiểu và phân tích.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/5 p-8 rounded-2xl hover:bg-white/10 transition duration-300 border border-white/10">
+                        <div class="text-5xl text-red-400 mb-4"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h3 class="text-3xl font-bold mb-4 text-white">Phần 2: Nhận biết lỗi ngoại lệ</h3>
+                        <ul class="space-y-3 text-xl text-slate-300 list-disc list-inside leading-relaxed">
+                            <li>Khái niệm Lỗi ngoại lệ (Exceptions).</li>
+                            <li>Sự khác biệt giữa lỗi ngoại lệ và lỗi cú pháp.</li>
+                            <li>Các loại ngoại lệ phổ biến (ZeroDivisionError, NameError, TypeError...).</li>
+                            <li>Giải thích chi tiết các ví dụ thực tế trong SGK.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Khái quát Phần 1 -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold uppercase tracking-wider">Phần 1</span>
+                    <h2 class="text-4xl font-bold text-white">Nhận biết lỗi chương trình</h2>
+                </div>
+                
+                <div class="content-scroll overflow-y-auto pr-4 text-lg text-slate-200 leading-relaxed space-y-6">
+                    <p class="text-xl bg-blue-900/40 p-4 rounded-lg border-l-4 border-blue-400">
+                        Trong quá trình viết chương trình bằng Python (hay bất kỳ ngôn ngữ lập trình nào), việc phát sinh lỗi là điều không thể tránh khỏi, ngay cả với những lập trình viên chuyên nghiệp. Theo <strong>SGK Tin học 10 (trang 142)</strong>, quá trình tìm và sửa lỗi được gọi là <strong>Gỡ lỗi (Debugging)</strong>.
+                    </p>
+                    
+                    <h3 class="text-2xl font-bold text-teal-300 mt-6"><i class="fas fa-layer-group mr-2"></i>Phân loại lỗi cơ bản:</h3>
+                    <p>Khi một chương trình chạy không đúng hoặc bị dừng đột ngột, chúng ta thường phân loại lỗi thành 3 nhóm chính:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-600 shadow-lg">
+                            <h4 class="text-xl font-bold text-red-400 mb-2">1. Lỗi cú pháp</h4>
+                            <p class="text-sm text-slate-400 italic mb-2">(Syntax Error)</p>
+                            <p>Xảy ra khi câu lệnh viết sai quy tắc của ngôn ngữ lập trình (thiếu dấu, sai từ khóa). Python sẽ báo lỗi ngay lập tức và <strong>không thực hiện bất kỳ lệnh nào</strong>.</p>
+                        </div>
+                        
+                        <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-600 shadow-lg">
+                            <h4 class="text-xl font-bold text-yellow-400 mb-2">2. Lỗi ngoại lệ</h4>
+                            <p class="text-sm text-slate-400 italic mb-2">(Runtime Error / Exceptions)</p>
+                            <p>Cú pháp viết đúng, nhưng khi chương trình đang chạy thì gặp một thao tác không thể thực hiện được (VD: chia cho 0). Chương trình sẽ <strong>dừng lại giữa chừng</strong>.</p>
+                        </div>
+                        
+                        <div class="bg-slate-800/80 p-6 rounded-xl border border-slate-600 shadow-lg">
+                            <h4 class="text-xl font-bold text-green-400 mb-2">3. Lỗi ngữ nghĩa</h4>
+                            <p class="text-sm text-slate-400 italic mb-2">(Logic Error)</p>
+                            <p>Chương trình chạy từ đầu đến cuối không báo lỗi gì cả, nhưng <strong>kết quả đầu ra lại sai</strong> so với yêu cầu bài toán ban đầu (VD: yêu cầu tính tổng nhưng lại viết dấu trừ).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Lỗi cú pháp chi tiết -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-6 text-red-400 border-l-8 border-red-500 pl-4">1. Lỗi cú pháp (Syntax Error)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full content-scroll overflow-y-auto">
+                    <div class="space-y-4">
+                        <p class="text-lg text-slate-200 leading-relaxed">
+                            <strong>Khái niệm:</strong> Lỗi cú pháp xảy ra khi chúng ta viết mã lệnh vi phạm ngữ pháp của Python. Đây là lỗi dễ phát hiện nhất vì trình thông dịch (interpreter) của Python sẽ kiểm tra mã trước khi chạy. Nếu có lỗi này, chương trình sẽ không thể bắt đầu.
+                        </p>
+                        <h3 class="text-2xl font-semibold text-white mt-4">Các nguyên nhân thường gặp:</h3>
+                        <ul class="list-disc list-inside space-y-2 text-slate-300">
+                            <li>Thiếu dấu hai chấm <code>:</code> ở cuối dòng lệnh <code>if, for, while, def</code>.</li>
+                            <li>Thụt lề (indentation) không đúng quy tắc, không thẳng hàng.</li>
+                            <li>Viết sai chính tả từ khóa (ví dụ viết <code>prin</code> thay vì <code>print</code>).</li>
+                            <li>Thiếu dấu ngoặc đóng mở <code>()</code>, hoặc dấu nháy <code>""</code>, <code>''</code> khi khai báo chuỗi.</li>
+                        </ul>
+                        <div class="bg-red-900/30 border border-red-500/50 p-4 rounded-lg mt-4">
+                            <i class="fas fa-lightbulb text-yellow-400 mr-2"></i> <strong>Cách khắc phục:</strong> Đọc kỹ thông báo lỗi của Python. Chú ý dòng có chữ <span class="text-red-400 font-mono">SyntaxError</span> và dấu <span class="text-red-400 font-mono">^</span> chỉ ra vị trí bị sai để sửa lại cho đúng.
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="code-block p-4 rounded-lg text-sm md:text-base">
+                            <div class="text-slate-400 mb-2 text-xs uppercase tracking-wider">Ví dụ 1: Thiếu dấu hai chấm</div>
+                            <pre class="code-font"><code><span class="keyword">if</span> n > <span class="string">0</span>  <span class="comment"># Quên dấu hai chấm ở đây</span>
+    <span class="function">print</span>(<span class="string">"Số dương"</span>)</code></pre>
+                            <div class="mt-2 bg-black/50 p-2 rounded error-text font-mono text-sm">
+                                SyntaxError: expected ':'
+                            </div>
+                        </div>
+
+                        <div class="code-block p-4 rounded-lg text-sm md:text-base">
+                            <div class="text-slate-400 mb-2 text-xs uppercase tracking-wider">Ví dụ 2: Lỗi thụt lề (IndentationError)</div>
+                            <pre class="code-font"><code><span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="string">5</span>):
+<span class="function">print</span>(i) <span class="comment"># Không thụt lề vào trong khối lệnh for</span></code></pre>
+                            <div class="mt-2 bg-black/50 p-2 rounded error-text font-mono text-sm">
+                                IndentationError: expected an indented block
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Lỗi ngữ nghĩa chi tiết -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-6 text-green-400 border-l-8 border-green-500 pl-4">2. Lỗi ngữ nghĩa (Logic Error)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full content-scroll overflow-y-auto">
+                    <div class="space-y-4">
+                        <p class="text-lg text-slate-200 leading-relaxed">
+                            <strong>Khái niệm:</strong> Lỗi ngữ nghĩa là những lỗi logic trong thuật toán hoặc cách suy luận. Cú pháp máy tính đánh giá là <strong>đúng</strong>, chương trình không báo lỗi hệ thống nào, nhưng kết quả tính toán lại <strong>sai hoàn toàn</strong>.
+                        </p>
+                        <p class="text-lg text-slate-200 leading-relaxed">
+                            Đây là loại lỗi <strong>khó phát hiện nhất</strong> vì máy tính không thể chỉ cho chúng ta dòng lệnh nào bị sai (vì máy tính không biết mục đích thực sự của bài toán là gì, nó chỉ chạy theo lệnh).
+                        </p>
+                        <h3 class="text-2xl font-semibold text-white mt-4">Nguyên nhân thường gặp:</h3>
+                        <ul class="list-disc list-inside space-y-2 text-slate-300">
+                            <li>Dùng sai toán tử (yêu cầu cộng thì dùng trừ, yêu cầu chia lấy phần nguyên <code>//</code> lại dùng chia thập phân <code>/</code>).</li>
+                            <li>Sai thứ tự ưu tiên phép toán (quên đóng mở ngoặc).</li>
+                            <li>Gán sai giá trị khởi tạo cho biến, hoặc điều kiện vòng lặp bị sai dẫn đến lặp vô hạn.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <div class="code-block p-4 rounded-lg text-sm md:text-base">
+                            <div class="text-slate-400 mb-2 text-xs uppercase tracking-wider">Ví dụ SGK: Tính trung bình cộng của a và b</div>
+                            <pre class="code-font"><code>a = <span class="string">5</span>
+b = <span class="string">10</span>
+<span class="comment"># Mục tiêu: Tính trung bình cộng (a + b) / 2</span>
+<span class="comment"># Viết sai: Không có dấu ngoặc</span>
+tb = a + b / <span class="string">2</span>  
+<span class="function">print</span>(tb)</code></pre>
+                            <div class="mt-2 bg-green-900/30 p-3 rounded font-mono text-sm text-green-200 border border-green-500/30">
+                                <strong>Output nhận được:</strong> 10.0 <br>
+                                <strong>Giải thích:</strong> Máy tính lấy b/2 (tức là 10/2 = 5), sau đó cộng với a (5+5 = 10). Kết quả đúng phải là (5+10)/2 = 7.5. Máy không báo lỗi, nhưng logic của người lập trình đã sai.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Khái quát Phần 2 - Lỗi ngoại lệ -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col text-center justify-center items-center relative overflow-hidden">
+                <div class="absolute inset-0 bg-yellow-600/10 -z-10"></div>
+                <div class="text-7xl mb-6 text-yellow-400 animate-bounce">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="bg-yellow-500 text-slate-900 px-6 py-2 rounded-full text-lg font-bold uppercase tracking-widest mb-6">Phần 2</span>
+                <h2 class="text-5xl md:text-6xl font-extrabold text-white mb-8">NHẬN BIẾT LỖI NGOẠI LỆ</h2>
+                <h3 class="text-2xl text-yellow-200 font-mono bg-black/40 px-6 py-3 rounded-xl border border-yellow-500/30">(Exceptions - Lỗi thực thi)</h3>
+                <p class="mt-8 text-xl text-slate-300 max-w-3xl leading-relaxed">
+                    "Mã lệnh viết hoàn toàn đúng ngữ pháp, nhưng khi chạy lại yêu cầu máy tính thực hiện một nhiệm vụ <strong>không tưởng</strong> (ví dụ: chia một cái bánh cho 0 người)."
+                </p>
+                <p class="mt-4 text-slate-400 text-lg">Cùng tìm hiểu chi tiết ở các slide tiếp theo ⮞</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Giải thích chi tiết Lỗi Ngoại Lệ -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-6 text-yellow-400 border-l-8 border-yellow-500 pl-4">Khái niệm & Bản chất Lỗi Ngoại Lệ</h2>
+                
+                <div class="content-scroll overflow-y-auto text-lg text-slate-200 leading-relaxed space-y-6">
+                    <p class="text-xl">
+                        Theo chương trình SGK, <strong>Ngoại lệ (Exception)</strong> là lỗi xảy ra <strong>trong quá trình thực thi</strong> (runtime) của chương trình. 
+                    </p>
+                    
+                    <div class="bg-white/5 border border-white/10 p-6 rounded-xl flex gap-6 items-start">
+                        <div class="text-4xl text-blue-400"><i class="fas fa-info-circle"></i></div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2">Đặc điểm nhận dạng:</h3>
+                            <ul class="list-disc list-inside space-y-2 text-slate-300">
+                                <li><strong>Vượt qua vòng kiểm tra cú pháp:</strong> Trước khi chạy, Python kiểm tra và thấy code viết hoàn toàn đúng ngữ pháp.</li>
+                                <li><strong>Chết giữa chừng:</strong> Khi chạy đến dòng lệnh chứa dữ liệu bất thường hoặc thao tác phi logic, chương trình sẽ tự động bị "văng" (crash) và dừng lại lập tức.</li>
+                                <li><strong>Có thông báo rõ ràng:</strong> Python sẽ in ra dòng <span class="font-mono text-yellow-400">Traceback (most recent call last)</span> kèm theo <strong>tên loại ngoại lệ</strong> và dòng lệnh gây ra lỗi để chúng ta biết đường sửa chữa.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-red-900/20 p-5 rounded-lg border border-red-500/30">
+                            <h4 class="font-bold text-red-300 mb-2">So sánh với lỗi cú pháp:</h4>
+                            <p class="text-sm">Lỗi cú pháp giống như bạn viết một lá thư sai chính tả, bưu điện từ chối gửi ngay từ đầu. Còn ngoại lệ giống như lá thư viết đúng chính tả, bưu điện đã gửi đi, nhưng khi đến nơi thì phát hiện <em>địa chỉ nhà không tồn tại</em> (không thể phát thư).</p>
+                        </div>
+                        <div class="bg-green-900/20 p-5 rounded-lg border border-green-500/30">
+                            <h4 class="font-bold text-green-300 mb-2">Mục đích của việc báo lỗi:</h4>
+                            <p class="text-sm">Máy tính dừng chương trình sinh ra ngoại lệ là để <strong>bảo vệ hệ thống</strong>, tránh việc tính toán ra những dữ liệu sai lệch làm hỏng toàn bộ cơ sở dữ liệu phía sau.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Các loại ngoại lệ phổ biến (P1) -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-6 text-purple-400 border-l-8 border-purple-500 pl-4">Các lỗi ngoại lệ phổ biến (Phần 1)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full content-scroll overflow-y-auto">
+                    <!-- ZeroDivisionError -->
+                    <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+                        <h3 class="text-2xl font-bold text-white mb-3 font-mono">1. ZeroDivisionError</h3>
+                        <p class="text-slate-300 mb-4"><strong>Ý nghĩa:</strong> Lỗi chia cho 0. Trong toán học, phép chia cho 0 là không xác định. Python cũng vậy.</p>
+                        <div class="code-block p-4 rounded-lg text-sm">
+                            <pre class="code-font"><code>a = <span class="string">10</span>
+b = <span class="string">0</span>
+<span class="function">print</span>(a / b) <span class="comment"># Cố tình chia cho b (b=0)</span></code></pre>
+                            <div class="mt-2 bg-black/50 p-2 rounded error-text font-mono text-xs">
+                                ZeroDivisionError: division by zero
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-300 mt-3"><i class="fas fa-tools"></i> <strong>Sửa:</strong> Kiểm tra biến mẫu số bằng lệnh <code>if b != 0:</code> trước khi thực hiện phép chia.</p>
+                    </div>
+
+                    <!-- NameError -->
+                    <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+                        <h3 class="text-2xl font-bold text-white mb-3 font-mono">2. NameError</h3>
+                        <p class="text-slate-300 mb-4"><strong>Ý nghĩa:</strong> Lỗi tên không xác định. Xảy ra khi bạn cố gắng sử dụng một biến chưa từng được gán giá trị hoặc khai báo trước đó.</p>
+                        <div class="code-block p-4 rounded-lg text-sm">
+                            <pre class="code-font"><code>x = <span class="string">5</span>
+<span class="comment"># Biến y chưa từng được khai báo</span>
+tong = x + y  
+<span class="function">print</span>(tong)</code></pre>
+                            <div class="mt-2 bg-black/50 p-2 rounded error-text font-mono text-xs">
+                                NameError: name 'y' is not defined
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-300 mt-3"><i class="fas fa-tools"></i> <strong>Sửa:</strong> Kiểm tra lại chính tả tên biến, đảm bảo biến đã được gán giá trị trước khi dùng.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Các loại ngoại lệ phổ biến (P2) -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-6xl h-5/6 rounded-3xl p-10 flex flex-col">
+                <h2 class="text-4xl font-bold mb-6 text-purple-400 border-l-8 border-purple-500 pl-4">Các lỗi ngoại lệ phổ biến (Phần 2)</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full content-scroll overflow-y-auto">
+                    <!-- TypeError -->
+                    <div class="bg-slate-800/60 p-6 rounded-xl border border-slate-600">
+                        <h3 class="text-2xl font-bold text-white mb-3 font-mono">3. TypeError</h3>
+                        <p class="text-slate-300 mb-4"><strong>Ý nghĩa:</strong> Lỗi kiểu dữ liệu. Khi bạn thực hiện phép toán trên các kiểu dữ liệu không tương thích (vd: lấy Chữ cộng với Số).</p>
+                        <div class="code-block p-4 rounded-lg text-sm">
+                            <pre class="code-font"><code>chuoi = <span class="string">"Điểm của tôi là: "</span>
+diem = <span class="string">10</span>
+<span class="comment"># Không thể dùng dấu + giữa str và int</span>
+ket_qua = chuoi + diem  </code></pre>
+                            <div class="mt-2 bg-black/50 p-2 rounded error-text font-mono text-xs">
+                                TypeError: can only concatenate str (not "int") to str
+                            </div>
+                        </div>
+                        <p class="text-sm text-yellow-300 mt-3"><i class="fas fa-tools"></i> <strong>Sửa:</strong> Ép kiểu dữ liệu đồng nhất, ví dụ: <code>chuoi + str(diem)</code>.</p>
+                    </div>
+
+                    <!-- IndexError & ValueError -->
+                    <div class="flex flex-col gap-4">
+                        <!-- IndexError -->
+                        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-600">
+                            <h3 class="text-xl font-bold text-white mb-2 font-mono">4. IndexError</h3>
+                            <p class="text-slate-300 text-sm mb-2">Truy cập vào vị trí (chỉ số) không tồn tại trong danh sách (List/String).</p>
+                            <div class="code-block p-3 rounded-lg text-xs">
+                                <pre class="code-font"><code>ds = [<span class="string">1, 2, 3</span>] <span class="comment"># Chỉ số có là 0,1,2</span>
+<span class="function">print</span>(ds[<span class="string">5</span>]) <span class="comment"># Lỗi: Cố lấy phần tử thứ 5</span></code></pre>
+                                <div class="mt-1 error-text font-mono">IndexError: list index out of range</div>
+                            </div>
+                        </div>
+                        
+                        <!-- ValueError -->
+                        <div class="bg-slate-800/60 p-5 rounded-xl border border-slate-600">
+                            <h3 class="text-xl font-bold text-white mb-2 font-mono">5. ValueError</h3>
+                            <p class="text-slate-300 text-sm mb-2">Lỗi giá trị. Khi dùng đúng kiểu dữ liệu nhưng nội dung không hợp lệ để chuyển đổi.</p>
+                            <div class="code-block p-3 rounded-lg text-xs">
+                                <pre class="code-font"><code><span class="comment"># Ép chữ 'abc' thành số nguyên? Vô lý!</span>
+so = <span class="function">int</span>(<span class="string">"abc"</span>) </code></pre>
+                                <div class="mt-1 error-text font-mono">ValueError: invalid literal for int()</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Tổng kết -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-5xl h-5/6 rounded-3xl p-10 flex flex-col justify-center items-center text-center">
+                <div class="text-6xl text-teal-400 mb-6"><i class="fas fa-flag-checkered"></i></div>
+                <h2 class="text-5xl font-bold mb-8 text-white">TỔNG KẾT BÀI HỌC</h2>
+                
+                <div class="w-full bg-white/5 rounded-2xl p-8 border border-white/10 text-left space-y-6">
+                    <div class="flex items-start gap-4">
+                        <div class="text-red-400 text-3xl"><i class="fas fa-times-circle"></i></div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Lỗi cú pháp (Syntax Error)</h3>
+                            <p class="text-slate-300 text-lg">Viết sai ngữ pháp. Chương trình không chạy được lệnh nào. Rất dễ sửa vì Python chỉ đích danh chỗ sai.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4 border-t border-white/10 pt-6">
+                        <div class="text-yellow-400 text-3xl"><i class="fas fa-exclamation-circle"></i></div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Lỗi ngoại lệ (Exceptions)</h3>
+                            <p class="text-slate-300 text-lg">Cú pháp đúng nhưng gặp dữ liệu phi lý khi đang chạy (chia cho 0, sai kiểu dữ liệu...). Chương trình bị dừng đột ngột. Cần đọc kỹ thông báo traceback để xử lý.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 border-t border-white/10 pt-6">
+                        <div class="text-green-400 text-3xl"><i class="fas fa-question-circle"></i></div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Lỗi ngữ nghĩa (Logic Error)</h3>
+                            <p class="text-slate-300 text-lg">Chạy mượt mà, không báo lỗi, nhưng kết quả sai bét. Đây là lỗi do tư duy thuật toán của người lập trình. Khó tìm và khó sửa nhất.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: End -->
+        <div class="slide">
+            <div class="glass-panel w-full max-w-4xl rounded-3xl p-16 text-center">
+                <div class="text-8xl text-pink-500 mb-8 animate-pulse"><i class="fas fa-heart"></i></div>
+                <h1 class="text-5xl font-extrabold text-white mb-6">CẢM ƠN CÔ VÀ CÁC BẠN</h1>
+                <h2 class="text-3xl text-blue-300 mb-8">ĐÃ CHÚ Ý LẮNG NGHE BÀI THUYẾT TRÌNH CỦA NHÓM 2!</h2>
+                <p class="text-xl text-slate-400">Các bạn có câu hỏi nào thắc mắc cho nhóm không?</p>
+                
+                <div class="mt-12 flex justify-center gap-4 text-3xl text-slate-500">
+                    <i class="fab fa-python hover:text-blue-400 transition"></i>
+                    <i class="fas fa-laptop-code hover:text-teal-400 transition"></i>
+                    <i class="fas fa-bug hover:text-red-400 transition"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Controls -->
+    <div class="fixed bottom-6 w-full px-8 flex justify-between items-center z-50">
+        <button id="prevBtn" onclick="prevSlide()" class="bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-6 py-3 rounded-full flex items-center transition-all disabled:opacity-30 disabled:cursor-not-allowed group">
+            <i class="fas fa-chevron-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Slide trước
+        </button>
+        
+        <div class="bg-black/40 backdrop-blur-md px-6 py-2 rounded-full font-mono text-white/80 border border-white/10">
+            <span id="current-slide-text">1</span> / <span id="total-slide-text">11</span>
+        </div>
+
+        <button id="nextBtn" onclick="nextSlide()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-full flex items-center shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-all group">
+            Tiếp theo <i class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressBar = document.getElementById('progress-bar');
+        
+        document.getElementById('total-slide-text').innerText = totalSlides;
+
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                    slide.style.zIndex = 10;
+                } else {
+                    slide.classList.remove('active');
+                    slide.style.zIndex = 0;
+                }
+            });
+
+            // Update Progress Bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // Update Text Counter
+            document.getElementById('current-slide-text').innerText = currentSlide + 1;
+
+            // Update Buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            const nextBtn = document.getElementById('nextBtn');
+            if (currentSlide === totalSlides - 1) {
+                nextBtn.innerHTML = 'Kết thúc <i class="fas fa-check ml-2"></i>';
+                nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-500');
+            } else {
+                nextBtn.innerHTML = 'Tiếp theo <i class="fas fa-chevron-right ml-2 group-hover:translate-x-1 transition-transform"></i>';
+                nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-500');
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize
+        updateSlides();
+    </script>
+</body>
+</html>
