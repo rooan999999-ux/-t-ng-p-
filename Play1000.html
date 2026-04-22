@@ -1,0 +1,4239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DesignStudio – Thiết kế trực tuyến</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --primary: #7c3aed;
+  --primary-light: #ede9fe;
+  --primary-dark: #5b21b6;
+  --accent: #f59e0b;
+  --surface: #ffffff;
+  --surface-2: #f8f7ff;
+  --surface-3: #f1f0fe;
+  --border: #e4e2f0;
+  --text: #1e1b4b;
+  --text-2: #6b6b8f;
+  --text-3: #a0a0c0;
+  --danger: #ef4444;
+  --success: #10b981;
+  --shadow-sm: 0 1px 3px rgba(124,58,237,0.08);
+  --shadow-md: 0 4px 16px rgba(124,58,237,0.12);
+  --shadow-lg: 0 12px 40px rgba(124,58,237,0.18);
+  --radius: 10px;
+  --radius-sm: 6px;
+  --radius-lg: 16px;
+  --font-ui: 'DM Sans', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: var(--font-ui); background: var(--surface-2); height:100vh; overflow:hidden; color:var(--text); }
+
+/* ---- TOP NAV ---- */
+.top-nav {
+  height: 58px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  z-index: 100;
+  gap: 12px;
+}
+.nav-left { display:flex; align-items:center; gap:10px; }
+.logo { display:flex; align-items:center; gap:8px; text-decoration:none; }
+.logo-icon { width:34px; height:34px; background: linear-gradient(135deg, var(--primary), #a855f7); border-radius:10px; display:flex; align-items:center; justify-content:center; }
+.logo-icon i { color:white; font-size:16px; }
+.logo span { font-family: var(--font-display); font-weight:700; font-size:18px; color:var(--text); }
+.project-name-input {
+  border: 1.5px solid transparent;
+  background: transparent;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  outline: none;
+  min-width: 160px;
+  transition: all .15s;
+}
+.project-name-input:hover { border-color: var(--border); background: var(--surface-2); }
+.project-name-input:focus { border-color: var(--primary); background: var(--surface); }
+.nav-center { display:flex; align-items:center; gap:4px; }
+.nav-btn {
+  width: 34px; height: 34px; border-radius: var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-2); transition:all .15s;
+  background:transparent; border:none; font-size:15px;
+  position:relative;
+}
+.nav-btn:hover { background: var(--surface-3); color:var(--primary); }
+.nav-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -28px; left:50%; transform:translateX(-50%);
+  background: var(--text); color:white; font-size:11px;
+  padding: 3px 7px; border-radius:4px; white-space:nowrap;
+  pointer-events:none; z-index:999;
+}
+.nav-separator { width:1px; height:24px; background:var(--border); margin:0 6px; }
+.nav-right { display:flex; align-items:center; gap:8px; }
+.btn-primary {
+  background: var(--primary); color:white; padding:8px 18px;
+  border-radius: var(--radius-sm); font-weight:600; font-size:13px;
+  cursor:pointer; display:flex; align-items:center; gap:7px;
+  border:none; transition:all .15s; font-family:var(--font-ui);
+}
+.btn-primary:hover { background: var(--primary-dark); transform:translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-secondary {
+  background: var(--surface-3); color:var(--text); padding:8px 18px;
+  border-radius: var(--radius-sm); font-weight:600; font-size:13px;
+  cursor:pointer; display:flex; align-items:center; gap:7px;
+  border: 1.5px solid var(--border); transition:all .15s; font-family:var(--font-ui);
+}
+.btn-secondary:hover { border-color:var(--primary); color:var(--primary); }
+
+/* ---- MAIN LAYOUT ---- */
+.app-container { display:flex; height:calc(100vh - 58px); }
+
+/* ---- LEFT ICON RAIL ---- */
+.left-rail {
+  width: 66px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 4px;
+  z-index: 20;
+}
+.rail-btn {
+  width: 46px; height: 46px;
+  border-radius: var(--radius);
+  display: flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-2);
+  transition:all .15s; gap:2px;
+  background:transparent; border:none;
+  position:relative;
+}
+.rail-btn i { font-size:18px; }
+.rail-btn span { font-size:9px; font-weight:600; letter-spacing:.3px; text-transform:uppercase; }
+.rail-btn:hover, .rail-btn.active { background: var(--primary-light); color:var(--primary); }
+.rail-separator { width:36px; height:1px; background:var(--border); margin:4px 0; }
+
+/* ---- LEFT PANEL ---- */
+.left-panel {
+  width: 280px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width .2s;
+}
+.left-panel.collapsed { width:0; }
+.panel-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-header h3 { font-family: var(--font-display); font-size:16px; font-weight:600; }
+.panel-search {
+  margin: 12px 12px 0;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  display:flex; align-items:center; gap:8px;
+  flex-shrink: 0;
+}
+.panel-search i { color:var(--text-3); font-size:13px; }
+.panel-search input {
+  border:none; background:transparent; outline:none;
+  font-size:13px; width:100%; font-family:var(--font-ui); color:var(--text);
+}
+.panel-body { flex:1; overflow-y:auto; padding:12px; }
+.panel-body::-webkit-scrollbar { width:4px; }
+.panel-body::-webkit-scrollbar-track { background:transparent; }
+.panel-body::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+/* Templates grid */
+.section-title { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.5px; margin:16px 0 8px; }
+.template-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.template-card {
+  border-radius: var(--radius);
+  overflow:hidden; cursor:pointer;
+  border: 1.5px solid var(--border);
+  transition:all .2s; aspect-ratio:4/3;
+  position:relative;
+}
+.template-card:hover { border-color:var(--primary); transform:scale(1.02); box-shadow:var(--shadow-md); }
+.template-card img { width:100%; height:100%; object-fit:cover; }
+.template-card-bg { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:white; }
+.template-label {
+  position:absolute; bottom:0; left:0; right:0;
+  background: linear-gradient(transparent, rgba(0,0,0,.5));
+  color:white; font-size:10px; padding:12px 6px 5px; font-weight:500;
+}
+
+/* Shape items */
+.shapes-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.shape-item {
+  aspect-ratio:1; border-radius:var(--radius-sm);
+  background: var(--surface-2); border: 1.5px solid var(--border);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:22px; transition:all .15s; color:var(--text-2);
+}
+.shape-item:hover { border-color:var(--primary); background:var(--primary-light); color:var(--primary); }
+
+/* Text items */
+.text-items { display:flex; flex-direction:column; gap:6px; }
+.text-item {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor:pointer; transition:all .15s;
+}
+.text-item:hover { border-color:var(--primary); background:var(--primary-light); }
+.text-item p { color:var(--text-2); font-size:11px; margin-bottom:2px; }
+
+/* ---- CANVAS AREA ---- */
+.canvas-area {
+  flex:1; background: #e8e7f5;
+  background-image: radial-gradient(circle, #ccc9e8 1px, transparent 1px);
+  background-size: 24px 24px;
+  display:flex; flex-direction:column; overflow:hidden; position:relative;
+}
+
+/* Format toolbar */
+.format-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display:flex; align-items:center; gap:4px;
+  height: 46px;
+  flex-shrink:0;
+  overflow-x:auto;
+}
+.format-bar::-webkit-scrollbar { display:none; }
+.fmt-btn {
+  width:32px; height:32px; border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-2); background:transparent;
+  border:none; font-size:13px; transition:all .15s; flex-shrink:0;
+}
+.fmt-btn:hover { background:var(--surface-3); color:var(--primary); }
+.fmt-btn.active { background:var(--primary-light); color:var(--primary); }
+.fmt-separator { width:1px; height:20px; background:var(--border); margin:0 4px; flex-shrink:0; }
+.fmt-select {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size:12px; font-family:var(--font-ui);
+  color:var(--text); background:var(--surface);
+  outline:none; cursor:pointer; flex-shrink:0;
+}
+.fmt-select:focus { border-color:var(--primary); }
+.fmt-input {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  font-size:12px; font-family:var(--font-ui);
+  color:var(--text); background:var(--surface);
+  outline:none; width:48px; flex-shrink:0; text-align:center;
+}
+.fmt-input:focus { border-color:var(--primary); }
+.fmt-color-btn {
+  width:32px; height:32px;
+  border-radius:6px; cursor:pointer;
+  border:none; display:flex; align-items:center;
+  justify-content:center; flex-direction:column; gap:1px;
+  background:transparent; transition:all .15s; flex-shrink:0; padding:0;
+}
+.fmt-color-btn:hover { background:var(--surface-3); }
+.fmt-color-btn i { font-size:12px; color:var(--text-2); }
+.fmt-color-bar { width:18px; height:4px; border-radius:2px; }
+.hidden-input { position:absolute; opacity:0; pointer-events:none; width:0; height:0; }
+
+.canvas-viewport {
+  flex:1; overflow:auto; display:flex;
+  align-items:center; justify-content:center;
+  padding:40px;
+}
+.canvas-viewport::-webkit-scrollbar { width:8px; height:8px; }
+.canvas-viewport::-webkit-scrollbar-track { background:transparent; }
+.canvas-viewport::-webkit-scrollbar-thumb { background:rgba(124,58,237,.2); border-radius:4px; }
+
+#designCanvas {
+  background: white;
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(124,58,237,.06);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transform-origin: top left;
+}
+
+/* Zoom info */
+.zoom-bar {
+  position:absolute; bottom:16px; right:20px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  display:flex; align-items:center; gap:0;
+  box-shadow: var(--shadow-md);
+  overflow:hidden;
+  z-index:50;
+}
+.zoom-btn {
+  width:34px; height:34px; border:none; background:transparent;
+  cursor:pointer; font-size:16px; color:var(--text-2);
+  display:flex; align-items:center; justify-content:center;
+  transition:all .15s;
+}
+.zoom-btn:hover { background:var(--surface-3); color:var(--primary); }
+.zoom-level {
+  padding:0 10px; font-size:12px; font-weight:600;
+  color:var(--text); cursor:pointer; border:none; background:transparent;
+  font-family:var(--font-ui); min-width:52px; text-align:center;
+}
+
+/* Page nav */
+.page-bar {
+  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  display:flex; align-items:center; gap:8px;
+  padding: 0 12px;
+  box-shadow: var(--shadow-md);
+  z-index:50; height:38px;
+}
+.page-btn { width:28px; height:28px; border:none; background:transparent; cursor:pointer; color:var(--text-2); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; transition:all .15s; }
+.page-btn:hover { background:var(--surface-3); color:var(--primary); }
+.page-info { font-size:12px; font-weight:600; color:var(--text); }
+
+/* ---- RIGHT SIDEBAR ---- */
+.right-sidebar {
+  width: 260px;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  flex-shrink:0;
+}
+.right-sidebar::-webkit-scrollbar { width:4px; }
+.right-sidebar::-webkit-scrollbar-track { background:transparent; }
+.right-sidebar::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+.prop-tabs {
+  display:flex; border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.prop-tab {
+  flex:1; padding:12px 0; text-align:center;
+  font-size:12px; font-weight:600; color:var(--text-3);
+  cursor:pointer; border-bottom:2px solid transparent;
+  transition:all .15s;
+}
+.prop-tab.active { color:var(--primary); border-bottom-color:var(--primary); }
+.prop-body { padding:16px; }
+.prop-section { margin-bottom:20px; }
+.prop-label { font-size:11px; font-weight:700; color:var(--text-3); text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; display:block; }
+
+/* Position inputs */
+.pos-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.pos-field { display:flex; flex-direction:column; gap:4px; }
+.pos-field label { font-size:11px; color:var(--text-3); font-weight:500; }
+.pos-input {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size:12px; font-family:var(--font-ui);
+  color:var(--text); outline:none; background:var(--surface-2);
+  width:100%;
+}
+.pos-input:focus { border-color:var(--primary); background:var(--surface); }
+
+/* Color picker */
+.color-strip { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.color-dot {
+  width:26px; height:26px; border-radius:50%;
+  cursor:pointer; border:2px solid transparent;
+  transition:all .15s; flex-shrink:0;
+}
+.color-dot:hover { transform:scale(1.15); }
+.color-dot.active { border-color: var(--primary); box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary); }
+.color-custom-row { display:flex; align-items:center; gap:8px; }
+.color-preview { width:32px; height:32px; border-radius:var(--radius-sm); border:1.5px solid var(--border); cursor:pointer; flex-shrink:0; }
+.color-hex {
+  border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  padding:6px 10px; font-size:12px; font-family:monospace;
+  color:var(--text); outline:none; flex:1; background:var(--surface-2);
+}
+.color-hex:focus { border-color:var(--primary); background:var(--surface); }
+
+/* Opacity */
+.opacity-row { display:flex; align-items:center; gap:10px; }
+.range-slider { flex:1; -webkit-appearance:none; appearance:none; height:4px; border-radius:2px; background:var(--border); outline:none; }
+.range-slider::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:var(--primary); cursor:pointer; border:2px solid white; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+.range-value { font-size:12px; font-weight:600; color:var(--text); min-width:36px; text-align:right; }
+
+/* Shadow section */
+.toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.toggle { width:36px; height:20px; border-radius:10px; background:var(--border); position:relative; cursor:pointer; transition:all .2s; }
+.toggle.on { background:var(--primary); }
+.toggle-knob { width:16px; height:16px; border-radius:50%; background:white; position:absolute; top:2px; left:2px; transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle.on .toggle-knob { left:18px; }
+
+/* Actions */
+.action-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.action-btn {
+  padding:8px; border-radius:var(--radius-sm);
+  background:var(--surface-2); border:1.5px solid var(--border);
+  font-size:11px; font-weight:600; color:var(--text-2);
+  cursor:pointer; transition:all .15s;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  font-family:var(--font-ui);
+}
+.action-btn:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+.action-btn.danger:hover { border-color:var(--danger); color:var(--danger); background:#fee2e2; }
+.action-btn.full { grid-column:1/-1; }
+
+/* ---- CANVAS ELEMENTS ---- */
+.canvas-element {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  box-sizing: border-box;
+  transition: box-shadow .15s;
+}
+.canvas-element.selected {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+.canvas-element.selected::before {
+  content:'';
+  position:absolute; inset:-4px;
+  border:1.5px solid rgba(124,58,237,.25);
+  border-radius:3px;
+  pointer-events:none;
+}
+
+/* Resize handles */
+.el-handle {
+  position:absolute; width:10px; height:10px;
+  background:white; border:2px solid var(--primary);
+  border-radius:3px; display:none; z-index:10;
+}
+.selected .el-handle { display:block; }
+.el-handle.nw { top:-5px; left:-5px; cursor:nw-resize; }
+.el-handle.n  { top:-5px; left:calc(50% - 5px); cursor:n-resize; }
+.el-handle.ne { top:-5px; right:-5px; cursor:ne-resize; }
+.el-handle.w  { top:calc(50% - 5px); left:-5px; cursor:w-resize; }
+.el-handle.e  { top:calc(50% - 5px); right:-5px; cursor:e-resize; }
+.el-handle.sw { bottom:-5px; left:-5px; cursor:sw-resize; }
+.el-handle.s  { bottom:-5px; left:calc(50% - 5px); cursor:s-resize; }
+.el-handle.se { bottom:-5px; right:-5px; cursor:se-resize; }
+.el-handle.rotate {
+  top:-28px; left:calc(50% - 5px);
+  cursor:grab; background:var(--primary); border-color:var(--primary);
+  border-radius:50%;
+}
+.el-handle.rotate::before {
+  content:'↻'; color:white; font-size:10px;
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+}
+
+/* Text element */
+.el-text {
+  padding: 4px;
+  outline: none;
+  word-break: break-word;
+  line-height: 1.4;
+  min-width: 40px;
+  min-height: 20px;
+}
+.el-text[contenteditable="true"] {
+  cursor: text;
+  background: rgba(124,58,237,.04);
+}
+
+/* Selection box (rubber-band) */
+#selectionBox {
+  position:absolute; border:1.5px dashed var(--primary);
+  background:rgba(124,58,237,.06); pointer-events:none;
+  display:none; z-index:200;
+}
+
+/* ---- CONTEXT MENU ---- */
+#contextMenu {
+  position: fixed; background:var(--surface);
+  border:1.5px solid var(--border); border-radius:var(--radius);
+  box-shadow: var(--shadow-lg); z-index:9999; min-width:180px;
+  padding:4px 0; display:none;
+}
+.ctx-item {
+  padding:9px 16px; font-size:13px; cursor:pointer;
+  display:flex; align-items:center; gap:10px; color:var(--text);
+  transition:background .1s;
+}
+.ctx-item:hover { background:var(--surface-2); color:var(--primary); }
+.ctx-item.danger:hover { background:#fee2e2; color:var(--danger); }
+.ctx-item i { width:14px; text-align:center; font-size:12px; }
+.ctx-separator { height:1px; background:var(--border); margin:3px 0; }
+
+/* ---- MODALS ---- */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(30,27,75,.35);
+  backdrop-filter:blur(4px);
+  z-index:9990; display:none;
+  align-items:center; justify-content:center;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--surface); border-radius:var(--radius-lg);
+  padding:28px; box-shadow: var(--shadow-lg);
+  width: min(92vw, 500px);
+  animation: modalIn .2s ease;
+}
+@keyframes modalIn { from{transform:scale(.95) translateY(10px); opacity:0} to{transform:none; opacity:1} }
+.modal h2 { font-family:var(--font-display); font-size:20px; margin-bottom:16px; }
+.modal-body { margin-bottom:20px; }
+.modal-footer { display:flex; gap:8px; justify-content:flex-end; }
+
+/* Canvas size modal */
+.size-presets { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:16px; }
+.size-preset {
+  padding:12px; border:1.5px solid var(--border);
+  border-radius:var(--radius); cursor:pointer; transition:all .15s;
+  text-align:center;
+}
+.size-preset:hover, .size-preset.active { border-color:var(--primary); background:var(--primary-light); }
+.size-preset strong { display:block; font-size:13px; color:var(--text); }
+.size-preset small { font-size:11px; color:var(--text-3); }
+.input-row { display:flex; align-items:center; gap:8px; }
+.input-row label { font-size:12px; color:var(--text-2); min-width:16px; font-weight:600; }
+.modal-input {
+  flex:1; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  padding:8px 12px; font-size:13px; font-family:var(--font-ui);
+  color:var(--text); outline:none; background:var(--surface-2);
+}
+.modal-input:focus { border-color:var(--primary); background:var(--surface); }
+
+/* Export modal */
+.export-formats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+.export-fmt {
+  padding:14px 8px; border:1.5px solid var(--border);
+  border-radius:var(--radius); cursor:pointer; transition:all .15s;
+  text-align:center;
+}
+.export-fmt:hover, .export-fmt.active { border-color:var(--primary); background:var(--primary-light); }
+.export-fmt i { font-size:24px; color:var(--primary); margin-bottom:6px; display:block; }
+.export-fmt strong { font-size:12px; display:block; }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--text); color:white; padding:10px 20px;
+  border-radius:50px; font-size:13px; font-weight:500;
+  box-shadow:var(--shadow-lg); z-index:99999;
+  opacity:0; transition:opacity .2s;
+  pointer-events:none;
+}
+.toast.show { opacity:1; }
+
+/* Loading overlay for elements */
+.el-img { width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block; }
+
+/* Gradient element */
+.el-gradient { width:100%; height:100%; }
+
+/* Line element */
+.el-line { pointer-events:all; }
+
+/* Empty state */
+.canvas-empty { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; opacity:.35; gap:8px; }
+.canvas-empty i { font-size:48px; color:var(--primary); }
+.canvas-empty p { font-size:14px; color:var(--text-2); font-weight:500; }
+
+/* Layers panel content */
+.layer-item {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 10px; border-radius:var(--radius-sm);
+  cursor:pointer; transition:all .15s; border:1.5px solid transparent;
+}
+.layer-item:hover { background:var(--surface-2); }
+.layer-item.active { background:var(--primary-light); border-color:var(--primary); }
+.layer-thumb { width:32px; height:32px; border-radius:4px; border:1px solid var(--border); overflow:hidden; flex-shrink:0; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.layer-info { flex:1; min-width:0; }
+.layer-info p { font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.layer-info span { font-size:10px; color:var(--text-3); }
+.layer-actions { display:flex; gap:2px; }
+.layer-act { width:22px; height:22px; border:none; background:transparent; cursor:pointer; color:var(--text-3); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; transition:all .1s; }
+.layer-act:hover { background:var(--border); color:var(--text); }
+
+/* Upload area */
+.upload-zone {
+  border:2px dashed var(--border); border-radius:var(--radius-lg);
+  padding:30px 20px; text-align:center; cursor:pointer;
+  transition:all .2s; color:var(--text-3);
+}
+.upload-zone:hover { border-color:var(--primary); background:var(--primary-light); color:var(--primary); }
+.upload-zone i { font-size:32px; margin-bottom:8px; display:block; }
+.upload-zone p { font-size:13px; font-weight:500; }
+.upload-zone small { font-size:11px; }
+
+/* AI panel */
+.ai-prompt-box { position:relative; }
+.ai-input {
+  width:100%; border:1.5px solid var(--border); border-radius:var(--radius);
+  padding:10px 44px 10px 12px; font-size:13px; font-family:var(--font-ui);
+  color:var(--text); outline:none; resize:none; background:var(--surface-2);
+  line-height:1.5; min-height:72px;
+}
+.ai-input:focus { border-color:var(--primary); background:var(--surface); }
+.ai-send {
+  position:absolute; right:8px; bottom:8px;
+  width:28px; height:28px; border-radius:8px;
+  background:var(--primary); color:white; border:none;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-size:11px; transition:all .15s;
+}
+.ai-send:hover { background:var(--primary-dark); }
+.ai-suggestion {
+  padding:10px; background:var(--surface-2);
+  border:1.5px solid var(--border); border-radius:var(--radius);
+  cursor:pointer; margin-bottom:6px; font-size:12px; color:var(--text-2);
+  transition:all .15s;
+}
+.ai-suggestion:hover { border-color:var(--primary); color:var(--primary); background:var(--primary-light); }
+
+/* Undo history indicator */
+.history-dots { display:flex; gap:3px; align-items:center; }
+.history-dot { width:4px; height:4px; border-radius:50%; background:var(--border); }
+.history-dot.filled { background:var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- HIDDEN INPUTS -->
+<input type="color" id="colorPicker" class="hidden-input">
+<input type="file" id="fileUpload" class="hidden-input" accept="image/*">
+<input type="file" id="bgUpload" class="hidden-input" accept="image/*">
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CONTEXT MENU -->
+<div id="contextMenu">
+  <div class="ctx-item" onclick="ctxAction('copy')"><i class="far fa-copy"></i> Sao chép</div>
+  <div class="ctx-item" onclick="ctxAction('paste')"><i class="far fa-paste"></i> Dán</div>
+  <div class="ctx-item" onclick="ctxAction('duplicate')"><i class="fas fa-clone"></i> Nhân đôi</div>
+  <div class="ctx-separator"></div>
+  <div class="ctx-item" onclick="ctxAction('bringFront')"><i class="fas fa-arrow-up"></i> Lên trên cùng</div>
+  <div class="ctx-item" onclick="ctxAction('sendBack')"><i class="fas fa-arrow-down"></i> Xuống dưới cùng</div>
+  <div class="ctx-item" onclick="ctxAction('bringForward')"><i class="fas fa-level-up-alt"></i> Tiến lên</div>
+  <div class="ctx-item" onclick="ctxAction('sendBackward')"><i class="fas fa-level-down-alt"></i> Lùi xuống</div>
+  <div class="ctx-separator"></div>
+  <div class="ctx-item" onclick="ctxAction('group')"><i class="fas fa-object-group"></i> Nhóm</div>
+  <div class="ctx-item" onclick="ctxAction('lock')"><i class="fas fa-lock"></i> Khóa</div>
+  <div class="ctx-item" onclick="ctxAction('flip')"><i class="fas fa-arrows-alt-h"></i> Lật ngang</div>
+  <div class="ctx-separator"></div>
+  <div class="ctx-item danger" onclick="ctxAction('delete')"><i class="fas fa-trash-alt"></i> Xóa</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="sizeModal">
+  <div class="modal">
+    <h2>Kích thước canvas</h2>
+    <div class="modal-body">
+      <div class="size-presets">
+        <div class="size-preset active" onclick="setPreset(1080,1080,this)"><strong>Bài đăng Instagram</strong><small>1080 × 1080 px</small></div>
+        <div class="size-preset" onclick="setPreset(1920,1080,this)"><strong>Trình chiếu HD</strong><small>1920 × 1080 px</small></div>
+        <div class="size-preset" onclick="setPreset(800,1200,this)"><strong>Story</strong><small>800 × 1200 px</small></div>
+        <div class="size-preset" onclick="setPreset(595,842,this)"><strong>A4 Portrait</strong><small>595 × 842 px</small></div>
+        <div class="size-preset" onclick="setPreset(1200,628,this)"><strong>Facebook cover</strong><small>1200 × 628 px</small></div>
+        <div class="size-preset" onclick="setPreset(800,600,this)"><strong>Tùy chỉnh</strong><small></small></div>
+      </div>
+      <div class="input-row" style="gap:12px;">
+        <div style="flex:1;">
+          <p style="font-size:11px;color:var(--text-3);margin-bottom:4px;">Rộng (px)</p>
+          <input class="modal-input" type="number" id="canvasW" value="800">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:8px;color:var(--text-3);font-weight:700;">×</div>
+        <div style="flex:1;">
+          <p style="font-size:11px;color:var(--text-3);margin-bottom:4px;">Cao (px)</p>
+          <input class="modal-input" type="number" id="canvasH" value="600">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('sizeModal')">Hủy</button>
+      <button class="btn-primary" onclick="applyCanvasSize()"><i class="fas fa-check"></i> Áp dụng</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h2>Xuất thiết kế</h2>
+    <div class="modal-body">
+      <div class="export-formats">
+        <div class="export-fmt active" onclick="selectExportFmt('PNG',this)"><i class="fas fa-file-image"></i><strong>PNG</strong></div>
+        <div class="export-fmt" onclick="selectExportFmt('JPEG',this)"><i class="fas fa-image"></i><strong>JPEG</strong></div>
+        <div class="export-fmt" onclick="selectExportFmt('SVG',this)"><i class="fas fa-bezier-curve"></i><strong>SVG</strong></div>
+      </div>
+      <div class="slider-group" style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:12px;color:var(--text-2);font-weight:500;">Chất lượng</span>
+          <span style="font-size:12px;font-weight:700;color:var(--primary);" id="qualityVal">90%</span>
+        </div>
+        <input type="range" class="range-slider" style="width:100%" min="10" max="100" value="90" id="qualitySlider"
+          oninput="document.getElementById('qualityVal').textContent=this.value+'%'">
+      </div>
+      <div style="background:var(--surface-2);border-radius:var(--radius);padding:12px;font-size:12px;color:var(--text-2);">
+        <i class="fas fa-info-circle" style="color:var(--primary);margin-right:6px;"></i>
+        Kích thước: <strong id="exportSize">800 × 600 px</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('exportModal')">Hủy</button>
+      <button class="btn-primary" onclick="doExport()"><i class="fas fa-download"></i> Tải xuống</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <div class="nav-left">
+    <a href="#" class="logo">
+      <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+      <span>DesignStudio</span>
+    </a>
+    <div class="nav-separator"></div>
+    <input class="project-name-input" id="projectName" value="Thiết kế chưa có tiêu đề" spellcheck="false">
+  </div>
+  <div class="nav-center">
+    <button class="nav-btn" id="undoBtn" title="Hoàn tác (Ctrl+Z)" onclick="undo()"><i class="fas fa-undo-alt"></i></button>
+    <button class="nav-btn" id="redoBtn" title="Làm lại (Ctrl+Y)" onclick="redo()"><i class="fas fa-redo-alt"></i></button>
+    <div class="nav-separator"></div>
+    <div class="history-dots" id="historyDots"></div>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn" title="Kích thước canvas" onclick="openModal('sizeModal')"><i class="fas fa-expand-arrows-alt"></i></button>
+    <button class="nav-btn" title="Xem trước" onclick="preview()"><i class="fas fa-play-circle"></i></button>
+    <button class="nav-btn" title="Tải xuống" onclick="openExport()"><i class="fas fa-download"></i></button>
+    <div class="nav-separator"></div>
+    <button class="btn-secondary" onclick="saveDesign()"><i class="fas fa-save"></i> Lưu</button>
+    <button class="btn-primary"><i class="fas fa-share-alt"></i> Chia sẻ</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container">
+
+  <!-- LEFT RAIL -->
+  <div class="left-rail">
+    <button class="rail-btn active" onclick="switchPanel('templates')" id="rail-templates" title="Mẫu">
+      <i class="fas fa-th-large"></i><span>Mẫu</span>
+    </button>
+    <button class="rail-btn" onclick="switchPanel('elements')" id="rail-elements" title="Thành phần">
+      <i class="fas fa-shapes"></i><span>Thành phần</span>
+    </button>
+    <button class="rail-btn" onclick="switchPanel('text')" id="rail-text" title="Văn bản">
+      <i class="fas fa-font"></i><span>Văn bản</span>
+    </button>
+    <button class="rail-btn" onclick="switchPanel('upload')" id="rail-upload" title="Tải lên">
+      <i class="fas fa-cloud-upload-alt"></i><span>Tải lên</span>
+    </button>
+    <button class="rail-btn" onclick="switchPanel('bg')" id="rail-bg" title="Nền">
+      <i class="fas fa-palette"></i><span>Nền</span>
+    </button>
+    <div class="rail-separator"></div>
+    <button class="rail-btn" onclick="switchPanel('layers')" id="rail-layers" title="Lớp">
+      <i class="fas fa-layer-group"></i><span>Lớp</span>
+    </button>
+    <button class="rail-btn" onclick="switchPanel('ai')" id="rail-ai" title="AI">
+      <i class="fas fa-magic"></i><span>AI</span>
+    </button>
+  </div>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel" id="leftPanel">
+
+    <!-- Templates panel -->
+    <div id="panel-templates" class="panel-section">
+      <div class="panel-header"><h3>Mẫu thiết kế</h3></div>
+      <div class="panel-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Tìm kiếm mẫu...">
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Phổ biến</div>
+        <div class="template-grid">
+          <div class="template-card" onclick="applyTemplate('gradient1')">
+            <div class="template-card-bg" style="background:linear-gradient(135deg,#667eea,#764ba2)">Hiện đại</div>
+            <div class="template-label">Gradient tím</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('minimal1')">
+            <div class="template-card-bg" style="background:#f8f7ff;color:#1e1b4b">Tối giản</div>
+            <div class="template-label">Minimal</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('bold1')">
+            <div class="template-card-bg" style="background:#1e1b4b">Đậm nét</div>
+            <div class="template-label">Dark bold</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('warm1')">
+            <div class="template-card-bg" style="background:linear-gradient(135deg,#f093fb,#f5576c)">Ấm áp</div>
+            <div class="template-label">Sunset</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('nature1')">
+            <div class="template-card-bg" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">Thiên nhiên</div>
+            <div class="template-label">Nature</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('ocean1')">
+            <div class="template-card-bg" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">Đại dương</div>
+            <div class="template-label">Ocean</div>
+          </div>
+        </div>
+        <div class="section-title">Thương hiệu & Logo</div>
+        <div class="template-grid">
+          <div class="template-card" onclick="applyTemplate('logo1')">
+            <div class="template-card-bg" style="background:#fff;color:#1e1b4b;border:2px solid #e4e2f0;">Logo đơn giản</div>
+            <div class="template-label">Logo minimal</div>
+          </div>
+          <div class="template-card" onclick="applyTemplate('logo2')">
+            <div class="template-card-bg" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">Logo nổi bật</div>
+            <div class="template-label">Logo bold</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Elements panel -->
+    <div id="panel-elements" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>Thành phần</h3></div>
+      <div class="panel-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Tìm hình dạng...">
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Hình cơ bản</div>
+        <div class="shapes-grid">
+          <div class="shape-item" onclick="addShape('rect')" title="Hình chữ nhật">▭</div>
+          <div class="shape-item" onclick="addShape('circle')" title="Hình tròn">●</div>
+          <div class="shape-item" onclick="addShape('triangle')" title="Tam giác">▲</div>
+          <div class="shape-item" onclick="addShape('star')" title="Ngôi sao">★</div>
+          <div class="shape-item" onclick="addShape('diamond')" title="Hình thoi">◆</div>
+          <div class="shape-item" onclick="addShape('rounded-rect')" title="Chữ nhật bo góc">▬</div>
+          <div class="shape-item" onclick="addShape('pentagon')" title="Ngũ giác">⬠</div>
+          <div class="shape-item" onclick="addShape('hexagon')" title="Lục giác">⬡</div>
+        </div>
+        <div class="section-title">Đường kẻ</div>
+        <div class="shapes-grid">
+          <div class="shape-item" onclick="addLine('solid')" title="Thẳng">—</div>
+          <div class="shape-item" onclick="addLine('dashed')" title="Đứt">⋯</div>
+          <div class="shape-item" onclick="addLine('arrow')" title="Mũi tên">→</div>
+          <div class="shape-item" onclick="addLine('double-arrow')" title="2 chiều">↔</div>
+        </div>
+        <div class="section-title">Gradient</div>
+        <div class="shapes-grid">
+          <div class="shape-item" onclick="addGradient('linear-purple')" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-color:transparent;"></div>
+          <div class="shape-item" onclick="addGradient('linear-sunset')" style="background:linear-gradient(135deg,#f093fb,#f5576c);border-color:transparent;"></div>
+          <div class="shape-item" onclick="addGradient('linear-ocean')" style="background:linear-gradient(135deg,#4facfe,#00f2fe);border-color:transparent;"></div>
+          <div class="shape-item" onclick="addGradient('radial-gold')" style="background:radial-gradient(circle,#f59e0b,#ef4444);border-color:transparent;"></div>
+        </div>
+        <div class="section-title">Biểu tượng</div>
+        <div class="shapes-grid">
+          <div class="shape-item" onclick="addIcon('fas fa-heart')" title="Tim">❤</div>
+          <div class="shape-item" onclick="addIcon('fas fa-star')" title="Sao">⭐</div>
+          <div class="shape-item" onclick="addIcon('fas fa-bolt')" title="Tia chớp">⚡</div>
+          <div class="shape-item" onclick="addIcon('fas fa-crown')" title="Vương miện">👑</div>
+          <div class="shape-item" onclick="addIcon('fas fa-fire')" title="Lửa">🔥</div>
+          <div class="shape-item" onclick="addIcon('fas fa-gem')" title="Đá quý">💎</div>
+          <div class="shape-item" onclick="addIcon('fas fa-music')" title="Âm nhạc">🎵</div>
+          <div class="shape-item" onclick="addIcon('fas fa-camera')" title="Máy ảnh">📷</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Text panel -->
+    <div id="panel-text" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>Văn bản</h3></div>
+      <div class="panel-body" style="padding-top:4px;">
+        <button class="btn-primary" style="width:100%;justify-content:center;margin-bottom:16px;" onclick="addText('heading')">
+          <i class="fas fa-plus"></i> Thêm văn bản
+        </button>
+        <div class="text-items">
+          <div class="text-item" onclick="addText('heading')">
+            <p>Tiêu đề lớn</p>
+            <div style="font-size:26px;font-weight:700;font-family:var(--font-display);color:var(--text)">Thêm tiêu đề</div>
+          </div>
+          <div class="text-item" onclick="addText('subheading')">
+            <p>Tiêu đề phụ</p>
+            <div style="font-size:18px;font-weight:600;color:var(--text)">Thêm tiêu đề phụ</div>
+          </div>
+          <div class="text-item" onclick="addText('body')">
+            <p>Nội dung</p>
+            <div style="font-size:14px;color:var(--text-2)">Thêm nội dung văn bản</div>
+          </div>
+          <div class="text-item" onclick="addText('caption')">
+            <p>Chú thích</p>
+            <div style="font-size:11px;color:var(--text-3)">Thêm chú thích</div>
+          </div>
+        </div>
+        <div class="section-title" style="margin-top:16px">Phông chữ</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="text-item" onclick="addStyledText('Space Grotesk','Tiêu đề đẹp',32,'700')">
+            <div style="font-family:'Space Grotesk';font-size:20px;font-weight:700">Space Grotesk</div>
+          </div>
+          <div class="text-item" onclick="addStyledText('Georgia','Phong cách cổ điển',28,'700')">
+            <div style="font-family:Georgia;font-size:18px;font-weight:700">Georgia Serif</div>
+          </div>
+          <div class="text-item" onclick="addStyledText('Courier New','Code & Mono',20,'700')">
+            <div style="font-family:'Courier New';font-size:16px;font-weight:700">Courier Mono</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload panel -->
+    <div id="panel-upload" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>Tải lên</h3></div>
+      <div class="panel-body">
+        <div class="upload-zone" onclick="document.getElementById('fileUpload').click()">
+          <i class="fas fa-cloud-upload-alt"></i>
+          <p>Nhấn để tải ảnh lên</p>
+          <small>PNG, JPG, GIF, SVG, WebP</small>
+        </div>
+        <div class="section-title" style="margin-top:16px">Ảnh đã tải lên</div>
+        <div id="uploadedImages" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
+      </div>
+    </div>
+
+    <!-- Background panel -->
+    <div id="panel-bg" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>Nền canvas</h3></div>
+      <div class="panel-body">
+        <div class="section-title">Màu nền</div>
+        <div class="color-strip" style="gap:8px;margin-bottom:12px">
+          <div style="width:36px;height:36px;border-radius:8px;border:2px dashed var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text-3);" onclick="setBgColor('#ffffff')">⊘</div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#ffffff;border:1.5px solid var(--border);" onclick="setBgColor('#ffffff')"></div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#1e1b4b;" onclick="setBgColor('#1e1b4b')"></div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#7c3aed;" onclick="setBgColor('#7c3aed')"></div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#f59e0b;" onclick="setBgColor('#f59e0b')"></div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#ef4444;" onclick="setBgColor('#ef4444')"></div>
+          <div class="color-dot" style="width:36px;height:36px;border-radius:8px;background:#10b981;" onclick="setBgColor('#10b981')"></div>
+        </div>
+        <div class="color-custom-row" style="margin-bottom:16px;">
+          <div class="color-preview" id="bgColorPreview" style="background:#ffffff;" onclick="document.getElementById('colorPicker').click()"></div>
+          <input class="color-hex" id="bgHexInput" value="#ffffff" maxlength="7" placeholder="#ffffff">
+          <button class="btn-primary" style="padding:6px 12px;font-size:12px;" onclick="setBgFromHex()">OK</button>
+        </div>
+        <div class="section-title">Gradient nền</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;">
+          <div style="height:60px;border-radius:var(--radius);cursor:pointer;background:linear-gradient(135deg,#667eea,#764ba2);transition:all .15s;" onclick="setBgGradient('linear-gradient(135deg,#667eea,#764ba2)')"></div>
+          <div style="height:60px;border-radius:var(--radius);cursor:pointer;background:linear-gradient(135deg,#f093fb,#f5576c);transition:all .15s;" onclick="setBgGradient('linear-gradient(135deg,#f093fb,#f5576c)')"></div>
+          <div style="height:60px;border-radius:var(--radius);cursor:pointer;background:linear-gradient(135deg,#4facfe,#00f2fe);transition:all .15s;" onclick="setBgGradient('linear-gradient(135deg,#4facfe,#00f2fe)')"></div>
+          <div style="height:60px;border-radius:var(--radius);cursor:pointer;background:linear-gradient(135deg,#43e97b,#38f9d7);transition:all .15s;" onclick="setBgGradient('linear-gradient(135deg,#43e97b,#38f9d7)')"></div>
+        </div>
+        <div class="section-title">Ảnh nền</div>
+        <div class="upload-zone" onclick="document.getElementById('bgUpload').click()">
+          <i class="fas fa-image"></i>
+          <p>Chọn ảnh nền</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layers panel -->
+    <div id="panel-layers" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>Các lớp</h3></div>
+      <div class="panel-body" id="layersList" style="padding-top:4px;"></div>
+    </div>
+
+    <!-- AI panel -->
+    <div id="panel-ai" class="panel-section" style="display:none">
+      <div class="panel-header"><h3>✨ AI Thiết kế</h3></div>
+      <div class="panel-body">
+        <div class="ai-prompt-box" style="margin-bottom:12px;">
+          <textarea class="ai-input" id="aiPrompt" placeholder="Mô tả thiết kế bạn muốn tạo..."></textarea>
+          <button class="ai-send" onclick="runAI()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+        <div class="section-title">Gợi ý nhanh</div>
+        <div class="ai-suggestion" onclick="setAIPrompt('Tạo banner quảng cáo sản phẩm với màu sắc nổi bật')">🎨 Banner quảng cáo sản phẩm</div>
+        <div class="ai-suggestion" onclick="setAIPrompt('Thiết kế logo đơn giản hiện đại cho công ty công nghệ')">💼 Logo công ty công nghệ</div>
+        <div class="ai-suggestion" onclick="setAIPrompt('Tạo bài đăng mạng xã hội phong cách minimal')">📱 Bài đăng mạng xã hội</div>
+        <div class="ai-suggestion" onclick="setAIPrompt('Thiết kế poster sự kiện âm nhạc với màu tím neon')">🎵 Poster sự kiện</div>
+        <div id="aiOutput" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area" id="canvasArea">
+    <!-- FORMAT BAR -->
+    <div class="format-bar" id="formatBar">
+      <!-- Font family -->
+      <select class="fmt-select" id="fmtFont" style="width:120px" onchange="applyFormat('font')">
+        <option value="DM Sans">DM Sans</option>
+        <option value="Space Grotesk">Space Grotesk</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Courier New">Courier New</option>
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Verdana">Verdana</option>
+        <option value="Trebuchet MS">Trebuchet</option>
+      </select>
+      <!-- Font size -->
+      <input class="fmt-input" type="number" id="fmtSize" value="24" min="8" max="200" onchange="applyFormat('size')">
+      <div class="fmt-separator"></div>
+      <!-- Bold, Italic, Underline -->
+      <button class="fmt-btn" id="fmtBold" onclick="applyFormat('bold')" title="Đậm (Ctrl+B)"><i class="fas fa-bold"></i></button>
+      <button class="fmt-btn" id="fmtItalic" onclick="applyFormat('italic')" title="Nghiêng (Ctrl+I)"><i class="fas fa-italic"></i></button>
+      <button class="fmt-btn" id="fmtUnderline" onclick="applyFormat('underline')" title="Gạch chân (Ctrl+U)"><i class="fas fa-underline"></i></button>
+      <div class="fmt-separator"></div>
+      <!-- Align -->
+      <button class="fmt-btn" onclick="applyFormat('alignLeft')" title="Căn trái"><i class="fas fa-align-left"></i></button>
+      <button class="fmt-btn" onclick="applyFormat('alignCenter')" title="Căn giữa"><i class="fas fa-align-center"></i></button>
+      <button class="fmt-btn" onclick="applyFormat('alignRight')" title="Căn phải"><i class="fas fa-align-right"></i></button>
+      <div class="fmt-separator"></div>
+      <!-- Text color -->
+      <button class="fmt-color-btn" id="textColorBtn" onclick="openColorForText()" title="Màu chữ">
+        <i class="fas fa-font"></i>
+        <div class="fmt-color-bar" id="textColorBar" style="background:#1e1b4b"></div>
+      </button>
+      <!-- BG color -->
+      <button class="fmt-color-btn" id="bgColorBtn" onclick="openColorForBg()" title="Màu nền phần tử">
+        <i class="fas fa-fill-drip"></i>
+        <div class="fmt-color-bar" id="bgColorBar" style="background:#7c3aed"></div>
+      </button>
+      <div class="fmt-separator"></div>
+      <!-- Z-order -->
+      <button class="fmt-btn" onclick="bringForward()" title="Tiến lên"><i class="fas fa-arrow-up"></i></button>
+      <button class="fmt-btn" onclick="sendBackward()" title="Lùi xuống"><i class="fas fa-arrow-down"></i></button>
+      <div class="fmt-separator"></div>
+      <!-- Flip, duplicate, delete -->
+      <button class="fmt-btn" onclick="flipElement()" title="Lật ngang"><i class="fas fa-arrows-alt-h"></i></button>
+      <button class="fmt-btn" onclick="duplicateSelected()" title="Nhân đôi (Ctrl+D)"><i class="fas fa-clone"></i></button>
+      <button class="fmt-btn" onclick="deleteSelected()" title="Xóa (Del)" style="color:var(--danger)"><i class="fas fa-trash-alt"></i></button>
+    </div>
+
+    <div class="canvas-viewport" id="canvasViewport" onmousedown="startRubberBand(event)">
+      <div id="designCanvas">
+        <div id="selectionBox"></div>
+        <div class="canvas-empty" id="canvasEmpty">
+          <i class="fas fa-layer-group"></i>
+          <p>Chọn mẫu hoặc thêm thành phần</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZOOM BAR -->
+    <div class="zoom-bar">
+      <button class="zoom-btn" onclick="changeZoom(-10)" title="Thu nhỏ">−</button>
+      <button class="zoom-level" id="zoomLabel" onclick="resetZoom()">100%</button>
+      <button class="zoom-btn" onclick="changeZoom(10)" title="Phóng to">+</button>
+    </div>
+
+    <!-- PAGE BAR -->
+    <div class="page-bar">
+      <button class="page-btn" onclick="prevPage()"><i class="fas fa-chevron-left"></i></button>
+      <span class="page-info" id="pageInfo">Trang 1 / 1</span>
+      <button class="page-btn" onclick="addPage()"><i class="fas fa-plus"></i></button>
+      <button class="page-btn" onclick="nextPage()"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="right-sidebar">
+    <div class="prop-tabs">
+      <div class="prop-tab active" onclick="switchPropTab('design',this)">Thiết kế</div>
+      <div class="prop-tab" onclick="switchPropTab('position',this)">Vị trí</div>
+      <div class="prop-tab" onclick="switchPropTab('effects',this)">Hiệu ứng</div>
+    </div>
+
+    <!-- Design tab -->
+    <div class="prop-body" id="propDesign">
+      <div class="prop-section">
+        <span class="prop-label">Màu chính</span>
+        <div class="color-strip" id="colorSwatches">
+          <div class="color-dot" style="background:#7c3aed" onclick="applyColor('#7c3aed')"></div>
+          <div class="color-dot" style="background:#3b82f6" onclick="applyColor('#3b82f6')"></div>
+          <div class="color-dot" style="background:#10b981" onclick="applyColor('#10b981')"></div>
+          <div class="color-dot" style="background:#f59e0b" onclick="applyColor('#f59e0b')"></div>
+          <div class="color-dot" style="background:#ef4444" onclick="applyColor('#ef4444')"></div>
+          <div class="color-dot" style="background:#ec4899" onclick="applyColor('#ec4899')"></div>
+          <div class="color-dot" style="background:#06b6d4" onclick="applyColor('#06b6d4')"></div>
+          <div class="color-dot" style="background:#1e1b4b" onclick="applyColor('#1e1b4b')"></div>
+          <div class="color-dot" style="background:#ffffff;border:1.5px solid var(--border)" onclick="applyColor('#ffffff')"></div>
+        </div>
+        <div class="color-custom-row">
+          <div class="color-preview" id="mainColorPreview" style="background:#7c3aed;" onclick="openColorPickerForEl()"></div>
+          <input class="color-hex" id="mainColorHex" value="#7c3aed" maxlength="7" oninput="applyHexColor(this.value)">
+        </div>
+      </div>
+      <div class="prop-section">
+        <span class="prop-label">Độ trong suốt</span>
+        <div class="opacity-row">
+          <input type="range" class="range-slider" min="0" max="100" value="100" id="opacitySlider" oninput="applyOpacity(this.value)">
+          <span class="range-value" id="opacityVal">100%</span>
+        </div>
+      </div>
+      <div class="prop-section" id="textPropsSection" style="display:none">
+        <span class="prop-label">Kiểu chữ</span>
+        <div class="action-grid">
+          <button class="action-btn" onclick="applyFormat('bold')"><i class="fas fa-bold"></i> Đậm</button>
+          <button class="action-btn" onclick="applyFormat('italic')"><i class="fas fa-italic"></i> Nghiêng</button>
+          <button class="action-btn" onclick="applyFormat('underline')"><i class="fas fa-underline"></i> Gạch chân</button>
+          <button class="action-btn" onclick="applyFormat('strikethrough')"><i class="fas fa-strikethrough"></i> Gạch ngang</button>
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="action-grid">
+          <button class="action-btn" onclick="duplicateSelected()"><i class="fas fa-clone"></i> Nhân đôi</button>
+          <button class="action-btn" onclick="lockSelected()"><i class="fas fa-lock"></i> Khóa</button>
+          <button class="action-btn" onclick="flipElement()"><i class="fas fa-arrows-alt-h"></i> Lật</button>
+          <button class="action-btn" onclick="alignElement('center')"><i class="fas fa-align-center"></i> Căn giữa</button>
+          <button class="action-btn danger full" onclick="deleteSelected()"><i class="fas fa-trash-alt"></i> Xóa phần tử</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Position tab -->
+    <div class="prop-body" id="propPosition" style="display:none">
+      <div class="prop-section">
+        <span class="prop-label">Vị trí (px)</span>
+        <div class="pos-grid">
+          <div class="pos-field"><label>X</label><input class="pos-input" type="number" id="posX" oninput="applyPosition()"></div>
+          <div class="pos-field"><label>Y</label><input class="pos-input" type="number" id="posY" oninput="applyPosition()"></div>
+        </div>
+      </div>
+      <div class="prop-section">
+        <span class="prop-label">Kích thước (px)</span>
+        <div class="pos-grid">
+          <div class="pos-field"><label>W</label><input class="pos-input" type="number" id="sizeW" oninput="applySize()"></div>
+          <div class="pos-field"><label>H</label><input class="pos-input" type="number" id="sizeH" oninput="applySize()"></div>
+        </div>
+        <div style="margin-top:8px">
+          <button class="action-btn" onclick="toggleLockRatio()" id="lockRatioBtn" style="width:100%;font-size:11px;">
+            <i class="fas fa-unlink" id="lockRatioIcon"></i> Tỉ lệ tự do
+          </button>
+        </div>
+      </div>
+      <div class="prop-section">
+        <span class="prop-label">Xoay</span>
+        <div class="opacity-row">
+          <input type="range" class="range-slider" min="0" max="360" value="0" id="rotateSlider" oninput="applyRotate(this.value)">
+          <span class="range-value" id="rotateVal">0°</span>
+        </div>
+        <div class="pos-grid" style="margin-top:8px;">
+          <button class="action-btn" onclick="applyRotate(0)"><i class="fas fa-undo"></i> Reset</button>
+          <button class="action-btn" onclick="rotateBy(90)"><i class="fas fa-redo"></i> +90°</button>
+        </div>
+      </div>
+      <div class="prop-section">
+        <span class="prop-label">Căn chỉnh</span>
+        <div class="action-grid">
+          <button class="action-btn" onclick="alignElement('left')"><i class="fas fa-align-left"></i> Trái</button>
+          <button class="action-btn" onclick="alignElement('center')"><i class="fas fa-align-center"></i> Giữa</button>
+          <button class="action-btn" onclick="alignElement('right')"><i class="fas fa-align-right"></i> Phải</button>
+          <button class="action-btn" onclick="alignElement('top')"><i class="fas fa-arrow-up"></i> Trên</button>
+          <button class="action-btn" onclick="alignElement('middle')"><i class="fas fa-arrows-alt-v"></i> Dọc</button>
+          <button class="action-btn" onclick="alignElement('bottom')"><i class="fas fa-arrow-down"></i> Dưới</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Effects tab -->
+    <div class="prop-body" id="propEffects" style="display:none">
+      <div class="prop-section">
+        <div class="toggle-row">
+          <span class="prop-label" style="margin:0">Đổ bóng</span>
+          <div class="toggle" id="shadowToggle" onclick="toggleEffect('shadow')"><div class="toggle-knob"></div></div>
+        </div>
+        <div id="shadowControls" style="display:none">
+          <div class="pos-grid" style="margin-bottom:8px;">
+            <div class="pos-field"><label>X bóng</label><input class="pos-input" type="number" value="4" id="shadowX" oninput="applyEffect()"></div>
+            <div class="pos-field"><label>Y bóng</label><input class="pos-input" type="number" value="4" id="shadowY" oninput="applyEffect()"></div>
+          </div>
+          <div class="pos-field" style="margin-bottom:8px;"><label>Mờ</label><input class="pos-input" type="number" value="8" id="shadowBlur" oninput="applyEffect()"></div>
+          <div class="pos-field"><label>Màu bóng</label>
+            <input class="pos-input" type="color" value="#000000" id="shadowColor" oninput="applyEffect()" style="padding:2px;height:36px;">
+          </div>
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="toggle-row">
+          <span class="prop-label" style="margin:0">Viền</span>
+          <div class="toggle" id="borderToggle" onclick="toggleEffect('border')"><div class="toggle-knob"></div></div>
+        </div>
+        <div id="borderControls" style="display:none">
+          <div class="pos-grid" style="margin-bottom:8px;">
+            <div class="pos-field"><label>Độ dày</label><input class="pos-input" type="number" value="2" id="borderWidth" oninput="applyEffect()"></div>
+            <div class="pos-field"><label>Màu viền</label>
+              <input class="pos-input" type="color" value="#7c3aed" id="borderColor" oninput="applyEffect()" style="padding:2px;height:36px;">
+            </div>
+          </div>
+          <select class="fmt-select" id="borderStyle" style="width:100%;padding:7px 10px;height:36px;margin-bottom:8px;" onchange="applyEffect()">
+            <option value="solid">Liền</option>
+            <option value="dashed">Đứt</option>
+            <option value="dotted">Chấm</option>
+            <option value="double">Đôi</option>
+          </select>
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="toggle-row">
+          <span class="prop-label" style="margin:0">Bo góc</span>
+          <div class="toggle" id="radiusToggle" onclick="toggleEffect('radius')"><div class="toggle-knob"></div></div>
+        </div>
+        <div id="radiusControls" style="display:none">
+          <div class="opacity-row">
+            <input type="range" class="range-slider" min="0" max="100" value="0" id="radiusSlider" oninput="applyEffect(); document.getElementById('radiusVal').textContent=this.value+'px'">
+            <span class="range-value" id="radiusVal">0px</span>
+          </div>
+        </div>
+      </div>
+      <div class="prop-section">
+        <div class="toggle-row">
+          <span class="prop-label" style="margin:0">Mờ nền</span>
+          <div class="toggle" id="blurToggle" onclick="toggleEffect('blur')"><div class="toggle-knob"></div></div>
+        </div>
+        <div id="blurControls" style="display:none">
+          <div class="opacity-row">
+            <input type="range" class="range-slider" min="0" max="20" value="0" id="blurSlider" oninput="applyEffect(); document.getElementById('blurVal').textContent=this.value+'px'">
+            <span class="range-value" id="blurVal">0px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const canvas = document.getElementById('designCanvas');
+let elements = [];
+let selected = null;
+let selectedIds = [];
+let clipboard = null;
+let history = [];
+let historyIndex = -1;
+let zoom = 1;
+let canvasW = 800, canvasH = 600;
+let activePanelId = 'templates';
+let exportFormat = 'PNG';
+let lockRatio = false;
+let currentColorTarget = null; // 'text' | 'bg' | 'element'
+let pages = [[]]; // array of element snapshots
+let currentPage = 0;
+let nextId = 1;
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  canvas.style.width = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+  document.getElementById('exportSize').textContent = canvasW + ' × ' + canvasH + ' px';
+
+  // Sample elements
+  addText('heading', 'Chào mừng đến với DesignStudio', 80, 200, '#1e1b4b', 36);
+  addText('body', 'Tạo thiết kế đẹp mắt và chuyên nghiệp', 140, 280, '#6b6b8f', 18);
+  addShape('rect', 260, 360, 280, 8, '#7c3aed');
+
+  saveHistory();
+  renderLayers();
+  updateHistoryDots();
+  deselectAll();
+}
+
+// ============================================================
+// HISTORY (UNDO/REDO)
+// ============================================================
+function saveHistory() {
+  const snap = JSON.stringify(elements.map(el => serializeEl(el)));
+  history = history.slice(0, historyIndex + 1);
+  history.push(snap);
+  historyIndex = history.length - 1;
+  if (history.length > 50) { history.shift(); historyIndex--; }
+  updateHistoryDots();
+}
+
+function serializeEl(el) {
+  return {
+    id: el.id, type: el.dataset.type, shape: el.dataset.shape || '',
+    left: el.style.left, top: el.style.top,
+    width: el.style.width, height: el.style.height,
+    transform: el.style.transform, opacity: el.style.opacity || '1',
+    boxShadow: el.style.boxShadow, border: el.style.border,
+    borderRadius: el.style.borderRadius, filter: el.style.filter,
+    innerHTML: el.innerHTML, color: el.style.color,
+    fontSize: el.style.fontSize, fontFamily: el.style.fontFamily,
+    fontWeight: el.style.fontWeight, fontStyle: el.style.fontStyle,
+    textDecoration: el.style.textDecoration,
+    textAlign: el.style.textAlign || 'left',
+    background: el.style.background, backgroundColor: el.style.backgroundColor,
+    locked: el.dataset.locked, zIndex: el.style.zIndex || '',
+    scaleX: el.dataset.scaleX || '1',
+    lineType: el.dataset.lineType || '',
+  };
+}
+
+function undo() {
+  if (historyIndex <= 0) { showToast('Không thể hoàn tác thêm'); return; }
+  historyIndex--;
+  restoreHistory();
+}
+function redo() {
+  if (historyIndex >= history.length - 1) { showToast('Không có gì để làm lại'); return; }
+  historyIndex++;
+  restoreHistory();
+}
+function restoreHistory() {
+  const snap = JSON.parse(history[historyIndex]);
+  // Remove elements (keep selection box & empty div)
+  elements.forEach(el => el.remove());
+  elements = [];
+  selected = null;
+  selectedIds = [];
+  snap.forEach(data => restoreEl(data));
+  updateHistoryDots();
+  renderLayers();
+  updateCanvasEmpty();
+}
+function restoreEl(d) {
+  const el = document.createElement('div');
+  el.id = d.id;
+  el.className = 'canvas-element';
+  el.dataset.type = d.type;
+  el.dataset.shape = d.shape;
+  el.dataset.locked = d.locked || '';
+  el.dataset.scaleX = d.scaleX || '1';
+  el.dataset.lineType = d.lineType || '';
+  el.style.left = d.left; el.style.top = d.top;
+  el.style.width = d.width; el.style.height = d.height;
+  el.style.transform = d.transform;
+  el.style.opacity = d.opacity;
+  el.style.boxShadow = d.boxShadow;
+  el.style.border = d.border;
+  el.style.borderRadius = d.borderRadius;
+  el.style.filter = d.filter;
+  el.style.color = d.color;
+  el.style.fontSize = d.fontSize;
+  el.style.fontFamily = d.fontFamily;
+  el.style.fontWeight = d.fontWeight;
+  el.style.fontStyle = d.fontStyle;
+  el.style.textDecoration = d.textDecoration;
+  el.style.textAlign = d.textAlign;
+  el.style.background = d.background;
+  el.style.backgroundColor = d.backgroundColor;
+  el.style.zIndex = d.zIndex;
+  el.innerHTML = d.innerHTML;
+  attachHandles(el);
+  attachDrag(el);
+  canvas.appendChild(el);
+  elements.push(el);
+}
+function updateHistoryDots() {
+  const dots = document.getElementById('historyDots');
+  const total = Math.min(history.length, 8);
+  dots.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'history-dot' + (i <= historyIndex ? ' filled' : '');
+    dots.appendChild(d);
+  }
+  document.getElementById('undoBtn').style.opacity = historyIndex > 0 ? '1' : '.4';
+  document.getElementById('redoBtn').style.opacity = historyIndex < history.length - 1 ? '1' : '.4';
+}
+
+// ============================================================
+// ELEMENT CREATION
+// ============================================================
+function makeEl(type, left, top, width, height) {
+  const el = document.createElement('div');
+  el.id = 'el_' + (nextId++);
+  el.className = 'canvas-element';
+  el.dataset.type = type;
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+  el.style.width = width + 'px';
+  el.style.height = height + 'px';
+  el.style.zIndex = elements.length + 1;
+  return el;
+}
+
+function addShape(type, x, y, w, h, color) {
+  x = x || randInt(50, canvasW - 200);
+  y = y || randInt(50, canvasH - 200);
+  w = w || 150; h = h || 150;
+  color = color || '#7c3aed';
+  const el = makeEl('shape', x, y, w, h);
+  el.dataset.shape = type;
+  el.style.backgroundColor = color;
+  if (type === 'circle') el.style.borderRadius = '50%';
+  else if (type === 'rounded-rect') el.style.borderRadius = '16px';
+  else el.style.borderRadius = '4px';
+  if (type === 'triangle') {
+    el.style.backgroundColor = 'transparent';
+    el.style.width = '0'; el.style.height = '0';
+    el.style.borderLeft = (w/2) + 'px solid transparent';
+    el.style.borderRight = (w/2) + 'px solid transparent';
+    el.style.borderBottom = h + 'px solid ' + color;
+    el.dataset.shapeColor = color;
+  }
+  if (type === 'star' || type === 'diamond' || type === 'pentagon' || type === 'hexagon') {
+    el.style.backgroundColor = 'transparent';
+    el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.justifyContent = 'center';
+    const map = { star:'★', diamond:'◆', pentagon:'⬠', hexagon:'⬡' };
+    el.innerHTML = `<span style="font-size:${Math.min(w,h)*0.75}px;color:${color};line-height:1;user-select:none;">${map[type]}</span>`;
+    el.dataset.shapeColor = color;
+  }
+  finalizeEl(el);
+}
+
+function addLine(lineType) {
+  const el = makeEl('line', randInt(50, canvasW - 250), randInt(50, canvasH - 100), 200, 40);
+  el.dataset.lineType = lineType;
+  el.style.backgroundColor = 'transparent';
+  el.style.display = 'flex'; el.style.alignItems = 'center';
+  const svg = createLineSVG(lineType, 200, 40, '#7c3aed');
+  el.innerHTML = svg;
+  finalizeEl(el);
+}
+function createLineSVG(type, w, h, color) {
+  const y = h/2;
+  let d = '';
+  if (type === 'arrow') return `<svg width="${w}" height="${h}" style="overflow:visible"><line x1="0" y1="${y}" x2="${w-12}" y2="${y}" stroke="${color}" stroke-width="2.5"/><polygon points="${w-12},${y-6} ${w},${y} ${w-12},${y+6}" fill="${color}"/></svg>`;
+  if (type === 'double-arrow') return `<svg width="${w}" height="${h}" style="overflow:visible"><line x1="12" y1="${y}" x2="${w-12}" y2="${y}" stroke="${color}" stroke-width="2.5"/><polygon points="12,${y-6} 0,${y} 12,${y+6}" fill="${color}"/><polygon points="${w-12},${y-6} ${w},${y} ${w-12},${y+6}" fill="${color}"/></svg>`;
+  const dash = type === 'dashed' ? 'stroke-dasharray="12,6"' : '';
+  return `<svg width="${w}" height="${h}" style="overflow:visible"><line x1="0" y1="${y}" x2="${w}" y2="${y}" stroke="${color}" stroke-width="2.5" ${dash}/></svg>`;
+}
+
+function addGradient(gradientId) {
+  const gradients = {
+    'linear-purple': 'linear-gradient(135deg,#7c3aed,#a855f7)',
+    'linear-sunset': 'linear-gradient(135deg,#f093fb,#f5576c)',
+    'linear-ocean': 'linear-gradient(135deg,#4facfe,#00f2fe)',
+    'radial-gold': 'radial-gradient(circle,#f59e0b,#ef4444)'
+  };
+  const el = makeEl('shape', randInt(50,400), randInt(50,300), 200, 120);
+  el.dataset.shape = 'gradient';
+  el.style.background = gradients[gradientId];
+  el.style.borderRadius = '8px';
+  finalizeEl(el);
+}
+
+function addIcon(iconClass) {
+  const el = makeEl('icon', randInt(50, canvasW - 150), randInt(50, canvasH - 150), 80, 80);
+  el.dataset.type = 'icon';
+  el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.justifyContent = 'center';
+  el.style.backgroundColor = 'transparent';
+  el.innerHTML = `<i class="${iconClass}" style="font-size:56px;color:#7c3aed;"></i>`;
+  finalizeEl(el);
+}
+
+function addText(style, txt, x, y, color, size) {
+  const styles = {
+    heading: { size: 36, weight: '700', color: '#1e1b4b', text: 'Thêm tiêu đề', font: 'Space Grotesk' },
+    subheading: { size: 24, weight: '600', color: '#374151', text: 'Tiêu đề phụ', font: 'DM Sans' },
+    body: { size: 16, weight: '400', color: '#6b7280', text: 'Thêm nội dung văn bản tại đây', font: 'DM Sans' },
+    caption: { size: 12, weight: '400', color: '#9ca3af', text: 'Chú thích nhỏ', font: 'DM Sans' },
+  };
+  const s = styles[style] || styles.body;
+  x = x || randInt(50, canvasW - 300);
+  y = y || randInt(50, canvasH - 100);
+  const el = makeEl('text', x, y, 320, 60);
+  el.style.fontSize = (size || s.size) + 'px';
+  el.style.fontWeight = s.weight;
+  el.style.color = color || s.color;
+  el.style.fontFamily = s.font;
+  el.style.backgroundColor = 'transparent';
+  el.style.padding = '4px';
+  el.style.minWidth = '40px'; el.style.minHeight = '20px';
+  el.style.width = 'auto'; el.style.height = 'auto';
+  el.setAttribute('contenteditable', 'false');
+  el.textContent = txt || s.text;
+  el.addEventListener('dblclick', startTextEdit);
+  el.addEventListener('blur', stopTextEdit);
+  el.addEventListener('input', () => saveHistory());
+  finalizeEl(el);
+}
+
+function addStyledText(font, text, size, weight) {
+  const el = makeEl('text', randInt(50, canvasW - 350), randInt(50, canvasH - 100), 350, 60);
+  el.style.fontSize = size + 'px';
+  el.style.fontWeight = weight;
+  el.style.color = '#1e1b4b';
+  el.style.fontFamily = font;
+  el.style.backgroundColor = 'transparent';
+  el.style.padding = '4px';
+  el.style.width = 'auto'; el.style.height = 'auto';
+  el.setAttribute('contenteditable', 'false');
+  el.textContent = text;
+  el.addEventListener('dblclick', startTextEdit);
+  el.addEventListener('blur', stopTextEdit);
+  el.addEventListener('input', () => saveHistory());
+  finalizeEl(el);
+}
+
+function startTextEdit(e) {
+  e.stopPropagation();
+  const el = this;
+  el.setAttribute('contenteditable', 'true');
+  el.style.cursor = 'text';
+  el.focus();
+  document.execCommand('selectAll', false, null);
+}
+function stopTextEdit() {
+  this.setAttribute('contenteditable', 'false');
+  this.style.cursor = 'move';
+  saveHistory();
+}
+
+function addImageFromSrc(src) {
+  const img = new Image();
+  img.onload = () => {
+    const ratio = img.width / img.height;
+    const w = Math.min(300, img.width);
+    const h = w / ratio;
+    const el = makeEl('image', randInt(50, canvasW - w - 50), randInt(50, canvasH - h - 50), w, h);
+    el.dataset.type = 'image';
+    el.style.backgroundColor = 'transparent';
+    el.innerHTML = `<img src="${src}" class="el-img" draggable="false">`;
+    finalizeEl(el);
+  };
+  img.src = src;
+}
+
+function finalizeEl(el) {
+  attachHandles(el);
+  attachDrag(el);
+  canvas.appendChild(el);
+  elements.push(el);
+  selectEl(el);
+  updateCanvasEmpty();
+  saveHistory();
+  renderLayers();
+}
+
+// ============================================================
+// HANDLES & RESIZE
+// ============================================================
+const HANDLE_DIRS = ['nw','n','ne','w','e','sw','s','se','rotate'];
+function attachHandles(el) {
+  // Remove existing handles
+  el.querySelectorAll('.el-handle').forEach(h => h.remove());
+  HANDLE_DIRS.forEach(dir => {
+    const h = document.createElement('div');
+    h.className = `el-handle ${dir}`;
+    h.dataset.dir = dir;
+    el.appendChild(h);
+    h.addEventListener('mousedown', e => { e.stopPropagation(); startResize(e, el, dir); });
+  });
+}
+
+function startResize(e, el, dir) {
+  e.preventDefault();
+  const startX = e.clientX, startY = e.clientY;
+  const startL = parseInt(el.style.left);
+  const startT = parseInt(el.style.top);
+  const startW = el.offsetWidth, startH = el.offsetHeight;
+  const cx = el.getBoundingClientRect().left + el.offsetWidth / 2;
+  const cy = el.getBoundingClientRect().top + el.offsetHeight / 2;
+  const startAngle = getRotation(el);
+
+  if (dir === 'rotate') {
+    const onMove = e => {
+      const angle = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90;
+      const snapped = e.shiftKey ? Math.round(angle / 15) * 15 : angle;
+      el.style.transform = `rotate(${snapped}deg) scaleX(${el.dataset.scaleX || 1})`;
+      document.getElementById('rotateSlider').value = ((snapped % 360) + 360) % 360;
+      document.getElementById('rotateVal').textContent = Math.round(((snapped % 360) + 360) % 360) + '°';
+    };
+    const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return;
+  }
+
+  const onMove = e => {
+    const dx = (e.clientX - startX) / zoom;
+    const dy = (e.clientY - startY) / zoom;
+    let nl = startL, nt = startT, nw = startW, nh = startH;
+    if (dir.includes('e')) nw = Math.max(30, startW + dx);
+    if (dir.includes('s')) nh = Math.max(30, startH + dy);
+    if (dir.includes('w')) { nw = Math.max(30, startW - dx); nl = startL + startW - nw; }
+    if (dir.includes('n')) { nh = Math.max(30, startH - dy); nt = startT + startH - nh; }
+    if (lockRatio) {
+      const ratio = startW / startH;
+      if (dir.includes('e') || dir.includes('w')) nh = nw / ratio;
+      else nw = nh * ratio;
+    }
+    el.style.left = nl + 'px'; el.style.top = nt + 'px';
+    el.style.width = nw + 'px'; el.style.height = nh + 'px';
+    updatePositionPanel(el);
+  };
+  const onUp = () => { document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); saveHistory(); };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+function getRotation(el) {
+  const t = el.style.transform;
+  const m = t.match(/rotate\(([^)]+)deg\)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
+// ============================================================
+// DRAG
+// ============================================================
+function attachDrag(el) {
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('el-handle')) return;
+    if (el.getAttribute('contenteditable') === 'true') return;
+    if (el.dataset.locked === 'true') return;
+    e.preventDefault();
+    e.stopPropagation();
+    selectEl(el);
+
+    const startX = e.clientX, startY = e.clientY;
+    const startL = parseInt(el.style.left), startT = parseInt(el.style.top);
+    let moved = false;
+
+    const onMove = e => {
+      moved = true;
+      const dx = (e.clientX - startX) / zoom;
+      const dy = (e.clientY - startY) / zoom;
+      let nl = startL + dx, nt = startT + dy;
+      if (e.shiftKey) { if (Math.abs(dx) > Math.abs(dy)) nt = startT; else nl = startL; }
+      el.style.left = nl + 'px'; el.style.top = nt + 'px';
+      updatePositionPanel(el);
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (moved) saveHistory();
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+  el.addEventListener('click', e => { e.stopPropagation(); selectEl(el); });
+  el.addEventListener('contextmenu', e => { e.preventDefault(); selectEl(el); showContextMenu(e.clientX, e.clientY); });
+}
+
+// ============================================================
+// SELECTION
+// ============================================================
+function selectEl(el) {
+  deselectAll();
+  selected = el;
+  selectedIds = [el.id];
+  el.classList.add('selected');
+  updateFormatBar(el);
+  updateRightPanel(el);
+  renderLayers();
+  updateCanvasEmpty();
+}
+function deselectAll() {
+  elements.forEach(el => el.classList.remove('selected'));
+  selected = null;
+  selectedIds = [];
+  document.getElementById('textPropsSection').style.display = 'none';
+}
+canvas.addEventListener('click', e => {
+  if (e.target === canvas || e.target.id === 'selectionBox' || e.target.id === 'canvasEmpty') {
+    deselectAll(); renderLayers();
+  }
+});
+
+// Rubber-band selection
+let rubberStart = null;
+function startRubberBand(e) {
+  if (e.target !== document.getElementById('canvasViewport')) return;
+  const canvasRect = canvas.getBoundingClientRect();
+  rubberStart = { x: (e.clientX - canvasRect.left) / zoom, y: (e.clientY - canvasRect.top) / zoom };
+  const box = document.getElementById('selectionBox');
+  box.style.display = 'block';
+  box.style.left = rubberStart.x + 'px'; box.style.top = rubberStart.y + 'px';
+  box.style.width = '0'; box.style.height = '0';
+
+  const onMove = e => {
+    const cx = (e.clientX - canvasRect.left) / zoom;
+    const cy = (e.clientY - canvasRect.top) / zoom;
+    const x = Math.min(rubberStart.x, cx), y = Math.min(rubberStart.y, cy);
+    const w = Math.abs(cx - rubberStart.x), h = Math.abs(cy - rubberStart.y);
+    box.style.left = x + 'px'; box.style.top = y + 'px';
+    box.style.width = w + 'px'; box.style.height = h + 'px';
+  };
+  const onUp = e => {
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    box.style.display = 'none';
+    rubberStart = null;
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onUp);
+}
+
+// ============================================================
+// FORMAT BAR & PROPERTIES
+// ============================================================
+function updateFormatBar(el) {
+  if (!el) return;
+  if (el.dataset.type === 'text') {
+    document.getElementById('fmtFont').value = el.style.fontFamily || 'DM Sans';
+    document.getElementById('fmtSize').value = parseInt(el.style.fontSize) || 16;
+    document.getElementById('fmtBold').classList.toggle('active', el.style.fontWeight === '700' || el.style.fontWeight === 'bold');
+    document.getElementById('fmtItalic').classList.toggle('active', el.style.fontStyle === 'italic');
+    document.getElementById('fmtUnderline').classList.toggle('active', el.style.textDecoration.includes('underline'));
+    const tc = el.style.color || '#1e1b4b';
+    document.getElementById('textColorBar').style.background = tc;
+    document.getElementById('textPropsSection').style.display = 'block';
+  }
+  const bc = el.style.backgroundColor || el.style.background || '#7c3aed';
+  document.getElementById('bgColorBar').style.background = bc;
+}
+
+function updateRightPanel(el) {
+  if (!el) return;
+  const color = el.style.backgroundColor || el.style.color || '#7c3aed';
+  document.getElementById('mainColorPreview').style.background = color;
+  document.getElementById('mainColorHex').value = colorToHex(color);
+  document.getElementById('opacitySlider').value = Math.round((parseFloat(el.style.opacity || 1)) * 100);
+  document.getElementById('opacityVal').textContent = Math.round((parseFloat(el.style.opacity || 1)) * 100) + '%';
+  updatePositionPanel(el);
+  // effects
+  const hasShadow = !!el.style.boxShadow;
+  document.getElementById('shadowToggle').classList.toggle('on', hasShadow);
+  document.getElementById('shadowControls').style.display = hasShadow ? 'block' : 'none';
+}
+
+function updatePositionPanel(el) {
+  if (!el) return;
+  document.getElementById('posX').value = Math.round(parseInt(el.style.left)) || 0;
+  document.getElementById('posY').value = Math.round(parseInt(el.style.top)) || 0;
+  document.getElementById('sizeW').value = Math.round(el.offsetWidth) || 0;
+  document.getElementById('sizeH').value = Math.round(el.offsetHeight) || 0;
+  const rot = getRotation(el);
+  document.getElementById('rotateSlider').value = ((rot % 360) + 360) % 360;
+  document.getElementById('rotateVal').textContent = Math.round(((rot % 360) + 360) % 360) + '°';
+}
+
+function applyFormat(cmd) {
+  if (!selected || selected.dataset.type !== 'text') return;
+  if (cmd === 'font') selected.style.fontFamily = document.getElementById('fmtFont').value;
+  else if (cmd === 'size') selected.style.fontSize = document.getElementById('fmtSize').value + 'px';
+  else if (cmd === 'bold') {
+    const isBold = selected.style.fontWeight === '700' || selected.style.fontWeight === 'bold';
+    selected.style.fontWeight = isBold ? '400' : '700';
+    document.getElementById('fmtBold').classList.toggle('active', !isBold);
+  } else if (cmd === 'italic') {
+    const isItalic = selected.style.fontStyle === 'italic';
+    selected.style.fontStyle = isItalic ? 'normal' : 'italic';
+    document.getElementById('fmtItalic').classList.toggle('active', !isItalic);
+  } else if (cmd === 'underline') {
+    const isUl = selected.style.textDecoration.includes('underline');
+    selected.style.textDecoration = isUl ? 'none' : 'underline';
+    document.getElementById('fmtUnderline').classList.toggle('active', !isUl);
+  } else if (cmd === 'strikethrough') {
+    selected.style.textDecoration = selected.style.textDecoration.includes('line-through') ? 'none' : 'line-through';
+  } else if (cmd === 'alignLeft') { selected.style.textAlign = 'left'; }
+  else if (cmd === 'alignCenter') { selected.style.textAlign = 'center'; }
+  else if (cmd === 'alignRight') { selected.style.textAlign = 'right'; }
+  saveHistory();
+}
+
+function applyColor(color) {
+  if (!selected) return;
+  if (selected.dataset.type === 'text') selected.style.color = color;
+  else selected.style.backgroundColor = color;
+  document.getElementById('mainColorPreview').style.background = color;
+  document.getElementById('mainColorHex').value = color;
+  document.getElementById('bgColorBar').style.background = color;
+  document.querySelectorAll('#colorSwatches .color-dot').forEach(d => {
+    d.classList.toggle('active', d.style.background === color);
+  });
+  saveHistory();
+}
+
+function applyHexColor(hex) {
+  if (/^#[0-9a-fA-F]{6}$/.test(hex)) applyColor(hex);
+}
+
+function applyOpacity(val) {
+  if (!selected) return;
+  selected.style.opacity = val / 100;
+  document.getElementById('opacityVal').textContent = val + '%';
+  saveHistory();
+}
+
+function applyPosition() {
+  if (!selected) return;
+  selected.style.left = (parseInt(document.getElementById('posX').value) || 0) + 'px';
+  selected.style.top = (parseInt(document.getElementById('posY').value) || 0) + 'px';
+  saveHistory();
+}
+function applySize() {
+  if (!selected) return;
+  selected.style.width = (parseInt(document.getElementById('sizeW').value) || 50) + 'px';
+  selected.style.height = (parseInt(document.getElementById('sizeH').value) || 50) + 'px';
+  saveHistory();
+}
+function applyRotate(val) {
+  if (!selected) return;
+  const r = typeof val === 'number' ? val : parseInt(document.getElementById('rotateSlider').value);
+  selected.style.transform = `rotate(${r}deg) scaleX(${selected.dataset.scaleX || 1})`;
+  document.getElementById('rotateSlider').value = r;
+  document.getElementById('rotateVal').textContent = r + '°';
+  saveHistory();
+}
+function rotateBy(deg) {
+  if (!selected) return;
+  const cur = getRotation(selected);
+  applyRotate(cur + deg);
+}
+
+function alignElement(dir) {
+  if (!selected) return;
+  const w = selected.offsetWidth, h = selected.offsetHeight;
+  if (dir === 'left') selected.style.left = '0px';
+  else if (dir === 'center') selected.style.left = (canvasW / 2 - w / 2) + 'px';
+  else if (dir === 'right') selected.style.left = (canvasW - w) + 'px';
+  else if (dir === 'top') selected.style.top = '0px';
+  else if (dir === 'middle') selected.style.top = (canvasH / 2 - h / 2) + 'px';
+  else if (dir === 'bottom') selected.style.top = (canvasH - h) + 'px';
+  updatePositionPanel(selected);
+  saveHistory();
+}
+
+function flipElement() {
+  if (!selected) return;
+  const cur = parseFloat(selected.dataset.scaleX || 1);
+  const next = cur === 1 ? -1 : 1;
+  selected.dataset.scaleX = next;
+  const rot = getRotation(selected);
+  selected.style.transform = `rotate(${rot}deg) scaleX(${next})`;
+  saveHistory();
+}
+
+function lockSelected() {
+  if (!selected) return;
+  const locked = selected.dataset.locked === 'true';
+  selected.dataset.locked = !locked;
+  showToast(locked ? 'Đã mở khóa phần tử' : 'Đã khóa phần tử');
+  saveHistory();
+}
+
+function deleteSelected() {
+  if (!selected) return;
+  elements = elements.filter(e => e !== selected);
+  selected.remove();
+  selected = null;
+  renderLayers();
+  updateCanvasEmpty();
+  saveHistory();
+}
+
+function duplicateSelected() {
+  if (!selected) return;
+  const data = serializeEl(selected);
+  data.id = 'el_' + (nextId++);
+  data.left = (parseInt(data.left) + 20) + 'px';
+  data.top = (parseInt(data.top) + 20) + 'px';
+  restoreEl(data);
+  selectEl(document.getElementById(data.id));
+  saveHistory();
+  renderLayers();
+}
+
+function bringForward() {
+  if (!selected) return;
+  const z = parseInt(selected.style.zIndex || 1);
+  selected.style.zIndex = z + 1;
+  saveHistory();
+}
+function sendBackward() {
+  if (!selected) return;
+  const z = parseInt(selected.style.zIndex || 1);
+  selected.style.zIndex = Math.max(1, z - 1);
+  saveHistory();
+}
+
+let lockRatioEnabled = false;
+function toggleLockRatio() {
+  lockRatioEnabled = !lockRatioEnabled;
+  lockRatio = lockRatioEnabled;
+  document.getElementById('lockRatioIcon').className = lockRatioEnabled ? 'fas fa-link' : 'fas fa-unlink';
+  document.getElementById('lockRatioBtn').querySelector('span') && (document.getElementById('lockRatioBtn').lastChild.textContent = lockRatioEnabled ? ' Tỉ lệ cố định' : ' Tỉ lệ tự do');
+}
+
+// ============================================================
+// EFFECTS
+// ============================================================
+function toggleEffect(type) {
+  const toggle = document.getElementById(type + 'Toggle');
+  const controls = document.getElementById(type + 'Controls');
+  const isOn = toggle.classList.toggle('on');
+  controls.style.display = isOn ? 'block' : 'none';
+  applyEffect();
+}
+function applyEffect() {
+  if (!selected) return;
+  // Shadow
+  if (document.getElementById('shadowToggle').classList.contains('on')) {
+    const x = document.getElementById('shadowX').value;
+    const y = document.getElementById('shadowY').value;
+    const b = document.getElementById('shadowBlur').value;
+    const c = document.getElementById('shadowColor').value;
+    selected.style.boxShadow = `${x}px ${y}px ${b}px ${c}`;
+  } else { selected.style.boxShadow = ''; }
+  // Border
+  if (document.getElementById('borderToggle').classList.contains('on')) {
+    const w = document.getElementById('borderWidth').value;
+    const c = document.getElementById('borderColor').value;
+    const s = document.getElementById('borderStyle').value;
+    selected.style.border = `${w}px ${s} ${c}`;
+  } else { selected.style.border = ''; }
+  // Radius
+  if (document.getElementById('radiusToggle').classList.contains('on')) {
+    selected.style.borderRadius = document.getElementById('radiusSlider').value + 'px';
+  } else { selected.style.borderRadius = selected.dataset.shape === 'circle' ? '50%' : ''; }
+  // Blur
+  if (document.getElementById('blurToggle').classList.contains('on')) {
+    selected.style.filter = `blur(${document.getElementById('blurSlider').value}px)`;
+  } else { selected.style.filter = ''; }
+  saveHistory();
+}
+
+// ============================================================
+// COLOR PICKER INTEGRATION
+// ============================================================
+function openColorPickerForEl() {
+  currentColorTarget = 'element';
+  const picker = document.getElementById('colorPicker');
+  picker.value = colorToHex(selected ? (selected.style.backgroundColor || selected.style.color || '#7c3aed') : '#7c3aed');
+  picker.click();
+}
+function openColorForText() {
+  currentColorTarget = 'text';
+  const picker = document.getElementById('colorPicker');
+  picker.value = colorToHex(selected ? (selected.style.color || '#1e1b4b') : '#1e1b4b');
+  picker.click();
+}
+function openColorForBg() {
+  currentColorTarget = 'elBg';
+  const picker = document.getElementById('colorPicker');
+  picker.value = colorToHex(selected ? (selected.style.backgroundColor || '#7c3aed') : '#7c3aed');
+  picker.click();
+}
+document.getElementById('colorPicker').addEventListener('input', e => {
+  const c = e.target.value;
+  if (currentColorTarget === 'text' && selected) {
+    selected.style.color = c;
+    document.getElementById('textColorBar').style.background = c;
+  } else if (currentColorTarget === 'elBg' && selected) {
+    selected.style.backgroundColor = c;
+    document.getElementById('bgColorBar').style.background = c;
+    document.getElementById('mainColorPreview').style.background = c;
+    document.getElementById('mainColorHex').value = c;
+  } else if (currentColorTarget === 'element' && selected) {
+    applyColor(c);
+  } else if (currentColorTarget === 'bgCanvas') {
+    setBgColor(c);
+  }
+});
+
+// ============================================================
+// BACKGROUND
+// ============================================================
+function setBgColor(color) {
+  canvas.style.background = color;
+  canvas.style.backgroundImage = '';
+  document.getElementById('bgColorPreview').style.background = color;
+  document.getElementById('bgHexInput').value = colorToHex(color);
+}
+function setBgGradient(grad) {
+  canvas.style.background = grad;
+  canvas.style.backgroundImage = '';
+}
+function setBgFromHex() {
+  const val = document.getElementById('bgHexInput').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) setBgColor(val);
+}
+
+document.getElementById('bgUpload').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    canvas.style.backgroundImage = `url(${ev.target.result})`;
+    canvas.style.backgroundSize = 'cover';
+    canvas.style.backgroundPosition = 'center';
+  };
+  reader.readAsDataURL(file);
+});
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+document.getElementById('fileUpload').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    addImageFromSrc(ev.target.result);
+    // Also add to uploaded images panel
+    const container = document.getElementById('uploadedImages');
+    const div = document.createElement('div');
+    div.style.cssText = 'aspect-ratio:1;border-radius:8px;overflow:hidden;cursor:pointer;border:1.5px solid var(--border);';
+    div.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;" onclick="addImageFromSrc('${ev.target.result}')">`;
+    container.appendChild(div);
+    showToast('Đã tải ảnh lên');
+  };
+  reader.readAsDataURL(file);
+});
+
+// ============================================================
+// ZOOM
+// ============================================================
+function changeZoom(delta) {
+  zoom = Math.max(0.1, Math.min(3, zoom + delta / 100));
+  canvas.style.transform = `scale(${zoom})`;
+  document.getElementById('zoomLabel').textContent = Math.round(zoom * 100) + '%';
+}
+function resetZoom() {
+  zoom = 1;
+  canvas.style.transform = 'scale(1)';
+  document.getElementById('zoomLabel').textContent = '100%';
+}
+// Mouse wheel zoom
+document.getElementById('canvasViewport').addEventListener('wheel', e => {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    changeZoom(e.deltaY > 0 ? -10 : 10);
+  }
+}, { passive: false });
+
+// ============================================================
+// CANVAS SIZE
+// ============================================================
+function setPreset(w, h, el) {
+  document.getElementById('canvasW').value = w;
+  document.getElementById('canvasH').value = h;
+  document.querySelectorAll('.size-preset').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+function applyCanvasSize() {
+  canvasW = parseInt(document.getElementById('canvasW').value) || 800;
+  canvasH = parseInt(document.getElementById('canvasH').value) || 600;
+  canvas.style.width = canvasW + 'px';
+  canvas.style.height = canvasH + 'px';
+  document.getElementById('exportSize').textContent = canvasW + ' × ' + canvasH + ' px';
+  closeModal('sizeModal');
+  showToast('Đã thay đổi kích thước canvas');
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function openExport() {
+  document.getElementById('exportSize').textContent = canvasW + ' × ' + canvasH + ' px';
+  openModal('exportModal');
+}
+function selectExportFmt(fmt, el) {
+  exportFormat = fmt;
+  document.querySelectorAll('.export-fmt').forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+}
+function doExport() {
+  // Use html2canvas-like approach via canvas API
+  showToast('Đang xuất file...');
+  closeModal('exportModal');
+
+  // Simple SVG-based export (works without external libs)
+  setTimeout(() => {
+    try {
+      const data = exportToDataURL();
+      const link = document.createElement('a');
+      const name = document.getElementById('projectName').value || 'thiet-ke';
+      link.download = `${name}.${exportFormat.toLowerCase()}`;
+      link.href = data;
+      link.click();
+      showToast('Đã tải xuống!');
+    } catch(e) {
+      showToast('Xuất dưới dạng HTML snapshot');
+      exportAsHTML();
+    }
+  }, 300);
+}
+function exportToDataURL() {
+  // Create offscreen canvas
+  const offscreen = document.createElement('canvas');
+  offscreen.width = canvasW;
+  offscreen.height = canvasH;
+  const ctx = offscreen.getContext('2d');
+  // Draw background
+  const bg = canvas.style.backgroundColor || '#ffffff';
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvasW, canvasH);
+  // Note: Full rendering requires html2canvas; show toast
+  throw new Error('Need html2canvas');
+}
+function exportAsHTML() {
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${document.getElementById('projectName').value}</title></head><body style="margin:0;background:#f0f0f0;display:flex;align-items:center;justify-content:center;min-height:100vh;">${canvas.outerHTML}</body></html>`;
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'design.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// SAVE
+// ============================================================
+function saveDesign() {
+  const data = { canvasW, canvasH, bg: canvas.style.background || canvas.style.backgroundColor, elements: elements.map(el => serializeEl(el)) };
+  localStorage.setItem('designstudio_save', JSON.stringify(data));
+  showToast('✓ Đã lưu thiết kế');
+}
+function loadDesign() {
+  try {
+    const data = JSON.parse(localStorage.getItem('designstudio_save'));
+    if (!data) return;
+    canvasW = data.canvasW || 800; canvasH = data.canvasH || 600;
+    canvas.style.width = canvasW + 'px'; canvas.style.height = canvasH + 'px';
+    if (data.bg) canvas.style.background = data.bg;
+    elements.forEach(el => el.remove()); elements = [];
+    data.elements.forEach(d => restoreEl(d));
+    renderLayers(); updateCanvasEmpty();
+    showToast('Đã tải thiết kế đã lưu');
+  } catch(e) {}
+}
+
+// ============================================================
+// CONTEXT MENU
+// ============================================================
+function showContextMenu(x, y) {
+  const menu = document.getElementById('contextMenu');
+  menu.style.display = 'block';
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+}
+function hideContextMenu() { document.getElementById('contextMenu').style.display = 'none'; }
+document.addEventListener('click', hideContextMenu);
+document.addEventListener('contextmenu', e => { if (e.target === canvas) hideContextMenu(); });
+
+function ctxAction(action) {
+  hideContextMenu();
+  if (action === 'delete') deleteSelected();
+  else if (action === 'duplicate') duplicateSelected();
+  else if (action === 'copy') { if (selected) clipboard = serializeEl(selected); showToast('Đã sao chép'); }
+  else if (action === 'paste') {
+    if (clipboard) {
+      const d = {...clipboard, id: 'el_' + (nextId++), left: (parseInt(clipboard.left)+20)+'px', top: (parseInt(clipboard.top)+20)+'px'};
+      restoreEl(d); selectEl(document.getElementById(d.id)); saveHistory(); renderLayers();
+    }
+  }
+  else if (action === 'bringFront') { if (selected) { selected.style.zIndex = elements.length + 100; saveHistory(); } }
+  else if (action === 'sendBack') { if (selected) { selected.style.zIndex = 0; saveHistory(); } }
+  else if (action === 'bringForward') bringForward();
+  else if (action === 'sendBackward') sendBackward();
+  else if (action === 'lock') lockSelected();
+  else if (action === 'flip') flipElement();
+  else if (action === 'group') showToast('Tính năng nhóm sắp ra mắt');
+}
+
+// ============================================================
+// LAYERS PANEL
+// ============================================================
+function renderLayers() {
+  const list = document.getElementById('layersList');
+  list.innerHTML = '';
+  if (elements.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-3);font-size:12px;margin-top:20px;">Chưa có phần tử nào</p>';
+    return;
+  }
+  [...elements].reverse().forEach(el => {
+    const item = document.createElement('div');
+    item.className = 'layer-item' + (el === selected ? ' active' : '');
+    const typeIcon = el.dataset.type === 'text' ? 'fas fa-font' : el.dataset.type === 'image' ? 'fas fa-image' : el.dataset.type === 'icon' ? 'fas fa-icons' : 'fas fa-square';
+    const typeLabel = el.dataset.type === 'text' ? 'Văn bản' : el.dataset.type === 'image' ? 'Ảnh' : el.dataset.type === 'icon' ? 'Biểu tượng' : 'Hình dạng';
+    item.innerHTML = `
+      <div class="layer-thumb"><i class="${typeIcon}" style="font-size:16px;color:var(--primary)"></i></div>
+      <div class="layer-info"><p>${el.textContent ? el.textContent.substring(0,18) || typeLabel : typeLabel}</p><span>${typeLabel}</span></div>
+      <div class="layer-actions">
+        <button class="layer-act" onclick="toggleVisibility('${el.id}')" title="Ẩn/hiện"><i class="fas fa-eye"></i></button>
+        <button class="layer-act" onclick="deleteEl('${el.id}')" title="Xóa"><i class="fas fa-times"></i></button>
+      </div>
+    `;
+    item.addEventListener('click', e => { if (!e.target.closest('.layer-act')) selectEl(el); });
+    list.appendChild(item);
+  });
+}
+function toggleVisibility(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.opacity = el.style.opacity === '0' ? '1' : '0';
+}
+function deleteEl(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  elements = elements.filter(e => e !== el);
+  el.remove();
+  if (selected === el) selected = null;
+  renderLayers(); updateCanvasEmpty(); saveHistory();
+}
+
+// ============================================================
+// TEMPLATES
+// ============================================================
+function applyTemplate(name) {
+  elements.forEach(el => el.remove()); elements = []; selected = null;
+  const templates = {
+    gradient1: () => {
+      canvas.style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+      addStyledText('Space Grotesk','Thiết kế hiện đại',48,'700');
+      selected.style.color = '#ffffff';
+      selected.style.left = '60px'; selected.style.top = '200px';
+      addText('body','Phong cách gradient tím sang trọng',60,290,'rgba(255,255,255,0.8)',20);
+      addShape('rounded-rect',60,360,200,6,'rgba(255,255,255,0.6)');
+    },
+    minimal1: () => {
+      canvas.style.background = '#f8f7ff';
+      addStyledText('Space Grotesk','Minimal.',56,'700');
+      selected.style.color = '#1e1b4b'; selected.style.left = '80px'; selected.style.top = '220px';
+      addText('body','Thiết kế tối giản, ấn tượng',80,310,'#6b7280',18);
+      addShape('rect',400,180,8,200,'#7c3aed');
+    },
+    bold1: () => {
+      canvas.style.background = '#1e1b4b';
+      addStyledText('Space Grotesk','BOLD',100,'700');
+      selected.style.color = '#7c3aed'; selected.style.left = '80px'; selected.style.top = '180px';
+      addText('body','Phong cách đậm, nổi bật',80,320,'rgba(255,255,255,0.7)',20);
+      addShape('circle',500,150,100,100,'rgba(124,58,237,0.3)');
+    },
+    warm1: () => {
+      canvas.style.background = 'linear-gradient(135deg,#f093fb,#f5576c)';
+      addStyledText('Space Grotesk','Passion',54,'700');
+      selected.style.color = 'white'; selected.style.left = '100px'; selected.style.top = '210px';
+      addText('body','Thiết kế đầy cảm xúc & màu sắc',100,290,'rgba(255,255,255,0.9)',18);
+    },
+    nature1: () => {
+      canvas.style.background = 'linear-gradient(135deg,#43e97b,#38f9d7)';
+      addStyledText('DM Sans','Go Green 🌿',48,'700');
+      selected.style.color = '#fff'; selected.style.left = '80px'; selected.style.top = '220px';
+      addText('body','Thiên nhiên tươi mát, năng lượng mới',80,290,'rgba(255,255,255,0.9)',17);
+    },
+    ocean1: () => {
+      canvas.style.background = 'linear-gradient(135deg,#4facfe,#00f2fe)';
+      addStyledText('Space Grotesk','Ocean Blue',48,'700');
+      selected.style.color = 'white'; selected.style.left = '80px'; selected.style.top = '220px';
+      addText('body','Sâu thẳm như đại dương',80,290,'rgba(255,255,255,0.9)',18);
+    },
+    logo1: () => {
+      canvas.style.background = '#ffffff';
+      addShape('circle',320,220,100,100,'#7c3aed');
+      addText('heading','LOGO',335,252,'#ffffff',22);
+      addText('subheading','Thương hiệu của bạn',240,360,'#1e1b4b',18);
+    },
+    logo2: () => {
+      canvas.style.background = 'linear-gradient(135deg,#f59e0b,#ef4444)';
+      addText('heading','YOUR',180,200,'#fff',48);
+      addText('heading','BRAND',160,270,'#fff',48);
+      addShape('rect',160,340,280,6,'rgba(255,255,255,0.8)');
+    }
+  };
+  if (templates[name]) { templates[name](); renderLayers(); saveHistory(); updateCanvasEmpty(); }
+  showToast('Đã áp dụng mẫu');
+}
+
+// ============================================================
+// PAGES
+// ============================================================
+function addPage() {
+  pages[currentPage] = elements.map(el => serializeEl(el));
+  pages.push([]);
+  currentPage = pages.length - 1;
+  elements.forEach(el => el.remove()); elements = []; selected = null;
+  canvas.style.background = '#ffffff';
+  updatePageInfo();
+  renderLayers(); updateCanvasEmpty();
+  showToast('Đã thêm trang mới');
+}
+function prevPage() {
+  if (currentPage === 0) return;
+  pages[currentPage] = elements.map(el => serializeEl(el));
+  elements.forEach(el => el.remove()); elements = []; selected = null;
+  currentPage--;
+  (pages[currentPage] || []).forEach(d => restoreEl(d));
+  updatePageInfo(); renderLayers(); updateCanvasEmpty();
+}
+function nextPage() {
+  if (currentPage >= pages.length - 1) { addPage(); return; }
+  pages[currentPage] = elements.map(el => serializeEl(el));
+  elements.forEach(el => el.remove()); elements = []; selected = null;
+  currentPage++;
+  (pages[currentPage] || []).forEach(d => restoreEl(d));
+  updatePageInfo(); renderLayers(); updateCanvasEmpty();
+}
+function updatePageInfo() {
+  document.getElementById('pageInfo').textContent = `Trang ${currentPage + 1} / ${pages.length}`;
+}
+
+// ============================================================
+// PANEL SWITCHING
+// ============================================================
+function switchPanel(id) {
+  activePanelId = id;
+  document.querySelectorAll('.panel-section').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.style.display = 'flex'; // flex for column layout
+  else { const p2 = document.getElementById('panel-' + id); if(p2) p2.style.display = 'block'; }
+  // Fix: use block for most panels
+  if (panel) panel.style.display = 'block';
+  document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('rail-' + id)?.classList.add('active');
+  if (id === 'layers') renderLayers();
+}
+
+function switchPropTab(tab, el) {
+  document.querySelectorAll('.prop-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('propDesign').style.display = tab === 'design' ? 'block' : 'none';
+  document.getElementById('propPosition').style.display = tab === 'position' ? 'block' : 'none';
+  document.getElementById('propEffects').style.display = tab === 'effects' ? 'block' : 'none';
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// AI (SIMULATED)
+// ============================================================
+function setAIPrompt(txt) { document.getElementById('aiPrompt').value = txt; }
+async function runAI() {
+  const prompt = document.getElementById('aiPrompt').value.trim();
+  if (!prompt) return;
+  const output = document.getElementById('aiOutput');
+  output.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-3)"><i class="fas fa-circle-notch fa-spin" style="font-size:24px;color:var(--primary)"></i><p style="margin-top:8px;font-size:12px">AI đang xử lý...</p></div>';
+
+  // Simulate AI response
+  await new Promise(r => setTimeout(r, 1500));
+  const lower = prompt.toLowerCase();
+  output.innerHTML = '';
+
+  if (lower.includes('banner') || lower.includes('quảng cáo')) {
+    applyTemplate('gradient1');
+    output.innerHTML = `<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius);font-size:12px;color:var(--primary);font-weight:500;"><i class="fas fa-magic"></i> Đã tạo banner từ gợi ý AI!</div>`;
+  } else if (lower.includes('logo')) {
+    applyTemplate('logo2');
+    output.innerHTML = `<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius);font-size:12px;color:var(--primary);font-weight:500;"><i class="fas fa-magic"></i> Đã tạo logo từ gợi ý AI!</div>`;
+  } else if (lower.includes('poster') || lower.includes('sự kiện') || lower.includes('âm nhạc')) {
+    applyTemplate('bold1');
+    output.innerHTML = `<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius);font-size:12px;color:var(--primary);font-weight:500;"><i class="fas fa-magic"></i> Đã tạo poster từ gợi ý AI!</div>`;
+  } else if (lower.includes('minimal') || lower.includes('tối giản')) {
+    applyTemplate('minimal1');
+    output.innerHTML = `<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius);font-size:12px;color:var(--primary);font-weight:500;"><i class="fas fa-magic"></i> Đã áp dụng thiết kế tối giản!</div>`;
+  } else {
+    // Generic: just add some elements
+    addText('heading', prompt.substring(0, 30), 100, 200, '#1e1b4b', 32);
+    addShape('rounded-rect', 100, 270, 300, 6, '#7c3aed');
+    output.innerHTML = `<div style="padding:10px;background:var(--primary-light);border-radius:var(--radius);font-size:12px;color:var(--primary);font-weight:500;"><i class="fas fa-magic"></i> AI đã thêm nội dung dựa trên mô tả!</div>`;
+  }
+}
+
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', e => {
+  const tag = e.target.tagName.toLowerCase();
+  const isEditing = e.target.getAttribute('contenteditable') === 'true' || tag === 'input' || tag === 'textarea' || tag === 'select';
+  if (isEditing) return;
+
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+  else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.shiftKey && e.key === 'z'))) { e.preventDefault(); redo(); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === 'd') { e.preventDefault(); duplicateSelected(); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === 'c') { if (selected) { clipboard = serializeEl(selected); showToast('Đã sao chép'); } }
+  else if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+    if (clipboard) {
+      const d = {...clipboard, id: 'el_' + (nextId++), left: (parseInt(clipboard.left)+20)+'px', top: (parseInt(clipboard.top)+20)+'px'};
+      restoreEl(d); selectEl(document.getElementById(d.id)); saveHistory(); renderLayers();
+    }
+  }
+  else if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDesign(); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { if (selected) deleteSelected(); }
+  else if (e.key === 'Escape') deselectAll();
+  else if (e.key === 'ArrowLeft' && selected) { selected.style.left = (parseInt(selected.style.left) - (e.shiftKey ? 10 : 1)) + 'px'; updatePositionPanel(selected); }
+  else if (e.key === 'ArrowRight' && selected) { selected.style.left = (parseInt(selected.style.left) + (e.shiftKey ? 10 : 1)) + 'px'; updatePositionPanel(selected); }
+  else if (e.key === 'ArrowUp' && selected) { selected.style.top = (parseInt(selected.style.top) - (e.shiftKey ? 10 : 1)) + 'px'; updatePositionPanel(selected); }
+  else if (e.key === 'ArrowDown' && selected) { selected.style.top = (parseInt(selected.style.top) + (e.shiftKey ? 10 : 1)) + 'px'; updatePositionPanel(selected); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === '+') { e.preventDefault(); changeZoom(10); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); changeZoom(-10); }
+  else if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); resetZoom(); }
+});
+
+// ============================================================
+// PREVIEW MODE
+// ============================================================
+function preview() {
+  const win = window.open('', '_blank');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Preview</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"></head><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1e1b4b;">${canvas.outerHTML.replace(/class="canvas-element selected"/g,'class="canvas-element"').replace(/class="canvas-element"/g,'class="canvas-element" style="position:absolute;box-sizing:border-box;"')}<style>.el-handle{display:none!important}</style></body></html>`;
+  win.document.write(html);
+}
+
+// ============================================================
+// HELPERS
+// ============================================================
+function updateCanvasEmpty() {
+  document.getElementById('canvasEmpty').style.display = elements.length === 0 ? 'flex' : 'none';
+}
+function randInt(min, max) { return Math.floor(Math.random() * (max - min)) + min; }
+function colorToHex(color) {
+  if (!color) return '#7c3aed';
+  if (color.startsWith('#')) return color;
+  const c = document.createElement('canvas').getContext('2d');
+  c.fillStyle = color;
+  return c.fillStyle;
+}
+
+// ============================================================
+// DRAG-DROP FILES ONTO CANVAS
+// ============================================================
+document.getElementById('canvasViewport').addEventListener('dragover', e => e.preventDefault());
+document.getElementById('canvasViewport').addEventListener('drop', e => {
+  e.preventDefault();
+  [...e.dataTransfer.files].forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = ev => addImageFromSrc(ev.target.result);
+    reader.readAsDataURL(file);
+  });
+});
+
+// ============================================================
+// AUTO-SAVE
+// ============================================================
+setInterval(() => {
+  if (elements.length > 0) saveDesign();
+}, 30000);
+
+// ============================================================
+// BOOT
+// ============================================================
+init();
+// Try to restore saved design
+const saved = localStorage.getItem('designstudio_save');
+if (saved) {
+  try {
+    const data = JSON.parse(saved);
+    if (data && data.elements && data.elements.length > 0) {
+      // Ask is tricky in production, just init fresh
+    }
+  } catch(e) {}
+}
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Canva Clone - Thiết kế trực tuyến</title>
+
+    <!-- Font Awesome Icons -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+
+        * {
+
+            margin: 0;
+
+            padding: 0;
+
+            box-sizing: border-box;
+
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+        }
+
+
+
+        body {
+
+            background: #f1f3f5;
+
+            height: 100vh;
+
+            overflow: hidden;
+
+        }
+
+
+
+        /* ----- TOP NAVBAR (Canva style) ----- */
+
+        .top-nav {
+
+            height: 64px;
+
+            background: white;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+
+            align-items: center;
+
+            padding: 0 20px;
+
+            justify-content: space-between;
+
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+
+            position: relative;
+
+            z-index: 10;
+
+        }
+
+
+
+        .nav-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+        }
+
+
+
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+        }
+
+
+
+        .logo i {
+
+            font-size: 28px;
+
+            color: #8b3dff;
+
+        }
+
+
+
+        .logo span {
+
+            font-weight: 700;
+
+            font-size: 22px;
+
+            color: #1a1a1a;
+
+            letter-spacing: -0.5px;
+
+        }
+
+
+
+        .menu-tabs {
+
+            display: flex;
+
+            gap: 6px;
+
+            margin-left: 30px;
+
+        }
+
+
+
+        .menu-tab {
+
+            padding: 8px 16px;
+
+            border-radius: 8px;
+
+            font-weight: 500;
+
+            font-size: 15px;
+
+            color: #4b5563;
+
+            cursor: pointer;
+
+            transition: all 0.15s;
+
+        }
+
+
+
+        .menu-tab.active {
+
+            background: #8b3dff;
+
+            color: white;
+
+        }
+
+
+
+        .menu-tab:hover:not(.active) {
+
+            background: #f3f4f6;
+
+        }
+
+
+
+        .nav-center {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+        }
+
+
+
+        .project-name {
+
+            font-weight: 600;
+
+            color: #1f2937;
+
+            font-size: 16px;
+
+            border-right: 1px solid #e5e7eb;
+
+            padding-right: 20px;
+
+        }
+
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+        }
+
+
+
+        .nav-btn {
+
+            width: 40px;
+
+            height: 40px;
+
+            border-radius: 8px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            cursor: pointer;
+
+            color: #4b5563;
+
+            transition: background 0.15s;
+
+        }
+
+
+
+        .nav-btn:hover {
+
+            background: #f3f4f6;
+
+        }
+
+
+
+        .share-btn {
+
+            background: #8b3dff;
+
+            color: white;
+
+            padding: 10px 20px;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            transition: background 0.15s;
+
+            border: none;
+
+        }
+
+
+
+        .share-btn:hover {
+
+            background: #7c3aed;
+
+        }
+
+
+
+        /* ----- MAIN LAYOUT (Grid 3 cột) ----- */
+
+        .app-container {
+
+            display: flex;
+
+            height: calc(100vh - 64px);
+
+        }
+
+
+
+        /* ----- LEFT SIDEBAR (Thư viện công cụ) ----- */
+
+        .left-sidebar {
+
+            width: 320px;
+
+            background: white;
+
+            border-right: 1px solid #e5e7eb;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .sidebar-header {
+
+            padding: 18px 16px;
+
+            border-bottom: 1px solid #eef2f6;
+
+        }
+
+
+
+        .sidebar-header h3 {
+
+            font-size: 18px;
+
+            font-weight: 600;
+
+            color: #1f2937;
+
+        }
+
+
+
+        .sidebar-tabs {
+
+            display: flex;
+
+            padding: 8px 12px;
+
+            gap: 4px;
+
+            border-bottom: 1px solid #eef2f6;
+
+        }
+
+
+
+        .sidebar-tab {
+
+            flex: 1;
+
+            padding: 10px 0;
+
+            text-align: center;
+
+            font-weight: 500;
+
+            font-size: 14px;
+
+            color: #6b7280;
+
+            cursor: pointer;
+
+            border-radius: 6px;
+
+            transition: all 0.15s;
+
+        }
+
+
+
+        .sidebar-tab.active {
+
+            background: #f3e8ff;
+
+            color: #8b3dff;
+
+        }
+
+
+
+        .sidebar-content {
+
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding: 16px;
+
+        }
+
+
+
+        .search-box {
+
+            background: #f9fafb;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 8px;
+
+            padding: 10px 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 20px;
+
+        }
+
+
+
+        .search-box i {
+
+            color: #9ca3af;
+
+            font-size: 16px;
+
+        }
+
+
+
+        .search-box input {
+
+            border: none;
+
+            background: transparent;
+
+            outline: none;
+
+            font-size: 15px;
+
+            width: 100%;
+
+        }
+
+
+
+        .category-grid {
+
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+
+        }
+
+
+
+        .category-card {
+
+            background: #f9fafb;
+
+            border-radius: 10px;
+
+            padding: 16px 8px;
+
+            text-align: center;
+
+            cursor: pointer;
+
+            border: 1px solid #eef2f6;
+
+            transition: all 0.15s;
+
+        }
+
+
+
+        .category-card:hover {
+
+            background: #f3e8ff;
+
+            border-color: #8b3dff;
+
+        }
+
+
+
+        .category-card i {
+
+            font-size: 28px;
+
+            color: #8b3dff;
+
+            margin-bottom: 8px;
+
+        }
+
+
+
+        .category-card span {
+
+            display: block;
+
+            font-size: 13px;
+
+            font-weight: 500;
+
+            color: #374151;
+
+        }
+
+
+
+        .recent-section {
+
+            margin-top: 24px;
+
+        }
+
+
+
+        .recent-section h4 {
+
+            font-size: 14px;
+
+            color: #6b7280;
+
+            margin-bottom: 12px;
+
+            font-weight: 600;
+
+        }
+
+
+
+        .recent-item {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 10px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            transition: background 0.15s;
+
+        }
+
+
+
+        .recent-item:hover {
+
+            background: #f3f4f6;
+
+        }
+
+
+
+        .recent-thumb {
+
+            width: 48px;
+
+            height: 48px;
+
+            background: linear-gradient(135deg, #667eea, #764ba2);
+
+            border-radius: 6px;
+
+        }
+
+
+
+        .recent-info {
+
+            flex: 1;
+
+        }
+
+
+
+        .recent-info p {
+
+            font-weight: 500;
+
+            font-size: 14px;
+
+            color: #1f2937;
+
+        }
+
+
+
+        .recent-info small {
+
+            font-size: 12px;
+
+            color: #9ca3af;
+
+        }
+
+
+
+        /* ----- CANVAS AREA (Trung tâm) ----- */
+
+        .canvas-area {
+
+            flex: 1;
+
+            background: #f8fafc;
+
+            display: flex;
+
+            flex-direction: column;
+
+            overflow: hidden;
+
+            position: relative;
+
+        }
+
+
+
+        .canvas-toolbar {
+
+            padding: 12px 20px;
+
+            background: white;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+        }
+
+
+
+        .canvas-tools {
+
+            display: flex;
+
+            gap: 6px;
+
+        }
+
+
+
+        .tool-btn {
+
+            width: 36px;
+
+            height: 36px;
+
+            border-radius: 6px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            cursor: pointer;
+
+            color: #4b5563;
+
+            background: transparent;
+
+            border: none;
+
+            transition: all 0.15s;
+
+        }
+
+
+
+        .tool-btn:hover {
+
+            background: #f3f4f6;
+
+        }
+
+
+
+        .tool-btn.active {
+
+            background: #8b3dff;
+
+            color: white;
+
+        }
+
+
+
+        .canvas-size-info {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 16px;
+
+            color: #6b7280;
+
+            font-size: 14px;
+
+        }
+
+
+
+        .canvas-wrapper {
+
+            flex: 1;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 30px;
+
+            overflow: auto;
+
+        }
+
+
+
+        #designCanvas {
+
+            background: white;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+
+            border-radius: 4px;
+
+            position: relative;
+
+            width: 800px;
+
+            height: 600px;
+
+        }
+
+
+
+        /* ----- RIGHT SIDEBAR (Thuộc tính) ----- */
+
+        .right-sidebar {
+
+            width: 280px;
+
+            background: white;
+
+            border-left: 1px solid #e5e7eb;
+
+            padding: 20px 16px;
+
+            overflow-y: auto;
+
+        }
+
+
+
+        .prop-section {
+
+            margin-bottom: 24px;
+
+        }
+
+
+
+        .prop-section h4 {
+
+            font-size: 13px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+
+            color: #9ca3af;
+
+            margin-bottom: 14px;
+
+        }
+
+
+
+        .color-palette {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+
+        .color-swatch {
+
+            width: 32px;
+
+            height: 32px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            border: 2px solid transparent;
+
+            transition: transform 0.1s;
+
+        }
+
+
+
+        .color-swatch:hover {
+
+            transform: scale(1.05);
+
+        }
+
+
+
+        .color-swatch.selected {
+
+            border-color: #8b3dff;
+
+        }
+
+
+
+        .slider-group {
+
+            margin-bottom: 16px;
+
+        }
+
+
+
+        .slider-group label {
+
+            display: block;
+
+            font-size: 13px;
+
+            color: #4b5563;
+
+            margin-bottom: 6px;
+
+        }
+
+
+
+        .slider-group input {
+
+            width: 100%;
+
+        }
+
+
+
+        .delete-btn {
+
+            width: 100%;
+
+            padding: 12px;
+
+            background: #fee2e2;
+
+            color: #dc2626;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-weight: 600;
+
+            font-size: 14px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            transition: background 0.15s;
+
+        }
+
+
+
+        .delete-btn:hover {
+
+            background: #fecaca;
+
+        }
+
+
+
+        /* ----- Element trên canvas ----- */
+
+        .canvas-element {
+
+            position: absolute;
+
+            cursor: move;
+
+            user-select: none;
+
+            border: 2px solid transparent;
+
+            box-sizing: border-box;
+
+        }
+
+
+
+        .canvas-element.selected {
+
+            border: 2px solid #8b3dff;
+
+        }
+
+
+
+        .canvas-element .resize-handle {
+
+            position: absolute;
+
+            width: 10px;
+
+            height: 10px;
+
+            background: white;
+
+            border: 2px solid #8b3dff;
+
+            border-radius: 50%;
+
+            right: -5px;
+
+            bottom: -5px;
+
+            cursor: nwse-resize;
+
+            display: none;
+
+        }
+
+
+
+        .canvas-element.selected .resize-handle {
+
+            display: block;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- TOP NAVIGATION -->
+
+    <div class="top-nav">
+
+        <div class="nav-left">
+
+            <div class="logo">
+
+                <i class="fas fa-paint-brush"></i>
+
+                <span>Canva</span>
+
+            </div>
+
+            <div class="menu-tabs">
+
+                <div class="menu-tab active">Thiết kế</div>
+
+                <div class="menu-tab">Dự án</div>
+
+                <div class="menu-tab">Thương hiệu</div>
+
+                <div class="menu-tab">Ứng dụng</div>
+
+            </div>
+
+        </div>
+
+        <div class="nav-center">
+
+            <span class="project-name">Thiết kế chưa có tiêu đề</span>
+
+            <div class="nav-btn"><i class="fas fa-undo-alt"></i></div>
+
+            <div class="nav-btn"><i class="fas fa-redo-alt"></i></div>
+
+        </div>
+
+        <div class="nav-right">
+
+            <div class="nav-btn"><i class="fas fa-download"></i></div>
+
+            <div class="nav-btn"><i class="fas fa-comment-dots"></i></div>
+
+            <button class="share-btn"><i class="fas fa-share"></i> Chia sẻ</button>
+
+            <div class="nav-btn"><i class="fas fa-user-circle"></i></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- MAIN APP -->
+
+    <div class="app-container">
+
+        <!-- LEFT SIDEBAR -->
+
+        <div class="left-sidebar">
+
+            <div class="sidebar-header">
+
+                <h3>Thêm vào thiết kế</h3>
+
+            </div>
+
+            <div class="sidebar-tabs">
+
+                <div class="sidebar-tab active">Thiết kế</div>
+
+                <div class="sidebar-tab">Thành phần</div>
+
+                <div class="sidebar-tab">Văn bản</div>
+
+                <div class="sidebar-tab">Tải lên</div>
+
+            </div>
+
+            <div class="sidebar-content">
+
+                <div class="search-box">
+
+                    <i class="fas fa-search"></i>
+
+                    <input type="text" placeholder="Tìm kiếm mẫu, ảnh, thành phần...">
+
+                </div>
+
+                <div class="category-grid">
+
+                    <div class="category-card" onclick="addTextElement()">
+
+                        <i class="fas fa-font"></i>
+
+                        <span>Văn bản</span>
+
+                    </div>
+
+                    <div class="category-card" onclick="addShapeElement('rect')">
+
+                        <i class="fas fa-square"></i>
+
+                        <span>Hình vuông</span>
+
+                    </div>
+
+                    <div class="category-card" onclick="addShapeElement('circle')">
+
+                        <i class="fas fa-circle"></i>
+
+                        <span>Hình tròn</span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        <i class="fas fa-image"></i>
+
+                        <span>Ảnh</span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        <i class="fas fa-shapes"></i>
+
+                        <span>Đồ họa</span>
+
+                    </div>
+
+                    <div class="category-card">
+
+                        <i class="fas fa-video"></i>
+
+                        <span>Video</span>
+
+                    </div>
+
+                </div>
+
+                <div class="recent-section">
+
+                    <h4>Mẫu gần đây</h4>
+
+                    <div class="recent-item">
+
+                        <div class="recent-thumb" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+
+                        <div class="recent-info">
+
+                            <p>Bài đăng Instagram</p>
+
+                            <small>1080 x 1080 px</small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="recent-item">
+
+                        <div class="recent-thumb" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+
+                        <div class="recent-info">
+
+                            <p>Bài thuyết trình</p>
+
+                            <small>1920 x 1080 px</small>
+
+                        </div>
+
+                    </div>
+
+                    <div class="recent-item">
+
+                        <div class="recent-thumb" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"></div>
+
+                        <div class="recent-info">
+
+                            <p>Logo</p>
+
+                            <small>500 x 500 px</small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CANVAS AREA -->
+
+        <div class="canvas-area">
+
+            <div class="canvas-toolbar">
+
+                <div class="canvas-tools">
+
+                    <button class="tool-btn" id="selectTool"><i class="fas fa-mouse-pointer"></i></button>
+
+                    <button class="tool-btn" id="textTool"><i class="fas fa-font"></i></button>
+
+                    <button class="tool-btn" id="shapeTool"><i class="fas fa-shapes"></i></button>
+
+                    <button class="tool-btn"><i class="fas fa-pencil-alt"></i></button>
+
+                </div>
+
+                <div class="canvas-size-info">
+
+                    <span><i class="far fa-expand"></i> 800 x 600 px</span>
+
+                    <span><i class="far fa-clock"></i> Đã lưu</span>
+
+                </div>
+
+                <div class="canvas-tools">
+
+                    <button class="tool-btn"><i class="fas fa-search-plus"></i></button>
+
+                    <button class="tool-btn"><i class="fas fa-search-minus"></i></button>
+
+                    <button class="tool-btn"><i class="fas fa-expand"></i></button>
+
+                </div>
+
+            </div>
+
+            <div class="canvas-wrapper">
+
+                <div id="designCanvas"></div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- RIGHT SIDEBAR (Thuộc tính) -->
+
+        <div class="right-sidebar" id="propertyPanel">
+
+            <div class="prop-section">
+
+                <h4>Màu sắc</h4>
+
+                <div class="color-palette">
+
+                    <div class="color-swatch" style="background: #8b3dff;" onclick="setSelectedColor('#8b3dff')"></div>
+
+                    <div class="color-swatch" style="background: #3b82f6;" onclick="setSelectedColor('#3b82f6')"></div>
+
+                    <div class="color-swatch" style="background: #10b981;" onclick="setSelectedColor('#10b981')"></div>
+
+                    <div class="color-swatch" style="background: #f59e0b;" onclick="setSelectedColor('#f59e0b')"></div>
+
+                    <div class="color-swatch" style="background: #ef4444;" onclick="setSelectedColor('#ef4444')"></div>
+
+                    <div class="color-swatch" style="background: #8b5cf6;" onclick="setSelectedColor('#8b5cf6')"></div>
+
+                    <div class="color-swatch" style="background: #ec4899;" onclick="setSelectedColor('#ec4899')"></div>
+
+                    <div class="color-swatch" style="background: #06b6d4;" onclick="setSelectedColor('#06b6d4')"></div>
+
+                </div>
+
+            </div>
+
+            <div class="prop-section">
+
+                <h4>Kích thước</h4>
+
+                <div class="slider-group">
+
+                    <label>Độ rộng</label>
+
+                    <input type="range" min="50" max="300" value="100" id="widthSlider">
+
+                </div>
+
+                <div class="slider-group">
+
+                    <label>Độ cao</label>
+
+                    <input type="range" min="50" max="300" value="100" id="heightSlider">
+
+                </div>
+
+            </div>
+
+            <div class="prop-section">
+
+                <h4>Xoay</h4>
+
+                <div class="slider-group">
+
+                    <input type="range" min="0" max="360" value="0" id="rotateSlider">
+
+                </div>
+
+            </div>
+
+            <div class="prop-section">
+
+                <button class="delete-btn" id="deleteBtn"><i class="fas fa-trash-alt"></i> Xóa phần tử</button>
+
+            </div>
+
+            <div class="prop-section" id="selectedInfo" style="color: #9ca3af; font-size: 13px; text-align: center;">
+
+                Chưa chọn phần tử
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // ----- QUẢN LÝ CANVAS VÀ ĐỐI TƯỢNG -----
+
+        const canvas = document.getElementById('designCanvas');
+
+        let selectedElement = null;
+
+        let selectedColor = '#8b3dff';
+
+        let elementCounter = 0;
+
+
+
+        // Khởi tạo canvas
+
+        function initCanvas() {
+
+            // Thêm một vài thành phần mẫu ban đầu
+
+            addTextElement('Tiêu đề', 100, 100, '#1f2937', 32);
+
+            addShapeElement('rect', 200, 200, 120, 80, '#8b3dff');
+
+        }
+
+
+
+        // ----- THÊM PHẦN TỬ VĂN BẢN -----
+
+        function addTextElement(text = 'Văn bản mới', left = 150, top = 150, color = '#1f2937', fontSize = 24) {
+
+            const el = document.createElement('div');
+
+            el.className = 'canvas-element';
+
+            el.id = 'el_' + (++elementCounter);
+
+            el.style.left = left + 'px';
+
+            el.style.top = top + 'px';
+
+            el.style.padding = '8px 12px';
+
+            el.style.fontSize = fontSize + 'px';
+
+            el.style.fontWeight = '500';
+
+            el.style.color = color;
+
+            el.style.backgroundColor = 'transparent';
+
+            el.textContent = text;
+
+            el.setAttribute('data-type', 'text');
+
+            el.setAttribute('data-color', color);
+
+            
+
+            addResizeHandle(el);
+
+            attachDragEvents(el);
+
+            el.addEventListener('click', (e) => { e.stopPropagation(); selectElement(el); });
+
+            
+
+            canvas.appendChild(el);
+
+            selectElement(el);
+
+            return el;
+
+        }
+
+
+
+        // ----- THÊM HÌNH DẠNG -----
+
+        function addShapeElement(type = 'rect', left = 250, top = 200, width = 100, height = 100, color = null) {
+
+            if (!color) color = selectedColor;
+
+            
+
+            const el = document.createElement('div');
+
+            el.className = 'canvas-element';
+
+            el.id = 'el_' + (++elementCounter);
+
+            el.style.left = left + 'px';
+
+            el.style.top = top + 'px';
+
+            el.style.width = width + 'px';
+
+            el.style.height = height + 'px';
+
+            el.style.backgroundColor = color;
+
+            el.style.borderRadius = type === 'circle' ? '50%' : '4px';
+
+            el.setAttribute('data-type', 'shape');
+
+            el.setAttribute('data-shape', type);
+
+            el.setAttribute('data-color', color);
+
+            
+
+            addResizeHandle(el);
+
+            attachDragEvents(el);
+
+            el.addEventListener('click', (e) => { e.stopPropagation(); selectElement(el); });
+
+            
+
+            canvas.appendChild(el);
+
+            selectElement(el);
+
+            return el;
+
+        }
+
+
+
+        function addResizeHandle(el) {
+
+            const handle = document.createElement('div');
+
+            handle.className = 'resize-handle';
+
+            el.appendChild(handle);
+
+            
+
+            let startX, startY, startW, startH;
+
+            
+
+            handle.addEventListener('mousedown', (e) => {
+
+                e.stopPropagation();
+
+                startX = e.clientX;
+
+                startY = e.clientY;
+
+                startW = parseInt(el.style.width) || el.offsetWidth;
+
+                startH = parseInt(el.style.height) || el.offsetHeight;
+
+                
+
+                function onMouseMove(e) {
+
+                    const dx = e.clientX - startX;
+
+                    const dy = e.clientY - startY;
+
+                    el.style.width = Math.max(50, startW + dx) + 'px';
+
+                    el.style.height = Math.max(50, startH + dy) + 'px';
+
+                    updatePropertySliders(el);
+
+                }
+
+                
+
+                function onMouseUp() {
+
+                    document.removeEventListener('mousemove', onMouseMove);
+
+                    document.removeEventListener('mouseup', onMouseUp);
+
+                }
+
+                
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                document.addEventListener('mouseup', onMouseUp);
+
+            });
+
+        }
+
+
+
+        // ----- KÉO THẢ -----
+
+        function attachDragEvents(el) {
+
+            let offsetX, offsetY, startX, startY;
+
+            
+
+            el.addEventListener('mousedown', (e) => {
+
+                if (e.target.classList.contains('resize-handle')) return;
+
+                
+
+                e.preventDefault();
+
+                selectElement(el);
+
+                
+
+                const rect = el.getBoundingClientRect();
+
+                const canvasRect = canvas.getBoundingClientRect();
+
+                
+
+                offsetX = e.clientX - rect.left;
+
+                offsetY = e.clientY - rect.top;
+
+                
+
+                function onMouseMove(e) {
+
+                    let newLeft = e.clientX - offsetX - canvasRect.left;
+
+                    let newTop = e.clientY - offsetY - canvasRect.top;
+
+                    
+
+                    newLeft = Math.max(0, Math.min(newLeft, canvasRect.width - rect.width));
+
+                    newTop = Math.max(0, Math.min(newTop, canvasRect.height - rect.height));
+
+                    
+
+                    el.style.left = newLeft + 'px';
+
+                    el.style.top = newTop + 'px';
+
+                }
+
+                
+
+                function onMouseUp() {
+
+                    document.removeEventListener('mousemove', onMouseMove);
+
+                    document.removeEventListener('mouseup', onMouseUp);
+
+                }
+
+                
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                document.addEventListener('mouseup', onMouseUp);
+
+            });
+
+        }
+
+
+
+        // ----- CHỌN PHẦN TỬ -----
+
+        function selectElement(el) {
+
+            if (selectedElement) {
+
+                selectedElement.classList.remove('selected');
+
+            }
+
+            selectedElement = el;
+
+            selectedElement.classList.add('selected');
+
+            
+
+            // Cập nhật panel thuộc tính
+
+            updatePropertySliders(el);
+
+            document.getElementById('selectedInfo').textContent = 
+
+                `Đã chọn: ${el.getAttribute('data-type') === 'text' ? 'Văn bản' : 'Hình dạng'}`;
+
+            
+
+            // Đánh dấu màu đang chọn
+
+            const color = el.getAttribute('data-color') || el.style.backgroundColor;
+
+            if (color) {
+
+                document.querySelectorAll('.color-swatch').forEach(swatch => {
+
+                    swatch.classList.remove('selected');
+
+                    if (swatch.style.backgroundColor === color) {
+
+                        swatch.classList.add('selected');
+
+                    }
+
+                });
+
+            }
+
+        }
+
+
+
+        function updatePropertySliders(el) {
+
+            const width = parseInt(el.style.width) || el.offsetWidth;
+
+            const height = parseInt(el.style.height) || el.offsetHeight;
+
+            document.getElementById('widthSlider').value = width;
+
+            document.getElementById('heightSlider').value = height;
+
+        }
+
+
+
+        // ----- XỬ LÝ THUỘC TÍNH -----
+
+        function setSelectedColor(color) {
+
+            selectedColor = color;
+
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+
+                swatch.classList.remove('selected');
+
+                if (swatch.style.backgroundColor === color) {
+
+                    swatch.classList.add('selected');
+
+                }
+
+            });
+
+            
+
+            if (selectedElement) {
+
+                if (selectedElement.getAttribute('data-type') === 'text') {
+
+                    selectedElement.style.color = color;
+
+                } else {
+
+                    selectedElement.style.backgroundColor = color;
+
+                }
+
+                selectedElement.setAttribute('data-color', color);
+
+            }
+
+        }
+
+
+
+        // Slider events
+
+        document.getElementById('widthSlider').addEventListener('input', (e) => {
+
+            if (selectedElement) {
+
+                selectedElement.style.width = e.target.value + 'px';
+
+            }
+
+        });
+
+        
+
+        document.getElementById('heightSlider').addEventListener('input', (e) => {
+
+            if (selectedElement) {
+
+                selectedElement.style.height = e.target.value + 'px';
+
+            }
+
+        });
+
+        
+
+        document.getElementById('rotateSlider').addEventListener('input', (e) => {
+
+            if (selectedElement) {
+
+                selectedElement.style.transform = `rotate(${e.target.value}deg)`;
+
+            }
+
+        });
+
+
+
+        // Nút xóa
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+
+            if (selectedElement) {
+
+                selectedElement.remove();
+
+                selectedElement = null;
+
+                document.getElementById('selectedInfo').textContent = 'Chưa chọn phần tử';
+
+            }
+
+        });
+
+
+
+        // Click ra ngoài canvas để bỏ chọn
+
+        canvas.addEventListener('click', () => {
+
+            if (selectedElement) {
+
+                selectedElement.classList.remove('selected');
+
+                selectedElement = null;
+
+                document.getElementById('selectedInfo').textContent = 'Chưa chọn phần tử';
+
+            }
+
+        });
+
+
+
+        // Tool buttons
+
+        document.getElementById('textTool').addEventListener('click', () => {
+
+            addTextElement();
+
+        });
+
+        
+
+        document.getElementById('shapeTool').addEventListener('click', () => {
+
+            addShapeElement('rect');
+
+        });
+
+
+
+        // Khởi động
+
+        initCanvas();
+
+    </script>
+
+</body>
+
+                                                                                            </html>
