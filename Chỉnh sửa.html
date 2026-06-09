@@ -2462,6 +2462,754 @@ if (saved) {
   } catch(e) {}
 }
 </script>
+<!-- NÂNG CẤP MỚI -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+(function() {
+  // ========== DARK MODE ==========
+  const darkToggle = document.getElementById('darkModeToggle');
+  const darkIcon = darkToggle.querySelector('i');
+  // Kiểm tra local storage
+  if (localStorage.getItem('designstudio-dark') === 'true') {
+    document.body.classList.add('dark-mode');
+    darkIcon.className = 'fas fa-sun';
+  }
+  darkToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    const isDark = document.body.classList.contains('dark-mode');
+    localStorage.setItem('designstudio-dark', isDark);
+    darkIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+  });
+
+  // ========== SNAP GRID ==========
+  const GRID_SIZE = 10; // px
+  function snapToGrid(value) {
+    return Math.round(value / GRID_SIZE) * GRID_SIZE;
+  }
+
+  // Ghi đè hàm attachDrag để thêm snap
+  const originalAttachDrag = window.attachDrag;
+  window.attachDrag = function(el) {
+    originalAttachDrag(el);
+    // Lấy lại listener đã gán để bọc thêm snap
+    const oldHandler = el.onmousedown;
+    el.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('el-handle')) return;
+      if (el.getAttribute('contenteditable') === 'true') return;
+      if (el.dataset.locked === 'true') return;
+      // Không cản trở multi‑select
+    }, { once: false });
+  };
+
+  // Chúng ta sẽ override cách di chuyển trong hàm startResize & drag bằng cách ghi đè sự kiện
+  const originalAddEventListener = Element.prototype.addEventListener;
+  // Cách tốt hơn: bọc trong hàm drag gốc (đã có trong mã của bạn)
+  // Sửa lại phần onMove của attachDrag trong code gốc thành như sau (nếu bạn copy code này vào cuối, nó sẽ ghi đè)
+  // Nhưng vì attachDrag đã được gọi trong init(), ta cần patch lại hàm attachDrag hoàn toàn.
+  
+  // Giải pháp đơn giản: chúng ta sẽ ghi đè toàn bộ attachDrag bằng phiên bản có snap.
+  // Lưu ý: phải đảm bảo elements mới cũng được attach lại.
+  window.attachDrag = function(el) {
+    el.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('el-handle')) return;
+      if (el.getAttribute('contenteditable') === 'true') return;
+      if (el.dataset.locked === 'true') return;
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Multi‑select với Shift
+      if (e.shiftKey) {
+        if (selected && selected !== el) {
+          if (!selectedIds.includes(el.id)) {
+            selectedIds.push(el.id);
+            el.classList.add('selected');
+          } else {
+            selectedIds = selectedIds.filter(id => id !== el.id);
+            el.classList.remove('selected');
+          }
+          if (selectedIds.length === 0) {
+            selected = null;
+          } else {
+            selected = document.getElementById(selectedIds[0]);
+          }
+          renderLayers();
+          return;
+        }
+      } else {
+        // Chọn đơn
+        if (!selectedIds.includes(el.id)) {
+          selectEl(el);
+        } else {
+          // đã chọn thì bắt đầu kéo cả nhóm
+        }
+      }
+
+      const startX = e.clientX, startY = e.clientY;
+      const startPositions = selectedIds.map(id => {
+        const el = document.getElementById(id);
+        return {
+          el,
+          left: parseInt(el.style.left),
+          top: parseInt(el.style.top)
+        };
+      });
+
+      let moved = false;
+      const onMove = function(e) {
+        moved = true;
+        const dx = (e.clientX - startX) / zoom;
+        const dy = (e.clientY - startY) / zoom;
+        const useSnap = !e.altKey; // giữ Alt để tắt snap
+        
+        startPositions.forEach(({el, left, top}) => {
+          let nl = left + dx;
+          let nt = top + dy;
+          if (e.shiftKey) {
+            if (Math.abs(dx) > Math.abs(dy)) nt = top;
+            else nl = left;
+          }
+          if (useSnap) {
+            nl = snapToGrid(nl);
+            nt = snapToGrid(nt);
+          }
+          el.style.left = nl + 'px';
+          el.style.top = nt + 'px';
+        });
+        if (selected) updatePositionPanel(selected);
+      };
+
+      const onUp = function() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        if (moved) saveHistory();
+      };
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!e.shiftKey) {
+        selectEl(el);
+      }
+    });
+
+    el.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      if (!selectedIds.includes(el.id)) {
+        selectEl(el);
+      }
+      showContextMenu(e.clientX, e.clientY);
+    });
+  };
+
+  // Re-attach cho tất cả elements hiện tại (sau khi load)
+  function reattachAll() {
+    elements.forEach(el => {
+      // Xoá listener cũ bằng cách clone node?
+      const newEl = el.cloneNode(true);
+      el.parentNode.replaceChild(newEl, el);
+      // Cập nhật lại mảng elements
+      const idx = elements.indexOf(el);
+      if (idx > -1) {
+        elements[idx] = newEl;
+        attachHandles(newEl);
+        attachDrag(newEl);
+        if (selected === el) selected = newEl;
+        if (selectedIds.includes(el.id)) {
+          selectedIds = selectedIds.map(id => id === el.id ? newEl.id : id);
+          newEl.classList.add('selected');
+        }
+      }
+    });
+    renderLayers();
+    updateCanvasEmpty();
+  }
+  // Gọi reattachAll() sau khi đã có elements (init xong)
+  setTimeout(reattachAll, 100);
+
+  // ========== XÓA NHIỀU ĐỐI TƯỢNG ==========
+  const originalDeleteSelected = window.deleteSelected;
+  window.deleteSelected = function() {
+    if (selectedIds.length > 0) {
+      selectedIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          elements = elements.filter(e => e !== el);
+          el.remove();
+        }
+      });
+      selected = null;
+      selectedIds = [];
+      renderLayers();
+      updateCanvasEmpty();
+      saveHistory();
+      return;
+    }
+    originalDeleteSelected();
+  };
+
+  // Cập nhật phím Delete
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (selectedIds.length > 0) {
+        deleteSelected();
+        e.preventDefault();
+      }
+    }
+  });
+
+  // ========== KÉO THẢ LAYERS PANEL ==========
+  function initSortableLayers() {
+    const list = document.getElementById('layersList');
+    if (!list) return;
+    new Sortable(list, {
+      animation: 150,
+      onEnd: function() {
+        // Cập nhật lại thứ tự elements dựa trên vị trí trong DOM layer
+        const items = list.querySelectorAll('.layer-item');
+        const newOrder = [];
+        items.forEach(item => {
+          const id = item.dataset.layerId;
+          const el = document.getElementById(id);
+          if (el) newOrder.push(el);
+        });
+        elements = newOrder;
+        // Gán lại z-index
+        elements.forEach((el, i) => {
+          el.style.zIndex = i + 1;
+        });
+        saveHistory();
+        renderLayers();
+      }
+    });
+  }
+
+  // Cập nhật renderLayers để thêm data-layer-id
+  const originalRenderLayers = window.renderLayers;
+  window.renderLayers = function() {
+    originalRenderLayers();
+    const items = document.querySelectorAll('#layersList .layer-item');
+    items.forEach((item, index) => {
+      const elId = elements[elements.length - 1 - index]?.id;
+      if (elId) item.dataset.layerId = elId;
+    });
+    if (window.Sortable) initSortableLayers();
+  };
+
+  // Gọi lại renderLayers sau khi Sortable sẵn sàng
+  setTimeout(() => {
+    renderLayers();
+  }, 300);
+
+  // ========== TOGGLE GRID VISUAL ==========
+  const style = document.createElement('style');
+  style.textContent = `
+    .canvas-area.show-grid {
+      background-image: linear-gradient(var(--canvas-dot) 1px, transparent 1px),
+                        linear-gradient(90deg, var(--canvas-dot) 1px, transparent 1px);
+      background-size: ${GRID_SIZE}px ${GRID_SIZE}px;
+    }
+  `;
+  document.head.appendChild(style);
+  
+  const gridToggle = document.createElement('button');
+  gridToggle.className = 'nav-btn';
+  gridToggle.title = 'Hiện/ẩn lưới';
+  gridToggle.innerHTML = '<i class="fas fa-th"></i>';
+  gridToggle.addEventListener('click', () => {
+    document.querySelector('.canvas-area').classList.toggle('show-grid');
+    localStorage.setItem('designstudio-grid', 
+      document.querySelector('.canvas-area').classList.contains('show-grid')
+    );
+  });
+  document.querySelector('.nav-center').appendChild(gridToggle);
+  if (localStorage.getItem('designstudio-grid') === 'true') {
+    document.querySelector('.canvas-area').classList.add('show-grid');
+  }
+
+  // ========== PHÍM TẮT MỚI ==========
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'g') {
+      e.preventDefault();
+      gridToggle.click();
+    }
+  });
+
+  console.log('✨ DesignStudio Pro: Dark mode, Snap Grid, Multi‑select đã sẵn sàng.');
+})();
+
+<!-- NÂNG CẤP MỞ RỘNG: Alignment Guides, Group, Ruler, JSON Export/Import, Eyedropper -->
+<script>
+(function() {
+  // ==================== ALIGNMENT GUIDES ====================
+  const guideLines = {
+    vertical: null,
+    horizontal: null,
+    active: false
+  };
+
+  // Tạo các đường dẫn ảo
+  function createGuideLines() {
+    const v = document.createElement('div');
+    v.style.cssText = `
+      position: absolute; left: 0; top: 0; width: 1px; height: 100%;
+      background: #ff3b30; pointer-events: none; z-index: 9999; display: none;
+    `;
+    const h = document.createElement('div');
+    h.style.cssText = `
+      position: absolute; left: 0; top: 0; height: 1px; width: 100%;
+      background: #ff3b30; pointer-events: none; z-index: 9999; display: none;
+    `;
+    document.getElementById('canvasViewport').appendChild(v);
+    document.getElementById('canvasViewport').appendChild(h);
+    guideLines.vertical = v;
+    guideLines.horizontal = h;
+  }
+
+  function showGuides(vX, vY) {
+    if (vX !== null) {
+      guideLines.vertical.style.left = vX + 'px';
+      guideLines.vertical.style.display = 'block';
+    } else {
+      guideLines.vertical.style.display = 'none';
+    }
+    if (vY !== null) {
+      guideLines.horizontal.style.top = vY + 'px';
+      guideLines.horizontal.style.display = 'block';
+    } else {
+      guideLines.horizontal.style.display = 'none';
+    }
+  }
+
+  function hideGuides() {
+    guideLines.vertical.style.display = 'none';
+    guideLines.horizontal.style.display = 'none';
+  }
+
+  function findAlignments(movingRect) {
+    const threshold = 5; // px
+    let alignX = null, alignY = null;
+    const allRects = elements
+      .filter(el => !selectedIds.includes(el.id) || selectedIds.length === 1)
+      .map(el => el.getBoundingClientRect());
+
+    // Các điểm quan trọng của moving
+    const ml = movingRect.left, mc = movingRect.left + movingRect.width/2, mr = movingRect.right;
+    const mt = movingRect.top, mct = movingRect.top + movingRect.height/2, mb = movingRect.bottom;
+
+    allRects.forEach(r => {
+      const rl = r.left, rc = r.left + r.width/2, rr = r.right;
+      const rt = r.top, rct = r.top + r.height/2, rb = r.bottom;
+
+      // Căn chỉnh dọc (X)
+      if (Math.abs(ml - rl) < threshold || Math.abs(ml - rr) < threshold) alignX = rl;
+      else if (Math.abs(mc - rc) < threshold) alignX = rc;
+      else if (Math.abs(mr - rr) < threshold || Math.abs(mr - rl) < threshold) alignX = rr;
+      // Căn chỉnh ngang (Y)
+      if (Math.abs(mt - rt) < threshold || Math.abs(mt - rb) < threshold) alignY = rt;
+      else if (Math.abs(mct - rct) < threshold) alignY = rct;
+      else if (Math.abs(mb - rb) < threshold || Math.abs(mb - rt) < threshold) alignY = rb;
+    });
+    return { alignX, alignY };
+  }
+
+  // Ghi đè lên hàm attachDrag để tích hợp alignment guides
+  const _originalAttachDrag = window.attachDrag;
+  window.attachDrag = function(el) {
+    _originalAttachDrag(el);
+    // Bổ sung alignment guides vào listener mousedown
+    el.addEventListener('mousedown', function(e) {
+      if (e.target.classList.contains('el-handle')) return;
+      if (el.getAttribute('contenteditable') === 'true') return;
+      if (el.dataset.locked === 'true') return;
+
+      const startX = e.clientX, startY = e.clientY;
+      const startPositions = selectedIds.map(id => {
+        const el = document.getElementById(id);
+        return { el, left: parseInt(el.style.left), top: parseInt(el.style.top) };
+      });
+
+      let moved = false;
+      const onMove = function(ev) {
+        moved = true;
+        const dx = (ev.clientX - startX) / zoom;
+        const dy = (ev.clientY - startY) / zoom;
+
+        // Tính vị trí mới cho nhóm (tạm thời)
+        const firstEl = startPositions[0].el;
+        const newLeft = startPositions[0].left + dx;
+        const newTop = startPositions[0].top + dy;
+
+        // Tạo rect ảo cho nhóm (dựa trên phần tử đầu tiên)
+        const movingRect = firstEl.getBoundingClientRect();
+        const fakeRect = {
+          left: movingRect.left + dx,
+          top: movingRect.top + dy,
+          width: movingRect.width,
+          height: movingRect.height,
+          right: movingRect.right + dx,
+          bottom: movingRect.bottom + dy
+        };
+
+        const { alignX, alignY } = findAlignments(fakeRect);
+        showGuides(alignX, alignY);
+
+        // Áp dụng snap nếu có alignment (ưu tiên align hơn grid)
+        startPositions.forEach(({el, left, top}) => {
+          let nl = left + dx;
+          let nt = top + dy;
+          if (alignX !== null) {
+            // Điều chỉnh để khớp với alignX
+            const offsetX = el === firstEl ? 0 : (parseInt(el.style.left) - left);
+            nl = (alignX / zoom) - offsetX; // cần tính toán chính xác hơn, nhưng đơn giản hoá
+          }
+          if (alignY !== null) {
+            const offsetY = el === firstEl ? 0 : (parseInt(el.style.top) - top);
+            nt = (alignY / zoom) - offsetY;
+          }
+          el.style.left = nl + 'px';
+          el.style.top = nt + 'px';
+        });
+        if (selected) updatePositionPanel(selected);
+      };
+
+      const onUp = function() {
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+        hideGuides();
+        if (moved) saveHistory();
+      };
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+  };
+
+  createGuideLines();
+
+  // ==================== GROUP & UNGROUP ====================
+  let groupCounter = 0;
+  window.groupElements = function() {
+    const ids = [...selectedIds];
+    if (ids.length <= 1) {
+      showToast('⚠️ Chọn ít nhất 2 đối tượng để nhóm');
+      return;
+    }
+    const groupId = 'group_' + (++groupCounter);
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.dataset.group = groupId;
+        el.classList.remove('selected');
+      }
+    });
+    selectedIds = [];
+    selected = null;
+    renderLayers();
+    saveHistory();
+    showToast('✅ Đã nhóm ' + ids.length + ' đối tượng');
+  };
+
+  window.ungroupElements = function() {
+    if (!selected) {
+      showToast('⚠️ Chọn một phần tử trong nhóm để rã');
+      return;
+    }
+    const groupId = selected.dataset.group;
+    if (!groupId) {
+      showToast('⚠️ Phần tử này không nằm trong nhóm');
+      return;
+    }
+    elements.forEach(el => {
+      if (el.dataset.group === groupId) {
+        delete el.dataset.group;
+      }
+    });
+    renderLayers();
+    saveHistory();
+    showToast('✅ Đã rã nhóm');
+  };
+
+  // Thêm nút nhóm/rã nhóm vào format bar (nếu chưa có)
+  const formatBar = document.getElementById('formatBar');
+  const groupBtn = document.createElement('button');
+  groupBtn.className = 'fmt-btn';
+  groupBtn.title = 'Nhóm (Ctrl+G)';
+  groupBtn.innerHTML = '<i class="fas fa-object-group"></i>';
+  groupBtn.onclick = groupElements;
+
+  const ungroupBtn = document.createElement('button');
+  ungroupBtn.className = 'fmt-btn';
+  ungroupBtn.title = 'Rã nhóm (Ctrl+Shift+G)';
+  ungroupBtn.innerHTML = '<i class="fas fa-object-ungroup"></i>';
+  ungroupBtn.onclick = ungroupElements;
+
+  formatBar.appendChild(ungroupBtn);
+  formatBar.appendChild(groupBtn);
+
+  // Cập nhật phím tắt Ctrl+G và Ctrl+Shift+G
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.getAttribute('contenteditable') === 'true') return;
+    if (e.ctrlKey && e.key === 'g' && !e.shiftKey) {
+      e.preventDefault();
+      groupElements();
+    } else if (e.ctrlKey && e.shiftKey && e.key === 'G') {
+      e.preventDefault();
+      ungroupElements();
+    }
+  });
+
+  // ==================== RULER ====================
+  function createRuler(orientation) {
+    const ruler = document.createElement('div');
+    ruler.style.cssText = `
+      position: absolute;
+      ${orientation === 'horizontal' ? 'top: 0; left: 20px; right: 0; height: 20px;' : 'left: 0; top: 20px; bottom: 0; width: 20px;'}
+      background: var(--surface-2);
+      border-${orientation === 'horizontal' ? 'bottom' : 'right'}: 1px solid var(--border);
+      z-index: 10;
+      overflow: hidden;
+      pointer-events: none;
+      font-family: monospace;
+    `;
+    const canvasEl = document.createElement('canvas');
+    canvasEl.style.width = '100%';
+    canvasEl.style.height = '100%';
+    ruler.appendChild(canvasEl);
+    return { ruler, canvas: canvasEl };
+  }
+
+  const viewport = document.getElementById('canvasViewport');
+  const hRuler = createRuler('horizontal');
+  const vRuler = createRuler('vertical');
+  viewport.appendChild(hRuler.ruler);
+  viewport.appendChild(vRuler.ruler);
+
+  function drawRuler(ctx, orientation, width, height, zoom, scrollX, scrollY) {
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-3');
+    ctx.font = '9px monospace';
+    const step = 50; // major tick
+    const minorStep = 10;
+    const start = orientation === 'horizontal' ? -scrollX / zoom : -scrollY / zoom;
+    const end = orientation === 'horizontal' ? start + width / zoom : start + height / zoom;
+
+    for (let i = Math.floor(start / minorStep) * minorStep; i < end; i += minorStep) {
+      const pos = orientation === 'horizontal' ? (i - start) * zoom : (i - start) * zoom;
+      if (orientation === 'horizontal') {
+        if (i % step === 0) {
+          ctx.fillRect(pos, 10, 1, 10);
+          ctx.fillText(i, pos + 2, 8);
+        } else {
+          ctx.fillRect(pos, 14, 1, 6);
+        }
+      } else {
+        if (i % step === 0) {
+          ctx.fillRect(10, pos, 10, 1);
+          ctx.save();
+          ctx.translate(4, pos + 10);
+          ctx.rotate(-Math.PI/2);
+          ctx.fillText(i, 0, 0);
+          ctx.restore();
+        } else {
+          ctx.fillRect(14, pos, 6, 1);
+        }
+      }
+    }
+  }
+
+  function updateRulers() {
+    const viewRect = viewport.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
+    const scrollX = canvasRect.left - viewRect.left;
+    const scrollY = canvasRect.top - viewRect.top;
+
+    const hCanvas = hRuler.canvas;
+    hCanvas.width = hRuler.ruler.clientWidth;
+    hCanvas.height = 20;
+    const hCtx = hCanvas.getContext('2d');
+    drawRuler(hCtx, 'horizontal', hCanvas.width, 20, zoom, scrollX, 0);
+
+    const vCanvas = vRuler.canvas;
+    vCanvas.width = 20;
+    vCanvas.height = vRuler.ruler.clientHeight;
+    const vCtx = vCanvas.getContext('2d');
+    drawRuler(vCtx, 'vertical', 20, vCanvas.height, zoom, 0, scrollY);
+  }
+
+  // Cập nhật ruler khi scroll, zoom, resize
+  viewport.addEventListener('scroll', updateRulers);
+  window.addEventListener('resize', updateRulers);
+  const origChangeZoom = changeZoom;
+  changeZoom = function(delta) {
+    origChangeZoom(delta);
+    updateRulers();
+  };
+  const origResetZoom = resetZoom;
+  resetZoom = function() {
+    origResetZoom();
+    updateRulers();
+  };
+  // Sau khi canvas thay đổi kích thước
+  const origApplyCanvasSize = applyCanvasSize;
+  applyCanvasSize = function() {
+    origApplyCanvasSize();
+    setTimeout(updateRulers, 100);
+  };
+  updateRulers();
+
+  // ==================== PHÍM TẮT FONT SIZE ====================
+  document.addEventListener('keydown', function(e) {
+    if (!selected || selected.dataset.type !== 'text') return;
+    if (e.ctrlKey && e.shiftKey && (e.key === '.' || e.key === '>')) {
+      e.preventDefault();
+      let size = parseInt(selected.style.fontSize) || 16;
+      size = Math.min(200, size + 2);
+      selected.style.fontSize = size + 'px';
+      document.getElementById('fmtSize').value = size;
+      saveHistory();
+    } else if (e.ctrlKey && e.shiftKey && (e.key === ',' || e.key === '<')) {
+      e.preventDefault();
+      let size = parseInt(selected.style.fontSize) || 16;
+      size = Math.max(6, size - 2);
+      selected.style.fontSize = size + 'px';
+      document.getElementById('fmtSize').value = size;
+      saveHistory();
+    }
+  });
+
+  // ==================== XUẤT / NHẬP JSON ====================
+  window.exportJSON = function() {
+    const data = {
+      canvasW, canvasH,
+      background: canvas.style.background || canvas.style.backgroundColor,
+      elements: elements.map(el => serializeEl(el)),
+      version: 1
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (document.getElementById('projectName').value || 'thiet-ke') + '.designstudio';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('💾 Đã xuất file thiết kế');
+  };
+
+  window.importJSON = function(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.elements) throw new Error('Không đúng định dạng');
+        // Xoá canvas hiện tại
+        elements.forEach(el => el.remove());
+        elements = [];
+        selected = null;
+        selectedIds = [];
+        canvasW = data.canvasW || 800;
+        canvasH = data.canvasH || 600;
+        canvas.style.width = canvasW + 'px';
+        canvas.style.height = canvasH + 'px';
+        if (data.background) canvas.style.background = data.background;
+        data.elements.forEach(d => restoreEl(d));
+        reattachAll(); // gắn lại drag mới
+        renderLayers();
+        updateCanvasEmpty();
+        saveHistory();
+        showToast('📂 Đã nhập thiết kế thành công');
+      } catch (err) {
+        showToast('❌ File không hợp lệ');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  // Thêm nút xuất/nhập JSON vào nav
+  const navRight = document.querySelector('.nav-right');
+  const importInput = document.createElement('input');
+  importInput.type = 'file';
+  importInput.accept = '.designstudio,application/json';
+  importInput.style.display = 'none';
+  importInput.addEventListener('change', (e) => {
+    if (e.target.files[0]) importJSON(e.target.files[0]);
+    importInput.value = '';
+  });
+  document.body.appendChild(importInput);
+
+  const importBtn = document.createElement('button');
+  importBtn.className = 'nav-btn';
+  importBtn.title = 'Nhập file thiết kế';
+  importBtn.innerHTML = '<i class="fas fa-folder-open"></i>';
+  importBtn.onclick = () => importInput.click();
+
+  const exportJsonBtn = document.createElement('button');
+  exportJsonBtn.className = 'nav-btn';
+  exportJsonBtn.title = 'Xuất file JSON';
+  exportJsonBtn.innerHTML = '<i class="fas fa-file-code"></i>';
+  exportJsonBtn.onclick = exportJSON;
+
+  navRight.insertBefore(importBtn, navRight.firstChild);
+  navRight.insertBefore(exportJsonBtn, navRight.firstChild);
+
+  // ==================== EYE DROPPER ====================
+  if (window.EyeDropper) {
+    const eyeDropperBtn = document.createElement('button');
+    eyeDropperBtn.className = 'nav-btn';
+    eyeDropperBtn.title = 'Lấy màu từ canvas (Eye Dropper)';
+    eyeDropperBtn.innerHTML = '<i class="fas fa-eye-dropper"></i>';
+    eyeDropperBtn.onclick = async () => {
+      try {
+        const dropper = new EyeDropper();
+        const result = await dropper.open();
+        const color = result.sRGBHex;
+        if (selected) {
+          if (selected.dataset.type === 'text') {
+            selected.style.color = color;
+          } else {
+            selected.style.backgroundColor = color;
+          }
+          applyColor(color);
+          showToast('🎨 Đã áp dụng màu ' + color);
+        } else {
+          // Đổi màu nền canvas
+          setBgColor(color);
+          showToast('🎨 Đã đổi màu nền ' + color);
+        }
+      } catch (e) {
+        // Người dùng hủy
+      }
+    };
+    navRight.insertBefore(eyeDropperBtn, navRight.firstChild);
+  }
+
+  // ==================== CẢI TIẾN TOAST ====================
+  const origShowToast = showToast;
+  window.showToast = function(msg, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.className = 'toast show ' + type;
+    clearTimeout(window.toastTimer);
+    window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+  };
+  // Thêm style cho toast types
+  const toastStyle = document.createElement('style');
+  toastStyle.textContent = `
+    .toast.info { background: var(--text); color: white; }
+    .toast.success { background: var(--success); color: white; }
+    .toast.warning { background: var(--accent); color: #000; }
+    .toast.error { background: var(--danger); color: white; }
+  `;
+  document.head.appendChild(toastStyle);
+
+  // ==================== HOÀN THIỆN ====================
+  console.log('✨ Nâng cấp mở rộng: Alignment Guides, Group, Ruler, JSON I/O, Eyedropper đã sẵn sàng.');
+})();
+</script>
+  
 </body>
 </html>
 
